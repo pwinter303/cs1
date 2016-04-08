@@ -3,7 +3,7 @@
 describe('Controller: GooglemapCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('collegeAppApp'));
+  beforeEach(module('collegeApp'));
 
   var GooglemapCtrl,
     scope;

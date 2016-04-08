@@ -2,17 +2,17 @@
 
 /**
  * @ngdoc overview
- * @name collegeAppApp
+ * @name collegeApp
  * @description
- * # collegeAppApp
+ * # collegeApp
  *
  * Main module of the application.
  */
 angular
-  .module('collegeAppApp', [
+  .module('collegeApp', [
     'ngRoute',
-        'uiGmapgoogle-maps',
-        'ui.bootstrap'
+    'uiGmapgoogle-maps',
+    'ui.bootstrap'
   ])
   .config(function ($routeProvider) {
     $routeProvider
@@ -42,11 +42,3 @@ angular
             libraries: 'weather,geometry,visualization'
         });
   });
-
-//  .config(['uiGmapgoogle-maps.providers', function (GoogleMapApi) {
-//    GoogleMapApi.configure({
-//        key: 'your Google Map api key',
-//        v: '3.17',
-//        libraries: ''
-//    });
-//}]);

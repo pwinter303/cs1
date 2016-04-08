@@ -2,13 +2,13 @@
 
 /**
  * @ngdoc function
- * @name collegeAppApp.controller:GooglemapCtrl
+ * @name collegeApp.controller:GooglemapCtrl
  * @description
  * # GooglemapCtrl
- * Controller of the collegeAppApp
+ * Controller of the collegeApp
  */
 
-angular.module('collegeAppApp')
+angular.module('collegeApp')
     .controller('GooglemapCtrl', ['$scope', 'uiGmapGoogleMapApi', function ($scope, uiGmapGoogleMapApi) {
     angular.extend($scope, {
         map: {
@@ -54,8 +54,10 @@ angular.module('collegeAppApp')
                     destination: end,
                     travelMode: maps.TravelMode.WALKING
                 };
+                //ToDo: Replace this with a call to a service that will call GoogleMaps WebService
+                //ToDo: Get result of webservice and correct it so it matches JS result
                 directionsService.route(request, function(response, status) {
-                    if (status == maps.DirectionsStatus.OK) {
+                    if (status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
                         directionsDisplay.setDirections(response);
                     }
                 });

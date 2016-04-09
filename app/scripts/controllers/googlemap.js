@@ -80,21 +80,24 @@ angular.module('collegeApp')
 
             $scope.calcRouteNEW = function (routePoints, waypoints) {
                 directionsDisplay.setMap($scope.map.control.getGMap());
-                var directionsService = new maps.DirectionsService();
-                var start = routePoints.start.latlng;
-                var end = routePoints.end.latlng;
-                var request = {
-                    origin: start,
-                    destination: end,
-                    travelMode: maps.TravelMode.WALKING
-                };
-                //ToDo: Replace this with a call to a service that will call GoogleMaps WebService
-                //ToDo: Get result of webservice and correct it so it matches JS result
-                directionsService.route(request, function(response, status) {
-                    if (status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
-                        directionsDisplay.setDirections(response);
+                var theRequest = {};
+                theRequest.routePoints = routePoints;
+                theRequest.wayPoinrts = waypoints;
+
+                collegeFactory.getDirections(theRequest).then(function (data) {
+                    if (data){
+                        // Process the route returned from Google Web Service
+                        //ToDo: Replace this with a call to a service that will call GoogleMaps WebService
+                        //ToDo: Get result of webservice and correct it so it matches JS result
+                        if (data.status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
+                            directionsDisplay.setDirections(response);
+                        }
                     }
+                }, function(error) {
+                    // promise rejected, could be because server returned 404, 500 error...
+                    collegeFactory.msgError(error);
                 });
+
                 return;
             };
         });

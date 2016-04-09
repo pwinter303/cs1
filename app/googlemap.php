@@ -120,7 +120,8 @@ function  getColleges(){
 }
 
 function  getDirections(){
-    return 1;
+//    return 1;
+    var_dump($_GET);
 }
 
 function  saveCollege(){

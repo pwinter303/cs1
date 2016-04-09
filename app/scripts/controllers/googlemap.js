@@ -26,15 +26,16 @@ angular.module('collegeApp')
 
     angular.extend($scope, {
         map: {
-            center: {
-                latitude: 35.681382,
-                longitude: 139.766084
-            },
+            zoom: 7,
+            center: {latitude: 40.75, longitude: -74.65},
+//            center: {
+//                latitude: 35.681382,
+//                longitude: 139.766084
+//            },
             options: {
                 maxZoom: 20,
                 minZoom: 3
             },
-            zoom: 16,
             control: {},
             routes: {
                 start: [
@@ -82,7 +83,7 @@ angular.module('collegeApp')
                 directionsDisplay.setMap($scope.map.control.getGMap());
                 var theRequest = {};
                 theRequest.routePoints = routePoints;
-                theRequest.wayPoinrts = waypoints;
+                theRequest.waypoints = waypoints;
 
                 collegeFactory.getDirections(theRequest).then(function (data) {
                     if (data){

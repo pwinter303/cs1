@@ -59,8 +59,9 @@ function  processGet($customer_id){
 function  processPost($customer_id){
     $postdata = file_get_contents("php://input");
     $request = json_decode($postdata);
-    $request = convertFromBoolean($request);
-    $dbh = createDatabaseConnection();
+//    $request = convertFromBoolean($request);
+//    $dbh = createDatabaseConnection();
+    $dbh = 'FIXME';
     $action = $request->action;
     switch ($action) {
        case 'saveCollege':
@@ -68,6 +69,9 @@ function  processPost($customer_id){
              break;
        case 'saveLocation':
              $result = saveLocation($dbh, $request, $customer_id);
+             break;
+       case 'getDirections':
+             $result = getDirectionsAsPOST($dbh, $request);
              break;
        default:
              echo "Error:Invalid Request:Action not set properly";
@@ -121,9 +125,20 @@ function  getColleges(){
 
 function  getDirections(){
 //    return 1;
-    var_dump($_GET);
+    $passedData = ($_GET);
+
+    $passedDataDecoded = json_decode($passedData{'routePoints'});
+//    echo ("from" => $from);
+//    var_dump($passedData{'routePoints'});
+//    var_dump($passedDataDecoded);
+    var_dump($passedDataDecoded{'name'});
+
 }
 
+function  getDirectionsAsPOST($dbh, $request_data){
+    $junk = $request_data->routePoints->start->name;
+    var_dump($junk);
+}
 function  saveCollege(){
     return 1;
 }

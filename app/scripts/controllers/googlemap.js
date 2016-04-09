@@ -9,7 +9,21 @@
  */
 
 angular.module('collegeApp')
-    .controller('GooglemapCtrl', ['$scope', 'uiGmapGoogleMapApi', function ($scope, uiGmapGoogleMapApi) {
+    .controller('GooglemapCtrl', ['$scope', 'uiGmapGoogleMapApi', 'collegeFactory', function ($scope, uiGmapGoogleMapApi, collegeFactory) {
+
+    $scope.getColleges = function (){
+        collegeFactory.getColleges().then(function (data) {
+            if (data){
+                $scope.colleges = data;
+            }
+        }, function(error) {
+            // promise rejected, could be because server returned 404, 500 error...
+            collegeFactory.msgError(error);
+        });
+    };
+    $scope.getColleges();
+
+
     angular.extend($scope, {
         map: {
             center: {
@@ -45,6 +59,26 @@ angular.module('collegeApp')
             var directionsDisplay = new maps.DirectionsRenderer();
 
             $scope.calcRoute = function (routePoints) {
+                directionsDisplay.setMap($scope.map.control.getGMap());
+                var directionsService = new maps.DirectionsService();
+                var start = routePoints.start.latlng;
+                var end = routePoints.end.latlng;
+                var request = {
+                    origin: start,
+                    destination: end,
+                    travelMode: maps.TravelMode.WALKING
+                };
+                //ToDo: Replace this with a call to a service that will call GoogleMaps WebService
+                //ToDo: Get result of webservice and correct it so it matches JS result
+                directionsService.route(request, function(response, status) {
+                    if (status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
+                        directionsDisplay.setDirections(response);
+                    }
+                });
+                return;
+            };
+
+            $scope.calcRouteNEW = function (routePoints, waypoints) {
                 directionsDisplay.setMap($scope.map.control.getGMap());
                 var directionsService = new maps.DirectionsService();
                 var start = routePoints.start.latlng;

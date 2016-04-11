@@ -36,6 +36,11 @@ angular
         controller: 'AddfilterCtrl',
         controllerAs: 'addfilter'
       })
+      .when('/collegelist', {
+        templateUrl: 'views/collegelist.html',
+        controller: 'CollegelistCtrl',
+        controllerAs: 'collegelist'
+      })
       .otherwise({
         redirectTo: '/'
       });

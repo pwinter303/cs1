@@ -131,13 +131,14 @@ function  getDirections(){
 //    echo ("from" => $from);
 //    var_dump($passedData{'routePoints'});
 //    var_dump($passedDataDecoded);
+//    var_dump($passedDataDecoded{'name'});
     var_dump($passedDataDecoded{'name'});
 
 }
 
 function  getDirectionsAsPOST($dbh, $request_data){
     $junk = $request_data->routePoints->start->name;
-    var_dump($junk);
+    return(array(name=>$junk));
 }
 function  saveCollege(){
     return 1;

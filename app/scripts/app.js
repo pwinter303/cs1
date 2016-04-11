@@ -31,6 +31,11 @@ angular
         controller: 'GooglemapCtrl',
         controllerAs: 'googleMap'
       })
+      .when('/addfilter', {
+        templateUrl: 'views/addfilter.html',
+        controller: 'AddfilterCtrl',
+        controllerAs: 'addfilter'
+      })
       .otherwise({
         redirectTo: '/'
       });

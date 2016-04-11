@@ -1,0 +1,64 @@
+<p>This is the addfilter view.</p>
+
+<div ng-controller="AddfilterCtrl">
+    <div class="row">
+        <div class="col-sm-12">
+        <h2>Size of the School</h2>
+        <b> Select all that apply:</b><br>
+        <select multiple id="schoolSize">
+            <option value="small">Small - X to Y students</option>
+            <option value="medium">Medium - X to Y students</option>
+            <option value="large">Large - X to Y students</option>
+            <option value="jumbo">Jumbo - X to Y students</option>
+        </select>
+    </div>
+
+    <div class="row">
+        <h2>Setting</h2>
+        <b> Select all that apply:</b><br>
+        <div class="col-sm-12">
+            <select class=input id="schoolSize">
+                <option value="rural">Rural</option>
+                <option value="city">City</option>
+            </select>
+        </div>
+    </div>
+
+
+        <div class="col-md-6">
+            <b>Select a Filter:</b> <br>
+            <select id="filter">
+                <option value="SchoolSize">Size of the School</option>
+                <option value="Setting">Setting (Rural, City, etc)</option>
+                <option value="Sports">Sports</option>
+                <option value="SAT">SAT Scores</option>
+                <option value="ACT">ACT Scores</option>
+                <option value="Academics">Academic Rating</option>
+                <option value="Social">Social Rating</option>
+                <option value="QOL">Quality of Life Rating</option>
+                <option value="Cost">Cost</option>
+                <option value="Location">Location</option>
+            </select>
+            <button ng-click="getAndDisplayInfo()" type="submit" class="btn btn-success">Add Filter</button>
+        </div>
+        <div class="col-md-6">
+            <b>{{heading}}</b> <br>
+            {{description}} <br>
+            {{values}} <br>
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <br>
+    <div class="row">
+
+        <div class="col-md-12">
+            <b>Existing Filters:</b> <br>
+
+        </div>
+    </div>
+
+
+
+</div>

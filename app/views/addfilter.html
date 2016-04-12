@@ -2,154 +2,256 @@
 
     <div class="container-fluid">
 
+        <h3>Criteria:</h3>
+
         <form role="form">
 
-        <div class="col-lg-6 col-md-6   col-xs-12">
-            <div class="panel panel-default">
-                <div class="panel-heading"><h3>School Size</h3></div>
-                <div class="panel-body">
+            <div class="col-lg-7">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                School Size
+                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSchoolSize">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </a>
+                            </h4>
+                            <div id="collapseSchoolSize" class="panel-collapse collapse">
+                                <div class="panel-body">
 
-                        <div class="col-md-7"></div>
-                        <div class="col-md-5">
-                            <div class="col-md-6">Minimum</div>
-                            <div class="col-md-6">Maximum</div>
-                        </div>
-                            <div class="col-md-7">Number of Students:</div>
-                            <div class="col-md-5">
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" data-ng-model="myForm.schoolSize.min">
+                                        <div class="col-md-7"></div>
+                                        <div class="col-md-5">
+                                            <div class="col-md-6">Minimum</div>
+                                            <div class="col-md-6">Maximum</div>
+                                        </div>
+                                            <div class="col-md-7">Number of Students:</div>
+                                            <div class="col-md-5">
+                                                <div class="col-md-6">
+                                                    <input type="text" class="form-control" data-ng-model="myForm.schoolSize.min">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input type="text" class="form-control" data-ng-model="myForm.schoolSize.max">
+                                                </div>
+                                            </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" data-ng-model="myForm.schoolSize.max">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                Annual Cost
+                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseAnnlCost">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </a>
+                            </h4>
+                            <div id="collapseAnnlCost" class="panel-collapse collapse">
+                                <div class="panel-body">
+
+                                    <div class="col-md-7"></div>
+                                    <div class="col-md-5">
+                                        <div class="col-md-6">Minimum</div>
+                                        <div class="col-md-6">Maximum</div>
+                                    </div>
+                                    <div class="col-md-7">Average Annual Cost (Room and Board):</div>
+                                    <div class="col-md-5">
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" data-ng-model="myForm.schoolCost.min">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" data-ng-model="myForm.schoolCost.max">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                </div>
-            </div>
-        </div>
-
-
-            <div class="col-lg-6 col-md-6   col-xs-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><h3>Annual Cost</h3></div>
-                    <div class="panel-body">
-
-                        <div class="col-md-7"></div>
-                        <div class="col-md-5">
-                            <div class="col-md-6">Minimum</div>
-                            <div class="col-md-6">Maximum</div>
-                        </div>
-                        <div class="col-md-7">Average Annual Cost (Room and Board):</div>
-                        <div class="col-md-5">
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" data-ng-model="myForm.schoolCost.min">
-                            </div>
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" data-ng-model="myForm.schoolCost.max">
-                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-lg-6 col-md-6   col-xs-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><h3>Setting</h3></div>
-                    <div class="panel-body">
+                <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    School Setting/Locale
+                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseLocale">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                </h4>
+                                <div id="collapseLocale" class="panel-collapse collapse">
+                                    <div class="panel-body">
 
-                        <div class="col-md-6">
-                            <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.rural" value="">Rural/Country</label>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.city"value="">Urban/City</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6   col-xs-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><h3>SAT/ACT Scores</h3></div>
-                    <div class="panel-body">
-
-                        <div class="col-md-7"></div>
-                        <div class="col-md-5">
-                            <div class="col-md-6">SAT</div>
-                            <div class="col-md-6">ACT</div>
-                        </div>
-                        <div class="col-md-7">Enter your scores (if applicable):</div>
-                        <div class="col-md-5">
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" data-ng-model="myForm.testScore.SAT">
-                            </div>
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" data-ng-model="myForm.testScore.ACT">
-                            </div>
-                        </div>
-                        <br>
-                        <br>
-                        <br>
-                        <div class="col-md-7">My scores should be:</div>
-                        <div class="col-md-5">
-                            <select multiple  id="filterTestScores" data-ng-model="myForm.testScore.matching">
-                                <option value="worst">The lowest in the school</option>
-                                <option value="average">Average for those attending</option>
-                                <option value="best">The best in the school</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6   col-xs-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><h3>Location</h3></div>
-                    <div class="panel-body">
-                        <div class="col-md-7">My home zip code:</div>
-                        <div class="col-md-5">
-                            <input type="text" class="form-control" data-ng-model="myForm.home.zipCode">
-                        </div>
-
-                        <div class="col-md-7"></div>
-                        <div class="col-md-5">
-                            <div class="col-md-6">Minimum</div>
-                            <div class="col-md-6">Maximum</div>
-                        </div>
-                        <div class="col-md-7">School distance from home:</div>
-                        <div class="col-md-5">
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" data-ng-model="myForm.home.minDistanceAway">
-                            </div>
-                            <div class="col-md-6">
-                                <input type="text" class="form-control" data-ng-model="myForm.home.maxDistanceAway">
+                                        <div class="col-md-6">
+                                            <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.rural" value="">Rural/Country</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.city"value="">Urban/City</label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="col-lg-6 col-md-6   col-xs-12">
-                <div class="panel panel-default">
-                    <div class="panel-heading"><h3>Sports</h3></div>
-                    <div class="panel-body">
+                <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    SAT/ACT Scores
+                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseScores">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                </h4>
+                                <div id="collapseScores" class="panel-collapse collapse">
+                                    <div class="panel-body">
 
-                        <div class="col-md-7">School must have these sports:</div>
-                        <div class="col-md-5">
-                            <select multiple  id="filterSports" data-ng-model="myForm.sports.sportsRequired">
-                                <option value="row1women">Womens Rowing Division I</option>
-                                <option value="row2women">Womens Rowing Division II</option>
-                                <option value="row3women">Womens Rowing Division III</option>
-                                <option value="row1men">Mens Rowing Division I</option>
-                                <option value="row2men">Mens Rowing Division II</option>
-                                <option value="row3men">Mens Rowing Division III</option>
-                            </select>
+                                        <div class="col-md-7"></div>
+                                        <div class="col-md-5">
+                                            <div class="col-md-6">SAT</div>
+                                            <div class="col-md-6">ACT</div>
+                                        </div>
+                                        <div class="col-md-7">Enter your scores (if applicable):</div>
+                                        <div class="col-md-5">
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" data-ng-model="myForm.testScore.SAT">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" data-ng-model="myForm.testScore.ACT">
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <div class="col-md-7">My scores should be:</div>
+                                        <div class="col-md-5">
+                                            <select multiple  id="filterTestScores" data-ng-model="myForm.testScore.matching">
+                                                <option value="worst">The lowest in the school</option>
+                                                <option value="average">Average for those attending</option>
+                                                <option value="best">The best in the school</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    Distance from Home
+                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance1">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                </h4>
+                                <div id="collapseDistance1" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <div class="col-md-7">My home zip code:</div>
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control" data-ng-model="myForm.home.zipCode">
+                                        </div>
+
+                                        <div class="col-md-7"></div>
+                                        <div class="col-md-5">
+                                            <div class="col-md-6">Minimum</div>
+                                            <div class="col-md-6">Maximum</div>
+                                        </div>
+                                        <div class="col-md-7">School distance from home:</div>
+                                        <div class="col-md-5">
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" data-ng-model="myForm.home.minDistanceAway">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" data-ng-model="myForm.home.maxDistanceAway">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    Distance from Another Location
+                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance2">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                </h4>
+                                <div id="collapseDistance2" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <div class="col-md-12">
+                                        You can use this to add another location. For example, you'd consider schools in Washington, DC even though it's further away from your home than you'd typically allow.
+                                        </div>
+                                        <div class="col-md-7">Zip code:</div>
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control" data-ng-model="myForm.loc2.zipCode">
+                                        </div>
+
+                                        <div class="col-md-7"></div>
+                                        <div class="col-md-5">
+                                            <div class="col-md-6">Minimum</div>
+                                            <div class="col-md-6">Maximum</div>
+                                        </div>
+                                        <div class="col-md-7">School distance from zip code:</div>
+                                        <div class="col-md-5">
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" data-ng-model="myForm.loc2.minDistanceAway">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" data-ng-model="myForm.loc2.maxDistanceAway">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    Sports Teams
+                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSports">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                </h4>
+                                <div id="collapseSports" class="panel-collapse collapse">
+                                    <div class="panel-body">
+
+                                        <div class="col-md-7">School must have these sports:</div>
+                                        <div class="col-md-5">
+                                            <select multiple  id="filterSports" data-ng-model="myForm.sports.sportsRequired">
+                                                <option value="row1women">Womens Rowing Division I</option>
+                                                <option value="row2women">Womens Rowing Division II</option>
+                                                <option value="row3women">Womens Rowing Division III</option>
+                                                <option value="row1men">Mens Rowing Division I</option>
+                                                <option value="row2men">Mens Rowing Division II</option>
+                                                <option value="row3men">Mens Rowing Division III</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <button class="btn btn-primary" data-ng-click="saveIt(myForm)">Save Filters</button>
             </div>
+            <!--<div class="col-lg-5"  ng-style="{'background-image': 'url(images/temp-DeleteMe.jpg)'}">-->
+            <div class="col-lg-5">
 
-
-            <button class="btn btn-primary" data-ng-click="saveIt(myForm)">Save Filters</button>
-
+                <h1>Schools Meeting Criteria:</h1>
+                <h1>4,500</h1>
+                <img src="images/temp-DeleteMe.jpg"/>
+            </div>
 
         </form>
 

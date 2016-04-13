@@ -1,1 +1,13 @@
-<p>This is the collegelist view.</p>
+<div ng-controller="CollegelistCtrl">
+
+
+    <div class="container-fluid" >
+        <button class="btn btn-primary btn-md" data-ng-click="getColleges()">GET COLLEGES</button>
+
+        <div ng-repeat="college in colleges">
+            {{college.institution_nm}}
+        </div>
+
+    </div>
+</div>
+

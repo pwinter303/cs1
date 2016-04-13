@@ -91,7 +91,7 @@ angular.module('collegeApp')
                         //ToDo: Replace this with a call to a service that will call GoogleMaps WebService
                         //ToDo: Get result of webservice and correct it so it matches JS result
                         if (data.status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
-                            directionsDisplay.setDirections(response);
+                            directionsDisplay.setDirections(data);
                         }
                     }
                 }, function(error) {

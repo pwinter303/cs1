@@ -14,7 +14,7 @@ angular.module('collegeApp')
 
         ////=============================================================================///
         dataFactory.getColleges = function() {
-            var url = 'googlemap.php';
+            var url = 'college.php';
             var passedData = {action: 'getColleges'};
             // Start Standard Code... GET
             var promise = $http.get(url , {params: passedData });
@@ -32,7 +32,7 @@ angular.module('collegeApp')
         };
         ////=============================================================================///
         dataFactory.getDirections = function(passedData) {
-            var url = 'googlemap.php';
+            var url = 'college.php';
             passedData.action = 'getDirections';
             // Start Standard Code... GET
             var promise = $http.post(url , passedData);
@@ -50,7 +50,7 @@ angular.module('collegeApp')
         };
         ////=============================================================================///
         dataFactory.getDirectionsOLD = function(passedData) {
-            var url = 'googlemap.php';
+            var url = 'college.php';
             passedData.action = 'getDirections';
             // Start Standard Code... GET
             var promise = $http.get(url , {params: passedData });
@@ -65,6 +65,23 @@ angular.module('collegeApp')
                 // something went wrong.... error on the call..
                 return $q.reject(result.data);
             });
+        };
+        ////=============================================================================///
+        dataFactory.saveCriteria = function(passedData) {
+          var url = 'college.php';
+          passedData.action = 'saveCriteria';
+          var promise = $http.post(url , passedData);
+          return promise.then(function(result) {
+            if (typeof result.data === 'object') {
+              return result.data;
+            } else {
+              // call was successful but response was invalid (result was not an object)
+              return $q.reject(result.data);
+            }
+          }, function(result) {
+            // something went wrong.... error on the call..
+            return $q.reject(result.data);
+          });
         };
        ////=============================================================================///
         // prevent toastr is not defined error in grunt/jshint

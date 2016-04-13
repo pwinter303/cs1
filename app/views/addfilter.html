@@ -7,231 +7,228 @@
         <form role="form">
 
             <div class="col-lg-7">
+
                 <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
+                        <div data-ng-class="{ 'panel-heading': 1, 'enabled': myForm.schoolSize.enabled }">
+                            <div class="panel-title pull-left">
                                 <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSchoolSize">
                                     School Size
                                 </a>
-                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSchoolSize">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                </a>
-                                <span class="glyphicon glyphicon-check"  style="color:green"></span>
-                            </h4>
-                            <div id="collapseSchoolSize" class="panel-collapse collapse">
-                                <div class="panel-body">
-
-                                        <div class="col-md-7"></div>
-                                        <div class="col-md-5">
-                                            <div class="col-md-6">Minimum</div>
-                                            <div class="col-md-6">Maximum</div>
-                                        </div>
-                                        <div class="col-md-7">Number of Students:</div>
-                                        <div class="col-md-5">
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" data-ng-model="myForm.schoolSize.min">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" data-ng-model="myForm.schoolSize.max">
-                                            </div>
-                                        </div>
+                            </div>
+                            <div class="panel-title pull-right" ng-show="myForm.schoolSize.enabled">Active</div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div id="collapseSchoolSize" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="col-md-7"></div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">Minimum</div>
+                                    <div class="col-md-6">Maximum</div>
                                 </div>
-                                <button class="btn btn-primary" data-ng-click="saveIt(myForm.schoolSize, 'SchoolSize')">Save Filters</button>
+                                <div class="col-md-7">Number of Students:</div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.schoolSize.min">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.schoolSize.max">
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.schoolSize, 'schoolSize')">Save/Activate</button>
+                                <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.schoolSize, 'schoolSize')">Remove</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
 
                 <div class="col-lg-12">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
+                        <div data-ng-class="{ 'panel-heading': 1, 'enabled': myForm.schoolCost.enabled }">
+                            <div class="panel-title pull-left">
                                 <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseAnnlCost">
                                     Annual Cost
                                 </a>
-                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseAnnlCost">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                </a>
-                                <span class="glyphicon glyphicon-unchecked"></span>
-                            </h4>
-                            <div id="collapseAnnlCost" class="panel-collapse collapse">
-                                <div class="panel-body">
-
-                                    <div class="col-md-7"></div>
-                                    <div class="col-md-5">
-                                        <div class="col-md-6">Minimum</div>
-                                        <div class="col-md-6">Maximum</div>
+                            </div>
+                            <div class="panel-title pull-right" ng-show="myForm.schoolCost.enabled">Active</div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div id="collapseAnnlCost" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="col-md-7"></div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">Minimum</div>
+                                    <div class="col-md-6">Maximum</div>
+                                </div>
+                                <div class="col-md-7">Average Annual Cost (Room and Board):</div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.schoolCost.min">
                                     </div>
-                                    <div class="col-md-7">Average Annual Cost (Room and Board):</div>
-                                    <div class="col-md-5">
-                                        <div class="col-md-6">
-                                            <input type="text" class="form-control" data-ng-model="myForm.schoolCost.min">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <input type="text" class="form-control" data-ng-model="myForm.schoolCost.max">
-                                        </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.schoolCost.max">
                                     </div>
                                 </div>
+                                <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.schoolCost, 'schoolCost')">Save/Activate</button>
+                                <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.schoolCost, 'schoolCost')">Remove</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseLocale">
-                                        School Setting/Locale
-                                    </a>
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseLocale">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                    <span class="glyphicon glyphicon-unchecked"></span>
-                                </h4>
-                                <div id="collapseLocale" class="panel-collapse collapse">
-                                    <div class="panel-body">
-
-                                        <div class="col-md-6">
-                                            <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.rural" value="">Rural/Country</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.city"value="">Urban/City</label>
-                                        </div>
-                                    </div>
+                    <div class="panel panel-default">
+                        <div data-ng-class="{ 'panel-heading': 1, 'enabled': myForm.schoolSetting.enabled }">
+                            <div class="panel-title pull-left">
+                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseLocale">
+                                    School Setting/Locale
+                                </a>
+                            </div>
+                            <div class="panel-title pull-right" ng-show="myForm.schoolSetting.enabled">Active</div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div id="collapseLocale" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="col-md-6">
+                                    <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.rural" value="">Rural/Country</label>
                                 </div>
+                                <div class="col-md-6">
+                                    <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.city"value="">Urban/City</label>
+                                </div>
+                                <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.schoolSetting, 'schoolSetting')">Save/Activate</button>
+                                <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.schoolSetting, 'schoolSetting')">Remove</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
                 <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseScores">
-                                        SAT/ACT Scores
-                                    </a>
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseScores">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                    <span class="glyphicon glyphicon-unchecked"></span>
-                                </h4>
-                                <div id="collapseScores" class="panel-collapse collapse">
-                                    <div class="panel-body">
+                    <div class="panel panel-default">
+                        <div data-ng-class="{ 'panel-heading': 1, 'enabled': myForm.testScore.enabled }">
+                            <div class="panel-title pull-left">
+                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseScores">
+                                    SAT/ACT Scores
+                                </a>
+                            </div>
+                            <div class="panel-title pull-right" ng-show="myForm.testScore.enabled">Active</div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div id="collapseScores" class="panel-collapse collapse">
+                            <div class="panel-body">
 
-                                        <div class="col-md-7"></div>
-                                        <div class="col-md-5">
-                                            <div class="col-md-6">SAT</div>
-                                            <div class="col-md-6">ACT</div>
-                                        </div>
-                                        <div class="col-md-7">Enter your scores (if applicable):</div>
-                                        <div class="col-md-5">
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" data-ng-model="myForm.testScore.SAT">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" data-ng-model="myForm.testScore.ACT">
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <br>
-                                        <br>
-                                        <div class="col-md-7">My scores should be:</div>
-                                        <div class="col-md-5">
-                                            <select multiple  id="filterTestScores" data-ng-model="myForm.testScore.matching">
-                                                <option value="worst">The lowest in the school</option>
-                                                <option value="average">Average for those attending</option>
-                                                <option value="best">The best in the school</option>
-                                            </select>
-                                        </div>
+                                <div class="col-md-7"></div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">SAT</div>
+                                    <div class="col-md-6">ACT</div>
+                                </div>
+                                <div class="col-md-7">Enter your scores (if applicable):</div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.testScore.SAT">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.testScore.ACT">
                                     </div>
                                 </div>
+                                <br>
+                                <br>
+                                <br>
+                                <div class="col-md-7">My scores should be:</div>
+                                <div class="col-md-5">
+                                    <select multiple  id="filterTestScores" data-ng-model="myForm.testScore.matching">
+                                        <option value="worst">The lowest in the school</option>
+                                        <option value="average">Average for those attending</option>
+                                        <option value="best">The best in the school</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.testScore, 'testScore')">Save/Activate</button>
+                                <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.testScore, 'testScore')">Remove</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
                 <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance1">
-                                        Distance from Home
-                                    </a>
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance1">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                    <span class="glyphicon glyphicon-check"  style="color:green"></span>
-                                </h4>
-                                <div id="collapseDistance1" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        <div class="col-md-7">My home zip code:</div>
-                                        <div class="col-md-5">
-                                            <input type="text" class="form-control" data-ng-model="myForm.home.zipCode">
-                                        </div>
+                    <div class="panel panel-default">
+                        <div data-ng-class="{ 'panel-heading': 1, 'enabled': myForm.home.enabled }">
+                            <div class="panel-title pull-left">
+                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance1">
+                                    Distance from Home
+                                </a>
+                            </div>
+                            <div class="panel-title pull-right" ng-show="myForm.home.enabled">Active</div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div id="collapseDistance1" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="col-md-7">My home zip code:</div>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" data-ng-model="myForm.home.zipCode">
+                                </div>
 
-                                        <div class="col-md-7"></div>
-                                        <div class="col-md-5">
-                                            <div class="col-md-6">Minimum</div>
-                                            <div class="col-md-6">Maximum</div>
-                                        </div>
-                                        <div class="col-md-7">School distance from home:</div>
-                                        <div class="col-md-5">
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" data-ng-model="myForm.home.minDistanceAway">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" data-ng-model="myForm.home.maxDistanceAway">
-                                            </div>
-                                        </div>
+                                <div class="col-md-7"></div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">Minimum</div>
+                                    <div class="col-md-6">Maximum</div>
+                                </div>
+                                <div class="col-md-7">School distance from home:</div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.home.minDistanceAway">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.home.maxDistanceAway">
                                     </div>
                                 </div>
+                                <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.home, 'home')">Save/Activate</button>
+                                <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.home, 'home')">Remove</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
                 <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance2">
-                                        Distance from Another Location
-                                    </a>
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance2">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                    <span class="glyphicon glyphicon-unchecked"></span>
-                                </h4>
-                                <div id="collapseDistance2" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        <div class="col-md-12">
-                                        You can use this to add another location. For example, you'd consider schools in Washington, DC even though it's further away from your home than you'd typically allow.
-                                        </div>
-                                        <div class="col-md-7">Zip code:</div>
-                                        <div class="col-md-5">
-                                            <input type="text" class="form-control" data-ng-model="myForm.loc2.zipCode">
-                                        </div>
+                    <div class="panel panel-default">
+                        <div data-ng-class="{ 'panel-heading': 1, 'enabled': myForm.loc2.enabled }">
+                            <div class="panel-title pull-left">
+                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance2">
+                                    Distance from Another Location
+                                </a>
+                            </div>
+                            <div class="panel-title pull-right" ng-show="myForm.loc2.enabled">Active</div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div id="collapseDistance2" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="col-md-12">
+                                    You can use this to add another location. For example, you'd consider schools in Washington, DC even though it's further away from your home than you'd typically allow.
+                                </div>
+                                <div class="col-md-7">Zip code:</div>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" data-ng-model="myForm.loc2.zipCode">
+                                </div>
 
-                                        <div class="col-md-7"></div>
-                                        <div class="col-md-5">
-                                            <div class="col-md-6">Minimum</div>
-                                            <div class="col-md-6">Maximum</div>
-                                        </div>
-                                        <div class="col-md-7">School distance from zip code:</div>
-                                        <div class="col-md-5">
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" data-ng-model="myForm.loc2.minDistanceAway">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <input type="text" class="form-control" data-ng-model="myForm.loc2.maxDistanceAway">
-                                            </div>
-                                        </div>
+                                <div class="col-md-7"></div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">Minimum</div>
+                                    <div class="col-md-6">Maximum</div>
+                                </div>
+                                <div class="col-md-7">School distance from zip code:</div>
+                                <div class="col-md-5">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.loc2.minDistanceAway">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" data-ng-model="myForm.loc2.maxDistanceAway">
                                     </div>
                                 </div>
+                                <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.loc2, 'loc2')">Save/Activate</button>
+                                <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.loc2, 'loc2')">Remove</button>
                             </div>
                         </div>
                     </div>
+                </div>
+
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div data-ng-class="{ 'panel-heading': 1, 'enabled': myForm.sports.enabled }">
@@ -239,10 +236,6 @@
                                 <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSports">
                                     Sports Teams
                                 </a>
-                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSports">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                </a>
-                                <span class="glyphicon glyphicon-unchecked"></span>
                             </div>
                             <div class="panel-title pull-right" ng-show="myForm.sports.enabled">Active</div>
                             <div class="clearfix"></div>
@@ -261,8 +254,8 @@
                                         <option value="row3men">Mens Rowing Division III</option>
                                     </select>
                                 </div>
-                                <button class="btn btn-primary btn-md" data-ng-click="saveSports()">Save</button>
-                                <button class="btn btn-primary btn-md" data-ng-click="resetSports()">Remove</button>
+                                <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.sports, 'sports')">Save/Activate</button>
+                                <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.sports, 'sports')">Remove</button>
                             </div>
                         </div>
                     </div>

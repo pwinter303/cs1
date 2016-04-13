@@ -84,6 +84,9 @@ body {
 
 .angular-google-map-container { height: 400px; }
 
+body{
+    background-color: #00e64d;
+}
 .panel-heading.enabled {
-    background-color: #99ff99;
+    background-color: #00cc00;
 }

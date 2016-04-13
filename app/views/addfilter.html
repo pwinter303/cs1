@@ -27,16 +27,17 @@
                                             <div class="col-md-6">Minimum</div>
                                             <div class="col-md-6">Maximum</div>
                                         </div>
-                                            <div class="col-md-7">Number of Students:</div>
-                                            <div class="col-md-5">
-                                                <div class="col-md-6">
-                                                    <input type="text" class="form-control" data-ng-model="myForm.schoolSize.min">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <input type="text" class="form-control" data-ng-model="myForm.schoolSize.max">
-                                                </div>
+                                        <div class="col-md-7">Number of Students:</div>
+                                        <div class="col-md-5">
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" data-ng-model="myForm.schoolSize.min">
                                             </div>
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" data-ng-model="myForm.schoolSize.max">
+                                            </div>
+                                        </div>
                                 </div>
+                                <button class="btn btn-primary" data-ng-click="saveIt(myForm.schoolSize, 'SchoolSize')">Save Filters</button>
                             </div>
                         </div>
                     </div>
@@ -47,7 +48,7 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSchoolSize">
+                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseAnnlCost">
                                     Annual Cost
                                 </a>
                                 <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseAnnlCost">
@@ -82,7 +83,7 @@
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSchoolSize">
+                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseLocale">
                                         School Setting/Locale
                                     </a>
                                     <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseLocale">
@@ -109,7 +110,7 @@
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSchoolSize">
+                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseScores">
                                         SAT/ACT Scores
                                     </a>
                                     <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseScores">
@@ -155,7 +156,7 @@
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSchoolSize">
+                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance1">
                                         Distance from Home
                                     </a>
                                     <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance1">
@@ -194,7 +195,7 @@
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4 class="panel-title">
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSchoolSize">
+                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance2">
                                         Distance from Another Location
                                     </a>
                                     <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseDistance2">
@@ -231,51 +232,53 @@
                             </div>
                         </div>
                     </div>
-
                 <div class="col-lg-12">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSchoolSize">
-                                        Sports Teams
-                                    </a>
-                                    <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSports">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                    <span class="glyphicon glyphicon-unchecked"></span>
-                                </h4>
-                                <div id="collapseSports" class="panel-collapse collapse">
-                                    <div class="panel-body">
+                    <div class="panel panel-default">
+                        <div data-ng-class="{ 'panel-heading': 1, 'enabled': myForm.sports.enabled }">
+                            <div class="panel-title pull-left">
+                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSports">
+                                    Sports Teams
+                                </a>
+                                <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseSports">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </a>
+                                <span class="glyphicon glyphicon-unchecked"></span>
+                            </div>
+                            <div class="panel-title pull-right" ng-show="myForm.sports.enabled">Active</div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div id="collapseSports" class="panel-collapse collapse">
+                            <div class="panel-body">
 
-                                        <div class="col-md-7">School must have these sports:</div>
-                                        <div class="col-md-5">
-                                            <select multiple  id="filterSports" data-ng-model="myForm.sports.sportsRequired">
-                                                <option value="row1women">Womens Rowing Division I</option>
-                                                <option value="row2women">Womens Rowing Division II</option>
-                                                <option value="row3women">Womens Rowing Division III</option>
-                                                <option value="row1men">Mens Rowing Division I</option>
-                                                <option value="row2men">Mens Rowing Division II</option>
-                                                <option value="row3men">Mens Rowing Division III</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                <div class="col-md-7">School must have these sports:</div>
+                                <div class="col-md-5">
+                                    <select multiple  id="filterSports1" data-ng-model="myForm.sports.sportsRequired">
+                                        <option value="row1women">Womens Rowing Division I</option>
+                                        <option value="row2women">Womens Rowing Division II</option>
+                                        <option value="row3women">Womens Rowing Division III</option>
+                                        <option value="row1men">Mens Rowing Division I</option>
+                                        <option value="row2men">Mens Rowing Division II</option>
+                                        <option value="row3men">Mens Rowing Division III</option>
+                                    </select>
                                 </div>
+                                <button class="btn btn-primary btn-md" data-ng-click="saveSports()">Save</button>
+                                <button class="btn btn-primary btn-md" data-ng-click="resetSports()">Remove</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                <button class="btn btn-primary" data-ng-click="saveIt(myForm)">Save Filters</button>
             </div>
             <!--<div class="col-lg-5"  ng-style="{'background-image': 'url(images/temp-DeleteMe.jpg)'}">-->
             <div class="col-lg-5">
 
                 <h1>Schools Meeting Criteria:</h1>
-                <h1>4,500</h1>
+                <h1>4,500   <a href="#/collegelist" class="btn btn-info" role="button">Show me the schools</a>
+                </h1>
                 <img src="images/temp-DeleteMe.jpg"/>
             </div>
 
         </form>
-
 
                 <!--<option value="Academics">Academic Rating</option>-->
                 <!--<option value="Social">Social Rating</option>-->

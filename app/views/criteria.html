@@ -1,4 +1,4 @@
-<div ng-controller="AddfilterCtrl">
+<div ng-controller="CriteriaCtrl">
 
 <!--<div class="col-lg-5"  ng-style="{'background-image': 'url(images/temp-DeleteMe.jpg)'}">-->
     <div class="container-fluid" ng-style="{'background-image': 'url(images/ivy.png)'}">
@@ -22,15 +22,21 @@
                         </div>
                         <div id="collapseSchoolSize" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <div class="col-md-7">School must have these sports:</div>
+                                <div class="col-md-7">Schools must have these many people attending:</div>
                                 <div class="col-md-5">
-                                    <select multiple  id="sizeSchool" data-ng-model="myForm.schoolSize.options">
-                                        <option value="1">Under 1,000</option>
-                                        <option value="2">1,000 - 4,999</option>
-                                        <option value="3">5,000 - 9,999</option>
-                                        <option value="4">10,000 - 19,999</option>
-                                        <option value="5">20,000 and above</option>
+                                    Select as many options as you'd like <br>(Ctrl click to select multiple).
+                                    <select size="5" class="form-control"
+                                            multiple="true"
+                                            data-ng-model="myForm.schoolSize.options"
+                                            data-ng-options="s.name for s in sizes track by s.id">
                                     </select>
+                                    <!--<select class="form-control" size="5" multiple  id="sizeSchool" data-ng-model="myForm.schoolSize.options">-->
+                                        <!--<option value="1">Under 1,000</option>-->
+                                        <!--<option value="2">1,000 - 4,999</option>-->
+                                        <!--<option value="3">5,000 - 9,999</option>-->
+                                        <!--<option value="4">10,000 - 19,999</option>-->
+                                        <!--<option value="5">20,000 and above</option>-->
+                                    <!--</select>-->
                                 </div>
                                 <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.schoolSize, 'schoolSize')">Save/Activate</button>
                                 <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.schoolSize, 'schoolSize')">Remove</button>
@@ -86,11 +92,14 @@
                         </div>
                         <div id="collapseLocale" class="panel-collapse collapse">
                             <div class="panel-body">
-                                <div class="col-md-6">
-                                    <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.rural" value="">Rural/Country</label>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="checkbox-inline"><input type="checkbox" data-ng-model="myForm.schoolSetting.city"value="">Urban/City</label>
+                                <div class="col-md-7">Schools must be located in these types of areas:</div>
+                                <div class="col-md-5">
+                                    Select as many options as you'd like <br>(Ctrl click to select multiple).
+                                    <select class="form-control"
+                                            multiple="true"
+                                            data-ng-model="myForm.schoolSetting.options"
+                                            data-ng-options="l.name for l in locales track by l.id">
+                                    </select>
                                 </div>
                                 <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.schoolSetting, 'schoolSetting')">Save/Activate</button>
                                 <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.schoolSetting, 'schoolSetting')">Remove</button>
@@ -132,7 +141,7 @@
                                 <br>
                                 <div class="col-md-7">My scores should be:</div>
                                 <div class="col-md-5">
-                                    <select multiple  id="filterTestScores" data-ng-model="myForm.testScore.matching">
+                                    <select class="form-control" multiple  id="filterTestScores" data-ng-model="myForm.testScore.options">
                                         <option value="worst">The lowest in the school</option>
                                         <option value="average">Average for those attending</option>
                                         <option value="best">The best in the school</option>
@@ -242,13 +251,11 @@
 
                                 <div class="col-md-7">School must have these sports:</div>
                                 <div class="col-md-5">
-                                    <select multiple  id="filterSports1" data-ng-model="myForm.sports.sportsRequired">
-                                        <option value="row1women">Womens Rowing Division I</option>
-                                        <option value="row2women">Womens Rowing Division II</option>
-                                        <option value="row3women">Womens Rowing Division III</option>
-                                        <option value="row1men">Mens Rowing Division I</option>
-                                        <option value="row2men">Mens Rowing Division II</option>
-                                        <option value="row3men">Mens Rowing Division III</option>
+                                    Select as many options as you'd like <br>(Ctrl click to select multiple).
+                                    <select class="form-control"
+                                            multiple="true"
+                                            data-ng-model="myForm.sports.options"
+                                            data-ng-options="s.name for s in sports track by s.id">
                                     </select>
                                 </div>
                                 <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.sports, 'sports')">Save/Activate</button>
@@ -261,11 +268,13 @@
             </div>
             <!--<div class="col-lg-5"  ng-style="{'background-image': 'url(images/temp-DeleteMe.jpg)'}">-->
             <div class="col-lg-6">
-
                 <h1>Schools Meeting Criteria:</h1>
-                <h1>4,500   <a href="#/collegelist" class="btn btn-info" role="button">Show me the schools</a>
-                </h1>
+                <!--<div id="odometer" class="odometer">{{collegeCount.count}}</div>-->
+                <div class="odometer" odometer="visitors" odometer-options="{theme: 'digital', duration: 3000}">{{collegeCount.count}}</div>
+                <a href="#/collegelist" class="btn btn-info" role="button">Show me the schools</a>
+                <br><br>
                 <img src="images/temp-DeleteMe.jpg"/>
+
             </div>
 
         </form>

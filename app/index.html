@@ -12,7 +12,11 @@
     <link rel="stylesheet" href="bower_components/toastr/toastr.css" />
     <!-- endbower -->
     <!-- endbuild -->
-    <!-- build:css(.tmp) styles/main.css -->
+
+    <!-- Odometr includes -->
+    <link rel="stylesheet" href="bower_components/odometer/themes/odometer-theme-default.css" />
+
+      <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
   </head>
@@ -41,7 +45,7 @@
 
             <ul class="nav navbar-nav">
               <li class="active"><a href="#/">Home</a></li>
-                <li><a href="#/addfilter">My Criteria</a></li>
+                <li><a href="#/criteria">My Criteria</a></li>
                 <li><a href="#/collegelist">List of Colleges</a></li>
                 <li><a href="#/googlemap">Plan A Trip</a></li>
               <li><a ng-href="#/about">About</a></li>
@@ -92,6 +96,12 @@
     <script src="bower_components/angular-google-maps/dist/angular-google-maps.min.js"></script>
     <script src="bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
 
+    <!-- Odometr includes -->
+    <script src="bower_components/odometer/odometer.js"></script>
+
+
+
+
     <!--<script type='text/javascript' src='http://www.honobono-life.info/wpeng/wp-content/themes/ang/js/angular-google-maps.min.js'></script>-->
 
     <script src="bower_components/toastr/toastr.js"></script>
@@ -104,7 +114,7 @@
         <script src="scripts/controllers/about.js"></script>
         <script src="scripts/controllers/googlemap.js"></script>
         <script src="scripts/services/collegefactory.js"></script>
-        <script src="scripts/controllers/addfilter.js"></script>
+        <script src="scripts/controllers/criteria.js"></script>
         <script src="scripts/controllers/collegelist.js"></script>
         <!-- endbuild -->
 </body>

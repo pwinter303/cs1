@@ -46,8 +46,23 @@ function  processGet($customer_id){
        case 'getColleges':
              $result = getColleges($dbh,$customer_id);
              break;
-       case 'getCriteria':
-              $result = getCriteria($dbh,$customer_id);
+       case 'getCollegeCount':
+             $result = getCollegeCount($dbh,$customer_id);
+             break;
+       case 'getCriteriaForWeb':
+              $result = getCriteriaForWeb($dbh,$customer_id);
+              break;
+       case 'getSize':
+              $result = getSize($dbh);
+              break;
+       case 'getLocale':
+              $result = getLocale($dbh);
+              break;
+       case 'getSchoolSizes':
+              $result = getSchoolSizes($dbh);
+              break;
+       case 'getSports':
+              $result = getSports($dbh);
               break;
       case 'getDirections':
              $result = getDirections($dbh,$customer_id);
@@ -85,60 +100,135 @@ function  processPost($customer_id){
     return $result;
 }
 
-function  getCriteriaEnabled($dbh, $customer_id){
-
-  $query = "select distinct filter_cd from filter where customer_id = ? and field_cd = 'enabled' and the_value = 1";
-
-  $types = 'i';  ## pass
-  $params = array($customer_id);
-  $data = execSqlMultiRowPREPARED($dbh, $query, $types, $params);
-  $where = "";
-  foreach ($data as $primaryKey => $fieldValuePairs){
-    foreach ($fieldValuePairs as $fieldKey => $value){
-        $query = "select filter_cd, field_cd, the_value from filter where customer_id = ? and filter_cd = ?";
-        $types = 'is';  ## pass
-        $params = array($customer_id, $value);
-        $dataCRIT = execSqlMultiRowPREPARED($dbh, $query, $types, $params);
-        foreach ($dataCRIT as $primaryKey => $fieldValuePairsCRIT){
-          if (  ('schoolSize' ==  $fieldValuePairsCRIT{'filter_cd'}) and
-                ('options'    ==  $fieldValuePairsCRIT{'field_cd'})    ){
-                $options = $fieldValuePairsCRIT{'the_value'};
-                if (strlen($options)){
-                  ##echo "These are the options:$options\n";
-                  $optionArr = explode(",", $options);
-
-                  foreach ($optionArr as $option){
-                    if (0 == strlen($where)){
-                      ##TODO: this wont work when handling multiple fields
-                      $where = "and (INSTSIZE = $option";
-                    } else {
-                      $where = "$where or INSTSIZE = $option";
-                    }
-                  }
-                  $where = "$where)";
-                }
-          }
-        }
-    }
-  }
-  return $where;
+function  getLocale($dbh){
+    $query = "select locale as id, locale_decode as name from decode_locale";
+    $data = execSqlMultiRowPREPARED($dbh, $query);
+    return $data;
 }
-
-function  getColleges($dbh, $customer_id){
-    $where = getCriteriaEnabled($dbh, $customer_id);
-    $query = "select instnm as institution_nm from institutions where 1 = 1 $where and unitid in (
-    select distinct sports.institutions_UNITID from sports where sport_cd = 'WCR')";
-    ##$query = "select instnm as institution_nm from institutions where instnm like 'A%'$where";
-    ### since types and params are defaulted to null in the called function you dont have to pass them
+function  getSchoolSizes($dbh){
+    $query = "select instsize as id, instsize_decode as name from decode_instsize where instsize >0";
     $data = execSqlMultiRowPREPARED($dbh, $query);
     return $data;
 }
 
-function  getCollegeCount($dbh, $customer_id){
-  getCriteriaEnabled($dbh, $customer_id);
-  #count colleges
-
+function  getSports($dbh){
+    $query = "select sport_cd as id, sport_nm as name from sports_decodes";
+    $data = execSqlMultiRowPREPARED($dbh, $query);
+    return $data;
 }
+
+function  getCriteriaForWeb($dbh, $customer_id){
+    $data = getCriteria($dbh, $customer_id);
+
+    foreach ($data as $criteria => $restOfArray){
+      foreach ($restOfArray as $field => $value){
+        if ('options' == $field){
+          # Define array that will hold the final value
+          $finalArr = array();
+          # turn the value retrieved from the database into an array
+          $values = explode(",", $value);
+          # loop through each of the values and build an array (the ng-option requires an object with id in it)
+          foreach($values as $single_value){
+            $valArr = array("id" => $single_value);
+            array_push($finalArr, $valArr);
+          }
+          $data{$criteria}{$field} = $finalArr;
+        }
+      }
+    }
+    return $data;
+}
+
+function  getCriteria($dbh, $customer_id){
+    $query = "select criteria_cd, field_cd, the_value from criteria where customer_id = ?";
+    $types = 'i';  ## pass
+    $params = array($customer_id);
+    $data = execSqlMultiRowPREPARED($dbh, $query, $types, $params);
+
+    foreach ($data as $primaryKey => $fieldValuePairs){
+        $criteria = $fieldValuePairs{'criteria_cd'};
+        $field = $fieldValuePairs{'field_cd'};
+        $value = $fieldValuePairs{'the_value'};
+        $finalData{$criteria}{$field} = $value;
+    }
+    return $finalData;
+}
+
+
+
+function  createWhereClauseUsingCriteria($dbh, $customer_id){
+  $data = getCriteria($dbh, $customer_id);
+  $whereArr = array();
+  foreach ($data as $criteria => $restOfArray){
+      ##var_dump($restOfArray);
+      if (1 == $restOfArray{'enabled'}){
+          switch ($criteria) {
+             case 'schoolSize':
+                 $value = $restOfArray{'options'};
+                 $where = " and institutions.instsize in ($value)";
+                 array_push($whereArr, $where);
+                 break;
+             case 'schoolSetting':
+                $value = $restOfArray{'options'};
+                $where = " and institutions.locale in ($value)";
+                array_push($whereArr, $where);
+                break;
+             case 'sports':
+                $value = $restOfArray{'options'};
+                $valueArr = explode(",", $value);
+                ####var_dump($valueArr);
+                array_walk($valueArr, create_function('&$str', '$str = "\"$str\"";'));
+                ###var_dump($valueArr);
+                $value = implode('", "', $valueArr);
+                ####echo "this is value for sports $value\n";
+                $where = " and institutions.unitid in (select distinct sports.unitid from sports where sport_cd in ($value)) ";
+                array_push($whereArr, $where);
+                break;
+          }
+      }
+  }
+  $finalWhere = implode(" ", $whereArr);
+  ##echo "here is the finalWhere:$finalWhere\n";
+  return $finalWhere;
+}
+
+function  getCollegeCount($dbh, $customer_id){
+  $data = getCollegeFunc($dbh, $customer_id, 1);  #1 = return count
+  return $data;
+}
+function  getColleges($dbh, $customer_id){
+  $data = getCollegeFunc($dbh, $customer_id);  #1 = return count
+  return $data;
+}
+
+function  getCollegeFunc($dbh, $customer_id, $count=0){
+    $where = createWhereClauseUsingCriteria($dbh, $customer_id);
+
+    $selectCols = "instnm as name,
+                             locale_decode as locale,
+                             city, stabbr as state_cd,
+                             instsize_decode as school_size ";
+    if ($count){
+      $selectCols = "count(*) as count";
+    }
+    $query = "select  $selectCols
+    from institutions, decode_instsize, decode_locale
+    where
+      institutions.instsize = decode_instsize.instsize and
+      institutions.locale = decode_locale.locale
+      $where
+    ";
+    #echo "this is the query:$query\n";
+
+    ### since types and params are defaulted to null in the called function you dont have to pass them
+    if ($count){
+      $data = execSqlSingleRowPREPARED($dbh, $query);
+    }else {
+      $data = execSqlMultiRowPREPARED($dbh, $query);
+    }
+    return $data;
+}
+
 
 function  getCollegesSTATIC(){
     $colleges = array( array( name => "Georgetown University",
@@ -204,8 +294,8 @@ function  saveCollege(){
     return 1;
 }
 function  saveCriteria($dbh, $request_data, $customer_id){
-  $filter = $request_data->func;
-  switch ($filter) {
+  $criteria = $request_data->func;
+  switch ($criteria) {
      case 'schoolSize':
            saveCriteriaFunc($dbh, $customer_id, $request_data, "options");  # last param is the field
            saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
@@ -215,18 +305,34 @@ function  saveCriteria($dbh, $request_data, $customer_id){
            saveCriteriaFunc($dbh, $customer_id, $request_data, "max");
            saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
            break;
+     case 'schoolSetting':
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "options");  # last param is the field
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
+           break;
+     case 'sports':
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "options");  # last param is the field
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
+           break;
      case 'home':
            saveCriteriaFunc($dbh, $customer_id, $request_data, "zipCode");  # last param is the field
            saveCriteriaFunc($dbh, $customer_id, $request_data, "minDistanceAway");
            saveCriteriaFunc($dbh, $customer_id, $request_data, "maxDistanceAway");
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
            break;
      case 'loc2':
            saveCriteriaFunc($dbh, $customer_id, $request_data, "zipCode");  # last param is the field
            saveCriteriaFunc($dbh, $customer_id, $request_data, "minDistanceAway");
            saveCriteriaFunc($dbh, $customer_id, $request_data, "maxDistanceAway");
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
+           break;
+     case 'testScore':
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "SAT");  # last param is the field
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "ACT");
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "options");
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
            break;
      default:
-           echo "Error:Invalid Request";
+           echo "Error:Invalid Criteria Name";
            break;
   }
 
@@ -241,18 +347,30 @@ function  saveCriteria($dbh, $request_data, $customer_id){
 ##############################################################################
 function  saveCriteriaFunc($dbh, $customer_id, $request_data, $field_cd){
 
-  $filter_cd = $request_data->func;
+  $criteria_cd = $request_data->func;
+  $value="";
   if (is_array($request_data->$field_cd)){
-      $value = implode(",", $request_data->$field_cd);
+      ### HACK:  assumes all the OPTIONS fields are multiple select fields so value will be an object
+      ### NOTE: the options MUST use 'id' as the key!
+      if ('options' == $field_cd){
+        $values = array();
+        foreach ($request_data->$field_cd as $item){
+          array_push($values,$item->id);
+        }
+      } else {
+        $values = $request_data->$field_cd;
+      }
+      $value = implode(",", $values);
   } else {
       $value = $request_data->$field_cd;
   }
+  ###echo "this is value:$value\n";
 
-  $query = "INSERT INTO filter (customer_id, filter_cd, field_cd, the_value) VALUES
+  $query = "INSERT INTO criteria (customer_id, criteria_cd, field_cd, the_value) VALUES
            (?,          ?,      ?,          ?) ON DUPLICATE KEY UPDATE the_value = ? ";
 
   $types = 'issss';  ## pass
-  $params = array($customer_id, $filter_cd, $field_cd, $value, $value);
+  $params = array($customer_id, $criteria_cd, $field_cd, $value, $value);
 
   $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
   return $rowsAffected;

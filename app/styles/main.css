@@ -90,3 +90,7 @@ body{
 .panel-heading.enabled {
     background-color: #00cc00;
 }
+
+.odometer {
+    font-size: 100px;
+}

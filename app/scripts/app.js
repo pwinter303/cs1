@@ -31,10 +31,10 @@ angular
         controller: 'GooglemapCtrl',
         controllerAs: 'googleMap'
       })
-      .when('/addfilter', {
-        templateUrl: 'views/addfilter.html',
-        controller: 'AddfilterCtrl',
-        controllerAs: 'addfilter'
+      .when('/criteria', {
+        templateUrl: 'views/criteria.html',
+        controller: 'CriteriaCtrl',
+        controllerAs: 'criteria'
       })
       .when('/collegelist', {
         templateUrl: 'views/collegelist.html',
@@ -51,4 +51,5 @@ angular
             v: '3.20', //defaults to latest 3.X anyhow
             libraries: 'weather,geometry,visualization'
         });
+
   });

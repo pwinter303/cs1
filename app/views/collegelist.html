@@ -6,7 +6,7 @@
         <button class="btn btn-primary btn-md" data-ng-click="getColleges()">GET COLLEGES</button>
 
         <div ng-repeat="college in colleges | orderBy:'name'">
-            <div class="col-md-4">{{college.name}}</div>
+            <div class="col-md-4"><a href="http://{{college.url}}">{{college.name}}</a></div>
             <div class="col-md-2">{{college.distance}}</div>
             <div class="col-md-2">{{college.city}},{{college.state_cd}}</div>
             <div class="col-md-2">{{college.locale}}</div>

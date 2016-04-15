@@ -4,6 +4,12 @@ session_start();
 include 'db.php';
 //include 'functions.php';
 
+#### NOTE NOTE NOTE NOTE
+# be VERY careful about $types passed into sql
+# i = integer,  d = double,  s=string
+# I've been burned using integer instead of double
+
+
 //PLW Added 2016-04-06
 date_default_timezone_set('America/New_York');
 
@@ -55,6 +61,9 @@ function  processGet($customer_id){
        case 'getSize':
               $result = getSize($dbh);
               break;
+       case 'getCustomersCollegeUnitIDs':
+              $result = getCustomersCollegeUnitIDs($dbh, $customer_id);
+              break;
        case 'getLocale':
               $result = getLocale($dbh);
               break;
@@ -80,6 +89,7 @@ function  processPost($customer_id){
 //    $request = convertFromBoolean($request);
     $dbh = createDatabaseConnection();
     $action = $request->action;
+
     switch ($action) {
        case 'saveCriteria':
              $result = saveCriteria($dbh, $request, $customer_id);
@@ -92,6 +102,9 @@ function  processPost($customer_id){
              break;
        case 'getDirections':
              $result = getDirectionsAsPOST($dbh, $request);
+             break;
+      case 'getCollegesOnRoute':
+             $result = getCollegesOnRoute($dbh,$request,$customer_id);
              break;
        default:
              echo "Error:Invalid Request:Action not set properly";
@@ -232,26 +245,31 @@ function  getCollegeFunc($dbh, $customer_id, $count=0){
 
     ###echo "$where,$distCols,$distHaving\n";
 
-    if ($count){
-      $distHaving = "";  #### hack since this means the count will NOT take distance criteria into account TODO:
-    }
     $where .= $distHaving;
     $selectCols = "instnm as name,
+                             unitid as id,
                              locale_decode as locale,
                              city, stabbr as state_cd,
+                             webaddr as url,
                              instsize_decode as school_size $distCols";
+
+    $countSelect = "";
+    $countEnd = "";
     if ($count){
-      $selectCols = "count(*) as count";
+      $countSelect = "SELECT count(*) as count FROM (";
+      $countEnd = ") as count";
     }
 
-    $query = "select  $selectCols
+    ## HACK: ICLEVEL = 1 is just 4 year colleges.. should be a drop down selection TODO
+    $query = "$countSelect  select  $selectCols
     from institutions, decode_instsize, decode_locale
     where
       institutions.instsize = decode_instsize.instsize and
-      institutions.locale = decode_locale.locale
-      $where
+      institutions.locale = decode_locale.locale and
+      iclevel = 1
+      $where  $countEnd
     ";
-    ##echo "this is the query:$query\n";
+    #echo "this is the query:$query\n";
 
     ### since types and params are defaulted to null in the called function you dont have to pass them
     if ($count){
@@ -308,21 +326,140 @@ function  getCollegesSTATIC(){
 
 function  getDirections(){
 //    return 1;
+    ### NOTE:  POST SEEMS BETTER
     $passedData = ($_GET);
-
     $passedDataDecoded = json_decode($passedData{'routePoints'});
-//    echo ("from" => $from);
-//    var_dump($passedData{'routePoints'});
-//    var_dump($passedDataDecoded);
-//    var_dump($passedDataDecoded{'name'});
     var_dump($passedDataDecoded{'name'});
-
 }
 
 function  getDirectionsAsPOST($dbh, $request_data){
-    $junk = $request_data->routePoints->start->name;
-    return(array(name=>$junk));
+    $orig = $request_data->routePoints->start->name;
+    $dest = $request_data->routePoints->end->name;
+
+//    var myKey = "&key=AIzaSyBJW90ZQrxG82XCEqDn9uxBlef8x7Oebkc";
+    $myKey = "&key=AIzaSyBJW90ZQrxG82XCEqDn9uxBlef8x7Oebkc";
+    #$parameters = "origin=" . encodeURI(orig) . "&destination=" . encodeURI(dest) . waypoints + myKey;
+    $parameters = "origin=" . urlencode($orig) . "&destination=" . urlencode($dest) . $myKey;
+//    var encodedParams = encodeURIComponent(parameters);
+    $encodedParams = $parameters;
+
+    $url = "https://maps.googleapis.com/maps/api/directions/json?" . $encodedParams;
+    echo "url is:$url\n";
+    error_reporting(0);
+    header('Content-Type: application/json');
+    #echo file_get_contents($_GET["url"]);
+    if (!$data = file_get_contents($url)) {
+          $error = error_get_last();
+          echo "HTTP request failed. Error was: " . $error['message'];
+    }
+    return($data);
 }
+function getCollegesOnRoute($dbh, $request_data, $customer_id){
+    $dataRouteJSON  = getDirectionsAsPOST($dbh, $request_data);
+    $dataColleges = getColleges($dbh, $customer_id);
+    $unitIDs = extractUnitIDs($dataColleges);
+    ###var_dump($unitIDs);
+    $finalUnitIDsArr = array();
+    $dataResponse = json_decode($dataRouteJSON);
+    ###var_dump($dataResponse);
+    $g = $dataResponse->routes;
+    foreach ($g as $item){
+      foreach ($item->legs as $myLeg){
+        foreach ($myLeg->steps as $myStep){
+          $lat = $myStep->end_location->lat;
+          $lon = $myStep->end_location->lng;   ### no "O" in lng
+          ##echo "lat:$lat lon:$lon\n";
+          $distance = 35;
+          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat, $lon, $distance, $unitIDs);
+          foreach ($dataCollegesNearRoute as $itemCollege){
+            $id = $itemCollege{'id'};
+            $dist = $itemCollege{'distance'};
+            if ($finalUnitIDsArr{$id}{'distance'}){
+              if ($dist < $finalUnitIDsArr{$id}{'distance'}){
+                $finalUnitIDsArr{$id}{'distance'} = $dist;
+                $finalUnitIDsArr{$id}{'lat'} = $lat;
+                $finalUnitIDsArr{$id}{'lon'} = $lon;
+              }
+            } else {
+              $finalUnitIDsArr{$id}{'distance'} = $dist;
+              $finalUnitIDsArr{$id}{'lat'} = $lat;
+              $finalUnitIDsArr{$id}{'lon'} = $lon;
+            }
+            #echo "id: $id distance:$dist\n";
+          }
+        }
+      }
+    }
+    #return var_dump($finalUnitIDsArr);
+    $finalArr = array();
+    foreach ($finalUnitIDsArr as $unitID => $rest){
+      $dataArr = getCollegeUsingUnitID($dbh, $unitID);
+      $distanceOffRoute = $rest{'distance'};
+      ##echo "distanceOffRoute:$distanceOffRoute\n";
+      $dataArr{'distance'} = $distanceOffRoute;
+      ##var_dump($dataArr);
+      ##echo "$unitID,";
+      array_push($finalArr, $dataArr);
+    }
+    return $finalArr;
+}
+function getCollegeUsingUnitID($dbh, $unitID){
+    $query = "select instnm as name,
+                     unitid as id,
+                     locale_decode as locale,
+                     city, stabbr as state_cd,
+                     instsize_decode as school_size
+    from institutions, decode_instsize, decode_locale
+    where
+      institutions.instsize = decode_instsize.instsize and
+      institutions.locale = decode_locale.locale and
+      $where  unitID = ? ";
+
+    $types = 'i';  ## pass
+    $params = array($unitID);
+    $data = execSqlSingleRowPREPARED($dbh, $query, $types, $params);
+    return $data;
+}
+
+function getCustomersCollegeUnitIDs($dbh, $customer_id){
+    $dataColleges = getColleges($dbh, $customer_id);
+    $unitIDs = extractUnitIDs($dataColleges);
+}
+
+function extractUnitIDs($dataColleges){
+  $unitIDsArr = array();
+  foreach ($dataColleges as $College){
+    array_push($unitIDsArr, $College{'id'});
+  }
+  return $unitIDsArr;
+}
+
+function getCollegesNearby($dbh, $lat, $lon, $distance, $unitIDs){
+      $whereUnits = implode(",", $unitIDs);
+
+//      $query = "select unitid as id,
+//                round((((acos(sin(($lat *pi()/180)) * sin((`latitude`*pi()/180))+cos(($lat *pi()/180))
+//                                   * cos((`latitude`*pi()/180)) * cos((($lon - `longitude`)*pi()/180))))*180/pi())*60*1.1515))
+//                                   AS distance
+//                from institutions
+//                where unitID in ($whereUnits)
+//                having distance < 15";
+      $query = "select unitid as id,
+                round((((acos(sin((? *pi()/180)) * sin((`latitude`*pi()/180))+cos((? *pi()/180))
+                                   * cos((`latitude`*pi()/180)) * cos(((? - `longitude`)*pi()/180))))*180/pi())*60*1.1515))
+                                   AS distance
+                from institutions
+                where unitID in ($whereUnits)
+                having distance < ? ";
+//      echo "this is the query:$query\n";
+      $types = 'dddi';  ## pass
+      $params = array($lat,$lat,$lon,$distance);
+      $data = execSqlMultiRowPREPARED($dbh, $query, $types, $params);
+//      $data = execSqlMultiRowPREPARED($dbh, $query);
+      return $data;
+}
+
+
 function  saveCollege(){
     return 1;
 }

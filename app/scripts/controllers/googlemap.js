@@ -39,12 +39,12 @@ angular.module('collegeApp')
             control: {},
             routes: {
                 start: [
-                    {name:'Tokyo Station', latlng:'35.6813177190391,139.76609230041504'},
-                    {name:'Ooimathi Station', latlng:'35.684228393108306,139.76293802261353'}
+                    {name:'Duxbury,MA', latlng:'42.0400000,-70.6700000'},
+                    {name:'Duxbury, MA', latlng:'42.0400000,-70.6700000'},
                 ],
                 end: [
-                    {name:'Ootemon', latlng:'35.68567497604782,139.7612428665161'},
-                    {name:'Nijyubashi', latlng:'35.67947017023017,139.75772380828857'}
+                    {name:'Arlington,VA', latlng:'38.8700000,-77.1000000'},
+                    {name:'Arlington, VA', latlng:'38.8700000,-77.1000000'},
                 ]
             }
         },
@@ -101,5 +101,28 @@ angular.module('collegeApp')
 
                 return;
             };
+          $scope.getCollegesOnRoute = function (routePoints, waypoints) {
+            directionsDisplay.setMap($scope.map.control.getGMap());
+            var theRequest = {};
+            theRequest.routePoints = routePoints;
+            theRequest.waypoints = waypoints;
+
+            collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
+              if (data){
+                // Process the route returned from Google Web Service
+                //ToDo: Replace this with a call to a service that will call GoogleMaps WebService
+                //ToDo: Get result of webservice and correct it so it matches JS result
+                if (data.status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
+                  directionsDisplay.setDirections(data);
+                }
+              }
+            }, function(error) {
+              // promise rejected, could be because server returned 404, 500 error...
+              collegeFactory.msgError(error);
+            });
+
+            return;
+          };
+
         });
     }]);

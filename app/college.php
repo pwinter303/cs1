@@ -117,6 +117,14 @@ function  getSports($dbh){
     return $data;
 }
 
+function  getLatLonForZipCode($dbh,$zipCode){
+    $query = "select latitude, longitude from zip_codes where postal_code = ? ";
+    $types = 's';  ## pass
+    $params = array($zipCode);
+    $data = execSqlSingleRowPREPARED($dbh, $query, $types, $params);
+    return $data;
+}
+
 function  getCriteriaForWeb($dbh, $customer_id){
     $data = getCriteria($dbh, $customer_id);
 
@@ -159,6 +167,9 @@ function  getCriteria($dbh, $customer_id){
 function  createWhereClauseUsingCriteria($dbh, $customer_id){
   $data = getCriteria($dbh, $customer_id);
   $whereArr = array();
+  $distCols = "";
+  $distHaving = "";
+
   foreach ($data as $criteria => $restOfArray){
       ##var_dump($restOfArray);
       if (1 == $restOfArray{'enabled'}){
@@ -172,6 +183,18 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
                 $value = $restOfArray{'options'};
                 $where = " and institutions.locale in ($value)";
                 array_push($whereArr, $where);
+                break;
+             case 'home':
+                $zipCode = $restOfArray{'zipCode'};
+                $min = $restOfArray{'minDistanceAway'};
+                $max = $restOfArray{'maxDistanceAway'};
+                $data = getLatLonForZipCode($dbh, $zipCode);
+                $latitude = $data{'latitude'};
+                $longitude = $data{'longitude'};
+                $distCols = ",round((((acos(sin(($latitude*pi()/180)) * sin((`latitude`*pi()/180))+cos(($latitude*pi()/180))
+                                 * cos((`latitude`*pi()/180)) * cos((($longitude- `longitude`)*pi()/180))))*180/pi())*60*1.1515))
+                                 AS distance";
+                $distHaving = "having distance < $max and $min < distance ";
                 break;
              case 'sports':
                 $value = $restOfArray{'options'};
@@ -189,7 +212,7 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
   }
   $finalWhere = implode(" ", $whereArr);
   ##echo "here is the finalWhere:$finalWhere\n";
-  return $finalWhere;
+  return array($finalWhere,$distCols,$distHaving);
 }
 
 function  getCollegeCount($dbh, $customer_id){
@@ -202,15 +225,25 @@ function  getColleges($dbh, $customer_id){
 }
 
 function  getCollegeFunc($dbh, $customer_id, $count=0){
-    $where = createWhereClauseUsingCriteria($dbh, $customer_id);
+    $componentsArr = createWhereClauseUsingCriteria($dbh, $customer_id);
+    $where = $componentsArr[0];
+    $distCols = $componentsArr[1];
+    $distHaving = $componentsArr[2];
 
+    ###echo "$where,$distCols,$distHaving\n";
+
+    if ($count){
+      $distHaving = "";  #### hack since this means the count will NOT take distance criteria into account TODO:
+    }
+    $where .= $distHaving;
     $selectCols = "instnm as name,
                              locale_decode as locale,
                              city, stabbr as state_cd,
-                             instsize_decode as school_size ";
+                             instsize_decode as school_size $distCols";
     if ($count){
       $selectCols = "count(*) as count";
     }
+
     $query = "select  $selectCols
     from institutions, decode_instsize, decode_locale
     where
@@ -218,7 +251,7 @@ function  getCollegeFunc($dbh, $customer_id, $count=0){
       institutions.locale = decode_locale.locale
       $where
     ";
-    #echo "this is the query:$query\n";
+    ##echo "this is the query:$query\n";
 
     ### since types and params are defaulted to null in the called function you dont have to pass them
     if ($count){

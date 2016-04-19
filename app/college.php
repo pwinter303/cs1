@@ -73,9 +73,6 @@ function  processGet($customer_id){
        case 'getSports':
               $result = getSports($dbh);
               break;
-      case 'getDirections':
-             $result = getDirections($dbh,$customer_id);
-             break;
        default:
              echo "Error:Invalid Request:Action not set properly";
              break;
@@ -130,7 +127,7 @@ function  getSports($dbh){
     return $data;
 }
 
-function  getLatLonForZipCode($dbh,$zipCode){
+function  getLatLngForZipCode($dbh,$zipCode){
     $query = "select latitude, longitude from zip_codes where postal_code = ? ";
     $types = 's';  ## pass
     $params = array($zipCode);
@@ -201,7 +198,7 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
                 $zipCode = $restOfArray{'zipCode'};
                 $min = $restOfArray{'minDistanceAway'};
                 $max = $restOfArray{'maxDistanceAway'};
-                $data = getLatLonForZipCode($dbh, $zipCode);
+                $data = getLatLngForZipCode($dbh, $zipCode);
                 $latitude = $data{'latitude'};
                 $longitude = $data{'longitude'};
                 $distCols = ",round((((acos(sin(($latitude*pi()/180)) * sin((`latitude`*pi()/180))+cos(($latitude*pi()/180))
@@ -332,6 +329,15 @@ function  getDirections(){
     var_dump($passedDataDecoded{'name'});
 }
 
+## ToDo: This reads the data from a file instead of hitting google
+function  getDirectionsFROMFILE($dbh, $request_data){
+    $myfile = fopen("c:/tmp/googleMapResults.txt", "r") or die("Unable to open file!");
+    $data = fread($myfile,filesize("c:/tmp/googleMapResults.txt"));
+    fclose($myfile);
+    ##echo $data;
+    return($data);
+}
+##function  getDirectionsAsPOST___REAL_ONE($dbh, $request_data){
 function  getDirectionsAsPOST($dbh, $request_data){
     $orig = $request_data->routePoints->start->name;
     $dest = $request_data->routePoints->end->name;
@@ -344,7 +350,7 @@ function  getDirectionsAsPOST($dbh, $request_data){
     $encodedParams = $parameters;
 
     $url = "https://maps.googleapis.com/maps/api/directions/json?" . $encodedParams;
-    echo "url is:$url\n";
+    #echo "url is:$url\n";
     error_reporting(0);
     header('Content-Type: application/json');
     #echo file_get_contents($_GET["url"]);
@@ -352,57 +358,152 @@ function  getDirectionsAsPOST($dbh, $request_data){
           $error = error_get_last();
           echo "HTTP request failed. Error was: " . $error['message'];
     }
+      ## Temp code to write the results of the directions call to a file (to use for testing)
+//    $myfile = fopen("c:/tmp/googleMapResults.txt", "w") or die("Unable to open file!");
+//    fwrite($myfile, $data);
+
     return($data);
 }
 function getCollegesOnRoute($dbh, $request_data, $customer_id){
     $dataRouteJSON  = getDirectionsAsPOST($dbh, $request_data);
+    ##var_dump($dataRouteJSON);
     $dataColleges = getColleges($dbh, $customer_id);
     $unitIDs = extractUnitIDs($dataColleges);
     ###var_dump($unitIDs);
     $finalUnitIDsArr = array();
     $dataResponse = json_decode($dataRouteJSON);
-    ###var_dump($dataResponse);
     $g = $dataResponse->routes;
+    $distance = 25;
     foreach ($g as $item){
       foreach ($item->legs as $myLeg){
         foreach ($myLeg->steps as $myStep){
-          $lat = $myStep->end_location->lat;
-          $lon = $myStep->end_location->lng;   ### no "O" in lng
-          ##echo "lat:$lat lon:$lon\n";
-          $distance = 35;
-          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat, $lon, $distance, $unitIDs);
-          foreach ($dataCollegesNearRoute as $itemCollege){
-            $id = $itemCollege{'id'};
-            $dist = $itemCollege{'distance'};
-            if ($finalUnitIDsArr{$id}{'distance'}){
-              if ($dist < $finalUnitIDsArr{$id}{'distance'}){
-                $finalUnitIDsArr{$id}{'distance'} = $dist;
-                $finalUnitIDsArr{$id}{'lat'} = $lat;
-                $finalUnitIDsArr{$id}{'lon'} = $lon;
-              }
-            } else {
-              $finalUnitIDsArr{$id}{'distance'} = $dist;
-              $finalUnitIDsArr{$id}{'lat'} = $lat;
-              $finalUnitIDsArr{$id}{'lon'} = $lon;
-            }
-            #echo "id: $id distance:$dist\n";
-          }
+          ### USING STARTING POINT
+          $lat1 = $myStep->start_location->lat;
+          $lng1 = $myStep->start_location->lng;   ### no "O" in lng
+          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat1, $lng1, $distance, $unitIDs);
+          $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat1, $lng1);
+          ### USING END POINT
+          $lat2 = $myStep->end_location->lat;
+          $lng2 = $myStep->end_location->lng;   ### no "O" in lng
+          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat2, $lng2, $distance, $unitIDs);
+          $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat2, $lng2);
+          $arrExtra = array();
+          #generateExtraWaypoints($lat1, $lng1, $lat2, $lng2,$arrExtra);
+
         }
       }
     }
-    #return var_dump($finalUnitIDsArr);
+    ##var_dump($finalUnitIDsArr);
     $finalArr = array();
     foreach ($finalUnitIDsArr as $unitID => $rest){
       $dataArr = getCollegeUsingUnitID($dbh, $unitID);
       $distanceOffRoute = $rest{'distance'};
       ##echo "distanceOffRoute:$distanceOffRoute\n";
       $dataArr{'distance'} = $distanceOffRoute;
-      ##var_dump($dataArr);
-      ##echo "$unitID,";
       array_push($finalArr, $dataArr);
     }
     return $finalArr;
 }
+
+function generateExtraWaypoints($lat1, $lng1, $lat2, $lng2, $extraWaypoints){
+    ### if the distance between two points is too far, calculate extra waypoints
+    ### this is needed when calculating colleges near route
+    ### if a route has a single leg that is 200 miles long.. you would only find college
+    ### that were near the start and end. You need the extra points along the way
+
+    #Steps
+    # Calc distance between 2 main points
+    $dist = distance($lat1, $lng1, $lat2, $lng2, ""); #### last param is unit (blank is miles)
+    $dist = round($dist);
+    echo "this is first lat/lng: $lat1 $lng1 and this is the second: $lat2 $lng2 and this is the distance: $dist\n";
+    # if distance is too large, then calculate the mid point and use it as a waypoint
+    if ($dist > 31){
+        list ($latNew, $lngNew) = midpoint($lat1, $lng1, $lat2, $lng2);
+
+        $dist = distance($lat1, $lng1, $latNew, $lngNew, ""); #### last param is unit (blank is miles)
+        echo "generated a new wayPoint it is: $latNew  $lngNew\n";
+        echo "distance between start and new point is $dist\n ";
+        if ($dist > 31){
+          list ($latNew, $lngNew) = midpoint($lat1, $lng1, $latNew, $lngNew);
+          $dist = distance($lat1, $lng1, $latNew, $lngNew, ""); #### last param is unit (blank is miles)
+          echo "generated a new wayPoint it is: $latNew  $lngNew\n";
+          echo "distance between start and new point is $dist\n ";
+        }
+    }
+}
+
+function genWP ($lat1, $lng1, $lat2, $lng2) {
+
+  foreach ($pointArr as $point){
+    list ($begLat, $startLng) = $point[0];
+    list ($endLat, $endLng) = $point[1];
+    $dist = distance($begLat, $startLng, $endLat, $endLng, "");
+    if ($dist > 31){
+      list ($latNew, $lngNew) = midpoint($begLat, $startLng, $endLat, $endLng);
+    }
+  }
+}
+### credit for these two functions goes to:  http://stackoverflow.com/questions/5657194/need-help-calculating-longitude-and-latitude-midpoint-using-javascript-from-php
+function midpoint ($lat1, $lng1, $lat2, $lng2) {
+
+    $lat1= deg2rad($lat1);
+    $lng1= deg2rad($lng1);
+    $lat2= deg2rad($lat2);
+    $lng2= deg2rad($lng2);
+
+    $dlng = $lng2 - $lng1;
+    $Bx = cos($lat2) * cos($dlng);
+    $By = cos($lat2) * sin($dlng);
+    $lat3 = atan2( sin($lat1)+sin($lat2),
+    sqrt((cos($lat1)+$Bx)*(cos($lat1)+$Bx) + $By*$By ));
+    $lng3 = $lng1 + atan2($By, (cos($lat1) + $Bx));
+    $pi = pi();
+//    return ($lat3*180)/$pi .' '. ($lng3*180)/$pi;
+    $latNew = ($lat3*180)/$pi;
+    $lngNew = ($lng3*180)/$pi;
+    return array($latNew, $lngNew);
+}
+
+function distance($lat1, $lng1, $lat2, $lng2, $unit) {
+
+  $theta = $lng1 - $lng2;
+  $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+  $dist = acos($dist);
+  $dist = rad2deg($dist);
+  $miles = $dist * 60 * 1.1515;
+  $unit = strtoupper($unit);
+
+  if ($unit == "K") {
+    return ($miles * 1.609344);
+  } else if ($unit == "N") {
+      return ($miles * 0.8684);
+    } else {
+        return $miles;
+      }
+}
+
+
+function updateFinalArrayWithResults($collegesFound, $finalArr, $lat, $lng){
+    foreach ($collegesFound as $itemCollege){
+      $id = $itemCollege{'id'};
+      $dist = $itemCollege{'distance'};
+
+      if (array_key_exists($id, $finalArr)){
+        if ($dist < $finalArr{$id}{'distance'}){
+          $finalArr{$id}{'distance'} = $dist;
+          $finalArr{$id}{'lat'} = $lat;
+          $finalArr{$id}{'lng'} = $lng;
+        }
+      } else {
+        $finalArr{$id}{'distance'} = $dist;
+        $finalArr{$id}{'lat'} = $lat;
+        $finalArr{$id}{'lng'} = $lng;
+      }
+      #echo "id: $id distance:$dist\n";
+    }
+    return $finalArr;
+}
+
 function getCollegeUsingUnitID($dbh, $unitID){
     $query = "select instnm as name,
                      unitid as id,
@@ -413,7 +514,7 @@ function getCollegeUsingUnitID($dbh, $unitID){
     where
       institutions.instsize = decode_instsize.instsize and
       institutions.locale = decode_locale.locale and
-      $where  unitID = ? ";
+      unitID = ? ";
 
     $types = 'i';  ## pass
     $params = array($unitID);
@@ -434,12 +535,12 @@ function extractUnitIDs($dataColleges){
   return $unitIDsArr;
 }
 
-function getCollegesNearby($dbh, $lat, $lon, $distance, $unitIDs){
+function getCollegesNearby($dbh, $lat, $lng, $distance, $unitIDs){
       $whereUnits = implode(",", $unitIDs);
 
 //      $query = "select unitid as id,
 //                round((((acos(sin(($lat *pi()/180)) * sin((`latitude`*pi()/180))+cos(($lat *pi()/180))
-//                                   * cos((`latitude`*pi()/180)) * cos((($lon - `longitude`)*pi()/180))))*180/pi())*60*1.1515))
+//                                   * cos((`latitude`*pi()/180)) * cos((($lng - `longitude`)*pi()/180))))*180/pi())*60*1.1515))
 //                                   AS distance
 //                from institutions
 //                where unitID in ($whereUnits)
@@ -453,7 +554,7 @@ function getCollegesNearby($dbh, $lat, $lon, $distance, $unitIDs){
                 having distance < ? ";
 //      echo "this is the query:$query\n";
       $types = 'dddi';  ## pass
-      $params = array($lat,$lat,$lon,$distance);
+      $params = array($lat,$lat,$lng,$distance);
       $data = execSqlMultiRowPREPARED($dbh, $query, $types, $params);
 //      $data = execSqlMultiRowPREPARED($dbh, $query);
       return $data;

@@ -40,11 +40,12 @@ angular.module('collegeApp')
             routes: {
                 start: [
                     {name:'Duxbury,MA', latlng:'42.0400000,-70.6700000'},
-                    {name:'Duxbury, MA', latlng:'42.0400000,-70.6700000'},
+                  {name:'Arlington, VA', latlng:'38.8700000,-77.1000000'},
+                  {name:'Montclair,NJ', latlng:'40.82590,-74.2090'}
                 ],
                 end: [
                     {name:'Arlington,VA', latlng:'38.8700000,-77.1000000'},
-                    {name:'Arlington, VA', latlng:'38.8700000,-77.1000000'},
+                  {name:'Duxbury, MA', latlng:'42.0400000,-70.6700000'}
                 ]
             }
         },

@@ -370,29 +370,50 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
     $dataColleges = getColleges($dbh, $customer_id);
     $unitIDs = extractUnitIDs($dataColleges);
     ###var_dump($unitIDs);
-    $finalUnitIDsArr = array();
+
     $dataResponse = json_decode($dataRouteJSON);
     $g = $dataResponse->routes;
-    $distance = 25;
+
+    $latLngArr = array();
+
+    ### COLLECT WAYPOINTS
     foreach ($g as $item){
       foreach ($item->legs as $myLeg){
         foreach ($myLeg->steps as $myStep){
-          ### USING STARTING POINT
-          $lat1 = $myStep->start_location->lat;
-          $lng1 = $myStep->start_location->lng;   ### no "O" in lng
-          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat1, $lng1, $distance, $unitIDs);
-          $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat1, $lng1);
-          ### USING END POINT
-          $lat2 = $myStep->end_location->lat;
-          $lng2 = $myStep->end_location->lng;   ### no "O" in lng
-          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat2, $lng2, $distance, $unitIDs);
-          $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat2, $lng2);
-          $arrExtra = array();
-          #generateExtraWaypoints($lat1, $lng1, $lat2, $lng2,$arrExtra);
-
+            $lat = $myStep->start_location->lat;
+            $lng = $myStep->start_location->lng;   ### no "O" in lng
+            array_push($latLngArr, array($lat, $lng));
+            $lat = $myStep->end_location->lat;
+            $lng = $myStep->end_location->lng;   ### no "O" in lng
+            array_push($latLngArr, array($lat, $lng));
+//          ### OLD CODE
+//          $lat1 = $myStep->start_location->lat;
+//          $lng1 = $myStep->start_location->lng;   ### no "O" in lng
+//          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat1, $lng1, $distance, $unitIDs);
+//          $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat1, $lng1);
+//          $lat2 = $myStep->end_location->lat;
+//          $lng2 = $myStep->end_location->lng;   ### no "O" in lng
+//          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat2, $lng2, $distance, $unitIDs);
+//          $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat2, $lng2);
+//          $arrExtra = array();
+//          #generateExtraWaypoints($lat1, $lng1, $lat2, $lng2,$arrExtra);
         }
       }
     }
+    #### GENERATE MISSING WAYPOINTS
+    $latLngArr = genWaypoints($latLngArr);
+
+
+    #### FIND COLLEGES
+    $finalUnitIDsArr = array();
+    $distance = 25;
+    foreach ($latLngArr as $point){
+        $lat = $point[0];
+        $lng = $point[1];
+        $dataCollegesNearRoute = getCollegesNearby($dbh, $lat, $lng, $distance, $unitIDs);
+        $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat, $lng);
+    }
+
     ##var_dump($finalUnitIDsArr);
     $finalArr = array();
     foreach ($finalUnitIDsArr as $unitID => $rest){
@@ -405,44 +426,66 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
     return $finalArr;
 }
 
-function generateExtraWaypoints($lat1, $lng1, $lat2, $lng2, $extraWaypoints){
-    ### if the distance between two points is too far, calculate extra waypoints
-    ### this is needed when calculating colleges near route
-    ### if a route has a single leg that is 200 miles long.. you would only find college
-    ### that were near the start and end. You need the extra points along the way
-
-    #Steps
-    # Calc distance between 2 main points
-    $dist = distance($lat1, $lng1, $lat2, $lng2, ""); #### last param is unit (blank is miles)
-    $dist = round($dist);
-    echo "this is first lat/lng: $lat1 $lng1 and this is the second: $lat2 $lng2 and this is the distance: $dist\n";
-    # if distance is too large, then calculate the mid point and use it as a waypoint
-    if ($dist > 31){
-        list ($latNew, $lngNew) = midpoint($lat1, $lng1, $lat2, $lng2);
-
-        $dist = distance($lat1, $lng1, $latNew, $lngNew, ""); #### last param is unit (blank is miles)
-        echo "generated a new wayPoint it is: $latNew  $lngNew\n";
-        echo "distance between start and new point is $dist\n ";
-        if ($dist > 31){
-          list ($latNew, $lngNew) = midpoint($lat1, $lng1, $latNew, $lngNew);
-          $dist = distance($lat1, $lng1, $latNew, $lngNew, ""); #### last param is unit (blank is miles)
-          echo "generated a new wayPoint it is: $latNew  $lngNew\n";
-          echo "distance between start and new point is $dist\n ";
-        }
-    }
-}
-
-function genWP ($lat1, $lng1, $lat2, $lng2) {
-
-  foreach ($pointArr as $point){
-    list ($begLat, $startLng) = $point[0];
-    list ($endLat, $endLng) = $point[1];
-    $dist = distance($begLat, $startLng, $endLat, $endLng, "");
-    if ($dist > 31){
-      list ($latNew, $lngNew) = midpoint($begLat, $startLng, $endLat, $endLng);
-    }
+function genWaypoints($latLngArr){
+  $itemsInArray = count($latLngArr);
+  $ctr = 0;
+  while ($ctr < $itemsInArray){
+      list ($lat1,$lng1) = $latLngArr[$ctr];
+      list ($lat2,$lng2) = $latLngArr[$ctr + 1];
+      $dist = distance($lat1, $lng1, $lat2, $lng2, ""); #### last param is unit (blank is miles)
+      $dist = round($dist);
+      if ($dist > 21){
+          list ($latNew, $lngNew) = midpoint($lat1, $lng1, $lat2, $lng2);
+          ##echo "dist is:$dist adding these:$latNew:$lngNew after $lat1:$lng1 and before $lat2:lng2\n";
+          $newItem = array(array($latNew,$lngNew));
+          array_splice( $latLngArr, $ctr + 1, 0, $newItem ); // add items to array
+          #var_dump($latLngArr);
+          #die;
+      } else {
+          $ctr++;
+      }
   }
+  return $latLngArr;
 }
+
+//function generateExtraWaypoints($lat1, $lng1, $lat2, $lng2, $extraWaypoints){
+//    ### if the distance between two points is too far, calculate extra waypoints
+//    ### this is needed when calculating colleges near route
+//    ### if a route has a single leg that is 200 miles long.. you would only find college
+//    ### that were near the start and end. You need the extra points along the way
+//
+//    #Steps
+//    # Calc distance between 2 main points
+//    $dist = distance($lat1, $lng1, $lat2, $lng2, ""); #### last param is unit (blank is miles)
+//    $dist = round($dist);
+//    echo "this is first lat/lng: $lat1 $lng1 and this is the second: $lat2 $lng2 and this is the distance: $dist\n";
+//    # if distance is too large, then calculate the mid point and use it as a waypoint
+//    if ($dist > 31){
+//        list ($latNew, $lngNew) = midpoint($lat1, $lng1, $lat2, $lng2);
+//
+//        $dist = distance($lat1, $lng1, $latNew, $lngNew, ""); #### last param is unit (blank is miles)
+//        echo "generated a new wayPoint it is: $latNew  $lngNew\n";
+//        echo "distance between start and new point is $dist\n ";
+//        if ($dist > 31){
+//          list ($latNew, $lngNew) = midpoint($lat1, $lng1, $latNew, $lngNew);
+//          $dist = distance($lat1, $lng1, $latNew, $lngNew, ""); #### last param is unit (blank is miles)
+//          echo "generated a new wayPoint it is: $latNew  $lngNew\n";
+//          echo "distance between start and new point is $dist\n ";
+//        }
+//    }
+//}
+//
+//function genWP ($lat1, $lng1, $lat2, $lng2) {
+//
+//  foreach ($pointArr as $point){
+//    list ($begLat, $startLng) = $point[0];
+//    list ($endLat, $endLng) = $point[1];
+//    $dist = distance($begLat, $startLng, $endLat, $endLng, "");
+//    if ($dist > 31){
+//      list ($latNew, $lngNew) = midpoint($begLat, $startLng, $endLat, $endLng);
+//    }
+//  }
+//}
 ### credit for these two functions goes to:  http://stackoverflow.com/questions/5657194/need-help-calculating-longitude-and-latitude-midpoint-using-javascript-from-php
 function midpoint ($lat1, $lng1, $lat2, $lng2) {
 

@@ -1,18 +1,51 @@
 <div ng-controller="CollegelistCtrl">
 
 
-    <div class="container-fluid" >
-        <h1>ROWING COLLEGES</h1>
-        <button class="btn btn-primary btn-md" data-ng-click="getColleges()">GET COLLEGES</button>
+    <div class="panel panel-default">
+        <div class="panel-heading">My Colleges</div>
+        <!-- Table -->
+        <table class="table">
+            <strong>
+                <div class="col-md-1"></div>
+                <div class="col-md-11">
+                    <div class="col-md-4 strong">College Name</div>
+                    <div class="col-md-2">Miles from Home</div>
+                    <div class="col-md-2">Location</div>
+                    <div class="col-md-2">Locale</div>
+                    <div class="col-md-2">Students</div>
+                </div>
+            </strong>
 
-        <div ng-repeat="college in colleges | orderBy:'name'">
-            <div class="col-md-4"><a href="http://{{college.url}}">{{college.name}}</a></div>
-            <div class="col-md-2">{{college.distance}}</div>
-            <div class="col-md-2">{{college.city}},{{college.state_cd}}</div>
-            <div class="col-md-2">{{college.locale}}</div>
-            <div class="col-md-2">{{college.school_size}}</div>
-        </div>
-
+            <div class="col-md-12" ng-repeat="college in colleges | orderBy:'name'" >
+                <div class="col-md-1">
+                    <span class="glyphicon glyphicon-thumbs-up" ng-click="addThumbUp(college.id)"></span>
+                    <span class="glyphicon glyphicon-thumbs-down" ng-click="addThumbDown(college.id)"></span>
+                </div>
+                <div class="col-md-11">
+                    <div class="col-md-4"><a href="http://{{college.url}}">{{college.name}}</a></div>
+                    <div class="col-md-2">{{college.distance}}</div>
+                    <div class="col-md-2">{{college.location}}</div>
+                    <div class="col-md-2">{{college.locale}}</div>
+                    <div class="col-md-2">{{college.school_size}}</div>
+                </div>
+            </div>
+        </table>
     </div>
 </div>
+
+
+    <!--<div class="container-fluid" >-->
+        <!--<h1>ROWING COLLEGES</h1>-->
+        <!--<button class="btn btn-primary btn-md" data-ng-click="getColleges()">GET COLLEGES</button>-->
+
+        <!--<div ng-repeat="college in colleges | orderBy:'name'">-->
+            <!--<div class="col-md-4"><a href="http://{{college.url}}">{{college.name}}</a></div>-->
+            <!--<div class="col-md-2">{{college.distance}}</div>-->
+            <!--<div class="col-md-2">{{college.location}}</div>-->
+            <!--<div class="col-md-2">{{college.locale}}</div>-->
+            <!--<div class="col-md-2">{{college.school_size}}</div>-->
+        <!--</div>-->
+
+    <!--</div>-->
+<!--</div>-->
 

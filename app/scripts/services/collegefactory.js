@@ -29,6 +29,23 @@ angular.module('collegeApp')
         // something went wrong.... error on the call..
         return $q.reject(result.data);
       });
+    };    ////=============================================================================///
+    dataFactory.getTestScoreRelation = function() {
+      var url = 'college.php';
+      var passedData = {action: 'getTestScoreRelation'};
+      // Start Standard Code... GET
+      var promise = $http.get(url , {params: passedData });
+      return promise.then(function(result) {
+        if (typeof result.data === 'object') {
+          return result.data;
+        } else {
+          // call was successful but response was invalid (result was not an object)
+          return $q.reject(result.data);
+        }
+      }, function(result) {
+        // something went wrong.... error on the call..
+        return $q.reject(result.data);
+      });
     };
     ////=============================================================================///
     dataFactory.getSchoolSizes = function() {

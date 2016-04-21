@@ -41,15 +41,15 @@
             <a class="navbar-brand" href="#/">collegeApp</a>
           </div>
 
-          <div class="collapse navbar-collapse" id="js-navbar-collapse">
+          <div ng-controller="NavCtrl" class="collapse navbar-collapse" id="js-navbar-collapse">
 
             <ul class="nav navbar-nav">
-              <li class="active"><a href="#/">Home</a></li>
-                <li><a href="#/criteria">My Criteria</a></li>
-                <li><a href="#/collegelist">List of Colleges</a></li>
-                <li><a href="#/googlemap">Plan A Trip</a></li>
-              <li><a ng-href="#/about">About</a></li>
-              <li><a ng-href="#/">Contact</a></li>
+              <li data-ng-class="{active: isActive('/home')}"><a href="#/">Home</a></li>
+              <li data-ng-class="{active: isActive('/criteria')}"><a href="#/criteria">My Criteria</a></li>
+              <li data-ng-class="{active: isActive('/collegelist')}"><a href="#/collegelist">List of Colleges</a></li>
+              <li data-ng-class="{active: isActive('/googlemap')}"><a href="#/googlemap">Plan A Trip</a></li>
+              <li data-ng-class="{active: isActive('/about')}"><a ng-href="#/about">About</a></li>
+              <li data-ng-class="{active: isActive('/contact')}"><a ng-href="#/contact">Contact</a></li>
             </ul>
           </div>
         </div>
@@ -110,6 +110,7 @@
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
+        <script src="scripts/controllers/nav.js"></script>
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/about.js"></script>
         <script src="scripts/controllers/googlemap.js"></script>

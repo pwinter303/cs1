@@ -49,6 +49,18 @@ function  processGet($customer_id){
     $dbh = createDatabaseConnection();
     $action = htmlspecialchars($_GET["action"]);
     switch ($action) {
+       case 'getLocale':
+              $result = getLocale($dbh);
+              break;
+       case 'getSchoolSizes':
+              $result = getSchoolSizes($dbh);
+              break;
+       case 'getSports':
+              $result = getSports($dbh);
+              break;
+       case 'getTestScoreRelation':
+              $result = getTestScoreRelation($dbh);
+              break;
        case 'getColleges':
              $result = getColleges($dbh,$customer_id);
              break;
@@ -58,20 +70,11 @@ function  processGet($customer_id){
        case 'getCriteriaForWeb':
               $result = getCriteriaForWeb($dbh,$customer_id);
               break;
-       case 'getSize':
-              $result = getSize($dbh);
-              break;
        case 'getCustomersCollegeUnitIDs':
               $result = getCustomersCollegeUnitIDs($dbh, $customer_id);
               break;
-       case 'getLocale':
-              $result = getLocale($dbh);
-              break;
-       case 'getSchoolSizes':
-              $result = getSchoolSizes($dbh);
-              break;
-       case 'getSports':
-              $result = getSports($dbh);
+       case 'convertPolylineToLatLng':
+              $result = convertPolylineToLatLng();
               break;
        default:
              echo "Error:Invalid Request:Action not set properly";
@@ -110,11 +113,13 @@ function  processPost($customer_id){
     return $result;
 }
 
+#################### GETS #####################################################
 function  getLocale($dbh){
     $query = "select locale as id, locale_decode as name from decode_locale";
     $data = execSqlMultiRowPREPARED($dbh, $query);
     return $data;
 }
+
 function  getSchoolSizes($dbh){
     $query = "select instsize as id, instsize_decode as name from decode_instsize where instsize >0";
     $data = execSqlMultiRowPREPARED($dbh, $query);
@@ -124,6 +129,15 @@ function  getSchoolSizes($dbh){
 function  getSports($dbh){
     $query = "select sport_cd as id, sport_nm as name from sports_decodes";
     $data = execSqlMultiRowPREPARED($dbh, $query);
+    return $data;
+}
+
+function  getTestScoreRelation($dbh){
+    $data = array(
+        array('id' => 'worst', 'name' => 'The lowest in the school'),
+        array('id' => 'average', 'name' => 'Average for those attending'),
+        array('id' => 'best', 'name' => 'The best in the school')
+        );
     return $data;
 }
 
@@ -209,9 +223,8 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
              case 'sports':
                 $value = $restOfArray{'options'};
                 $valueArr = explode(",", $value);
-                ####var_dump($valueArr);
+                # Iterate through the array and convert items to strings and wrap with quotes
                 array_walk($valueArr, create_function('&$str', '$str = "\"$str\"";'));
-                ###var_dump($valueArr);
                 $value = implode('", "', $valueArr);
                 ####echo "this is value for sports $value\n";
                 $where = " and institutions.unitid in (select distinct sports.unitid from sports where sport_cd in ($value)) ";
@@ -246,7 +259,7 @@ function  getCollegeFunc($dbh, $customer_id, $count=0){
     $selectCols = "instnm as name,
                              unitid as id,
                              locale_decode as locale,
-                             city, stabbr as state_cd,
+                             CONCAT(city,',', stabbr) as location,
                              webaddr as url,
                              instsize_decode as school_size $distCols";
 
@@ -278,58 +291,8 @@ function  getCollegeFunc($dbh, $customer_id, $count=0){
 }
 
 
-function  getCollegesSTATIC(){
-    $colleges = array( array( name => "Georgetown University",
-                          location => "3700 O St NW, Washington, DC"
-                        ),
-                   array( name => "Princeton University",
-                          location => "One Nassau Hall, Princeton, NJ"
-                        ),
-                   array( name => "Miss Porters",
-                          location => "Farmington,CT"
-                        ),
-                   array( name => "Pennsylvania State University",
-                          location => "University Park, PA"
-                        ),
-                   array( name => "University of Pittsburgh",
-                          location => "Pittsburgh,PA"
-                        ),
-                   array( name => "Ohio State University",
-                          location => "Columbus,OH"
-                        ),
-                   array( name => "UMASS Amherst",
-                          location => "Amherst, MA"
-                        ),
-                   array( name => "UMASS Boston",
-                          location => "Boston, MA"
-                        ),
-                   array( name => "UVM",
-                          location => "Burlington, VT"
-                        ),
-                   array( name => "Dartmouth",
-                          location => "Hanover, NH"
-                        ),
-                   array( name => "Brown",
-                          location => "Providence,RI"
-                        )
-                 );
-
-    return $colleges;
-//    array(['name' => "COLLEGE1"],
-//                 ['name' => "COLLEGE2"],
-//                 ['name' => "COLLEGE3"]);
-}
-
-
-function  getDirections(){
-//    return 1;
-    ### NOTE:  POST SEEMS BETTER
-    $passedData = ($_GET);
-    $passedDataDecoded = json_decode($passedData{'routePoints'});
-    var_dump($passedDataDecoded{'name'});
-}
-
-## ToDo: This reads the data from a file instead of hitting google
+####################### POSTS ####################################################
+## This reads the data from a file instead of hitting google
 function  getDirectionsFROMFILE($dbh, $request_data){
     $myfile = fopen("c:/tmp/googleMapResults.txt", "r") or die("Unable to open file!");
     $data = fread($myfile,filesize("c:/tmp/googleMapResults.txt"));
@@ -337,16 +300,26 @@ function  getDirectionsFROMFILE($dbh, $request_data){
     ##echo $data;
     return($data);
 }
-##function  getDirectionsAsPOST___REAL_ONE($dbh, $request_data){
-function  getDirectionsAsPOST($dbh, $request_data){
-    $orig = $request_data->routePoints->start->name;
-    $dest = $request_data->routePoints->end->name;
 
-//    var myKey = "&key=AIzaSyBJW90ZQrxG82XCEqDn9uxBlef8x7Oebkc";
+function  getDirectionsAsPOST($dbh, $request_data){
+    $orig = $request_data->routePoints->start;
+    $dest = $request_data->routePoints->end;
+    $wayPts = "";
+
+    #var_dump($request_data->waypoints);
+    if (isset($request_data->waypoints)){
+      $waypts = "=optimize:true|";
+      $wayPtLocations = array();
+      foreach ($request_data->waypoints as $waypoint){
+        array_push($wayPtLocations, $waypoint->location);
+      }
+      $wayPts .= implode("|", $wayPtLocations);
+    }
+
     $myKey = "&key=AIzaSyBJW90ZQrxG82XCEqDn9uxBlef8x7Oebkc";
     #$parameters = "origin=" . encodeURI(orig) . "&destination=" . encodeURI(dest) . waypoints + myKey;
-    $parameters = "origin=" . urlencode($orig) . "&destination=" . urlencode($dest) . $myKey;
-//    var encodedParams = encodeURIComponent(parameters);
+    $parameters = "origin=" . urlencode($orig) . "&destination=" . urlencode($dest) . "&waypoints=". urlencode($wayPts) . $myKey;
+
     $encodedParams = $parameters;
 
     $url = "https://maps.googleapis.com/maps/api/directions/json?" . $encodedParams;
@@ -358,18 +331,17 @@ function  getDirectionsAsPOST($dbh, $request_data){
           $error = error_get_last();
           echo "HTTP request failed. Error was: " . $error['message'];
     }
-      ## Temp code to write the results of the directions call to a file (to use for testing)
-//    $myfile = fopen("c:/tmp/googleMapResults.txt", "w") or die("Unable to open file!");
-//    fwrite($myfile, $data);
-
+    ## Temp code to write the results of the directions call to a file (to use for testing)
+    ## $myfile = fopen("c:/tmp/googleMapResults.txt", "w") or die("Unable to open file!");
+    ## fwrite($myfile, $data);
     return($data);
 }
+
 function getCollegesOnRoute($dbh, $request_data, $customer_id){
     $dataRouteJSON  = getDirectionsAsPOST($dbh, $request_data);
     ##var_dump($dataRouteJSON);
     $dataColleges = getColleges($dbh, $customer_id);
     $unitIDs = extractUnitIDs($dataColleges);
-    ###var_dump($unitIDs);
 
     $dataResponse = json_decode($dataRouteJSON);
     $g = $dataResponse->routes;
@@ -377,6 +349,9 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
     $latLngArr = array();
 
     ### COLLECT WAYPOINTS
+    ### ToDo: May want to decode the polylines and get all the actual lat/lng along the route
+    ### there are hundreds (or thousands) along a typical route so it would be necessary to
+    ### filter them.. eg: compare distance and drop the ones that are too close
     foreach ($g as $item){
       foreach ($item->legs as $myLeg){
         foreach ($myLeg->steps as $myStep){
@@ -386,27 +361,17 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
             $lat = $myStep->end_location->lat;
             $lng = $myStep->end_location->lng;   ### no "O" in lng
             array_push($latLngArr, array($lat, $lng));
-//          ### OLD CODE
-//          $lat1 = $myStep->start_location->lat;
-//          $lng1 = $myStep->start_location->lng;   ### no "O" in lng
-//          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat1, $lng1, $distance, $unitIDs);
-//          $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat1, $lng1);
-//          $lat2 = $myStep->end_location->lat;
-//          $lng2 = $myStep->end_location->lng;   ### no "O" in lng
-//          $dataCollegesNearRoute = getCollegesNearby($dbh, $lat2, $lng2, $distance, $unitIDs);
-//          $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat2, $lng2);
-//          $arrExtra = array();
-//          #generateExtraWaypoints($lat1, $lng1, $lat2, $lng2,$arrExtra);
         }
       }
     }
+
     #### GENERATE MISSING WAYPOINTS
     $latLngArr = genWaypoints($latLngArr);
 
 
     #### FIND COLLEGES
     $finalUnitIDsArr = array();
-    $distance = 25;
+    $distance = 2500;
     foreach ($latLngArr as $point){
         $lat = $point[0];
         $lng = $point[1];
@@ -423,7 +388,12 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
       $dataArr{'distance'} = $distanceOffRoute;
       array_push($finalArr, $dataArr);
     }
-    return $finalArr;
+    $finalResults = array(
+                    'googleDirections' => $dataResponse,
+                    'collegesOnRoute' => $finalArr
+                    );
+    ##return $finalArr;
+    return $finalResults;
 }
 
 function genWaypoints($latLngArr){
@@ -448,44 +418,6 @@ function genWaypoints($latLngArr){
   return $latLngArr;
 }
 
-//function generateExtraWaypoints($lat1, $lng1, $lat2, $lng2, $extraWaypoints){
-//    ### if the distance between two points is too far, calculate extra waypoints
-//    ### this is needed when calculating colleges near route
-//    ### if a route has a single leg that is 200 miles long.. you would only find college
-//    ### that were near the start and end. You need the extra points along the way
-//
-//    #Steps
-//    # Calc distance between 2 main points
-//    $dist = distance($lat1, $lng1, $lat2, $lng2, ""); #### last param is unit (blank is miles)
-//    $dist = round($dist);
-//    echo "this is first lat/lng: $lat1 $lng1 and this is the second: $lat2 $lng2 and this is the distance: $dist\n";
-//    # if distance is too large, then calculate the mid point and use it as a waypoint
-//    if ($dist > 31){
-//        list ($latNew, $lngNew) = midpoint($lat1, $lng1, $lat2, $lng2);
-//
-//        $dist = distance($lat1, $lng1, $latNew, $lngNew, ""); #### last param is unit (blank is miles)
-//        echo "generated a new wayPoint it is: $latNew  $lngNew\n";
-//        echo "distance between start and new point is $dist\n ";
-//        if ($dist > 31){
-//          list ($latNew, $lngNew) = midpoint($lat1, $lng1, $latNew, $lngNew);
-//          $dist = distance($lat1, $lng1, $latNew, $lngNew, ""); #### last param is unit (blank is miles)
-//          echo "generated a new wayPoint it is: $latNew  $lngNew\n";
-//          echo "distance between start and new point is $dist\n ";
-//        }
-//    }
-//}
-//
-//function genWP ($lat1, $lng1, $lat2, $lng2) {
-//
-//  foreach ($pointArr as $point){
-//    list ($begLat, $startLng) = $point[0];
-//    list ($endLat, $endLng) = $point[1];
-//    $dist = distance($begLat, $startLng, $endLat, $endLng, "");
-//    if ($dist > 31){
-//      list ($latNew, $lngNew) = midpoint($begLat, $startLng, $endLat, $endLng);
-//    }
-//  }
-//}
 ### credit for these two functions goes to:  http://stackoverflow.com/questions/5657194/need-help-calculating-longitude-and-latitude-midpoint-using-javascript-from-php
 function midpoint ($lat1, $lng1, $lat2, $lng2) {
 
@@ -506,6 +438,65 @@ function midpoint ($lat1, $lng1, $lat2, $lng2) {
     $lngNew = ($lng3*180)/$pi;
     return array($latNew, $lngNew);
 }
+
+function convertPolylineToLatLng(){
+
+# Do steps 1-11 given here
+# https://developers.google.com/maps/documentation/utilities/polylinealgorithm
+# in reverse order and inverted (i.e. left shift -> right shift, add -> subtract)
+
+$string = "udgiEctkwIldeRe}|x@cfmXq|flA`nrvApihC";
+$string = "mmf~Fjp{rL`CgEp@oAx@cBf@aAjAyCbA_D@CZiA@C?A?ARu@h@}BFW\\cBf@}BdAuERw@Ng@Rk@j@kAR[BCBENQJO@AHI\\a@d@a@t@i@JIjEaDlBsAXSBALILKJG@AZOp@]d@QRGTIRETEf@IRAVATAT?\\@`@BTBTB`ANl@HRBt@H\\@l@?JA^Aj@Gb@GZIfAQZIZIr@O|@Ux@UxBk@tA_@b@Md@KXIrBg@dD}@d@KhAUjA[t@QRGVGFCb@K\\INCPC\\GRCTA`@ARAV@P@V@F@D@F@TDTDTFRHRHRHPJRNRLPLPPNNPPNRLPNTLTNVJTXr@`@|@JXv@hBnCnGf@nA|@xBr@bB~BtFZt@vAfDtHvQJVRj@Pb@X|@r@dCRl@f@xA`@bAb@`Ad@|@l@fA`@r@d@t@j@z@t@bAV\\RVf@n@rA~At@v@v@x@dAbAb@`@BBNLNNTPRR`@Zt@n@p@f@x@p@z@l@XRXRZRt@d@JHv@h@^Tn@^hAl@|@f@xAt@~@b@r@ZHDDBB@fCdAd@PTJ`@NB@FBxAf@nA`@LDB@pBh@vEjAjEjAbDv@PDnA\\lFvA|Cv@fKnCVH~MrDzDbA~Bj@pGbBNBB@JBn@PxA^b@Lr@PvBj@r@RpD`AbCn@`GzAbAX~A`@h@R~@XrA`@~@Zd@R|@\\h@Tj@X^Ph@Vh@Z\\PVPh@\\v@f@x@j@fAz@~@z@dBdBn@p@dBjBdAjApAxAlApAFHPPRRdGtGt@x@fCpClApAdAfAdA`AxApAzAhAlAx@ZRf@XPJp@^f@VnBbAPJRJLFz@\\l@R|@XdD~@pCt@pElAfAVpDdA~Bp@`AVhBj@r@T~Aj@RHd@PRHTLx@`@z@`@z@`@|@d@x@`@h@Xz@f@lAr@vBzANHp@f@d@\\f@^dA~@|AnAfA`ArArAvAzArAzArAzA`BvBrCbEj@z@vLjQn@`AnC~Dl@z@hCzDBDhGbJjC|DnDfFdA|A~@tAz@lAlAfB\\h@`@j@j@z@hElGf@p@jAvAp@v@v@x@`AbAjA`AjA~@`BjADBlBjAd@Vn@\\n@Xf@Tr@Zt@VjDlAbExAD@@@PHD@|Bv@FBPF~Bz@r@VtAj@t@ZRHNFHBzAd@dBb@hB`@HB|AVfBVx@JhEVz@DP@^P~DGtCApB?bEB|B?|BBp@?l@D|@Dr@Fv@Jj@Fd@Hl@Jl@Hh@Lj@Lh@Jh@LNDXFh@L~AZzBf@nCn@jFjAvCn@\\Hz@Rz@RfJpBfATtBd@hB\\|B\\|BV|BVrBNzBNbAD~AD`A@tA?rDAvC?|AAlCAzAA@?f@@bC?pAAlA?nDAtF?zB@z@?jAA`BAbB?zAA~@@X@L?dBH~AJnBPr@Ht@Lv@Nn@NTFPDx@T`Cv@^NXL|@`@z@b@dAl@n@^z@j@p@f@h@b@^Zz@r@bA`At@v@`@f@Z^d@j@^f@f@t@f@x@Zf@^r@Xp@\\x@Rf@L\\Pl@L`@VfANr@Hd@DNJp@ZdCPtAHh@Ff@`@lD";
+# Step 11) unpack the string as unsigned char 'C'
+$byte_array = array_merge(unpack('C*', $string));
+$results = array();
+
+$index = 0; # tracks which char in $byte_array
+do {
+  $shift = 0;
+  $result = 0;
+  do {
+    $char = $byte_array[$index] - 63; # Step 10
+    # Steps 9-5
+    # get the least significat 5 bits from the byte
+    # and bitwise-or it into the result
+    $result |= ($char & 0x1F) << (5 * $shift);
+    $shift++; $index++;
+  } while ($char >= 0x20); # Step 8 most significant bit in each six bit chunk
+    # is set to 1 if there is a chunk after it and zero if it's the last one
+    # so if char is less than 0x20 (0b100000), then it is the last chunk in that num
+
+  # Step 3-5) sign will be stored in least significant bit, if it's one, then
+  # the original value was negated per step 5, so negate again
+  if ($result & 1)
+    $result = ~$result;
+  # Step 4-1) shift off the sign bit by right-shifting and multiply by 1E-5
+  $result = ($result >> 1) * 0.00001;
+  $results[] = $result;
+} while ($index < count($byte_array));
+
+# to save space, lat/lons are deltas from the one that preceded them, so we need to
+# adjust all the lat/lon pairs after the first pair
+for ($i = 2; $i < count($results); $i++) {
+  $results[$i] += $results[$i - 2];
+}
+
+# chunk the array into pairs of lat/lon values
+
+$plwArr = array_chunk($results, 2);
+foreach ($plwArr as $item){
+  #var_dump($item);
+  list ($lat, $lng) = $item;
+  echo "lat:$lat lng:$lng<br>";
+}
+//var_dump(array_chunk($results, 2));
+
+# Test correctness by using Google's polylineutility here:
+# https://developers.google.com/maps/documentation/utilities/polylineutility
+
+
+}
+
 
 function distance($lat1, $lng1, $lat2, $lng2, $unit) {
 
@@ -551,7 +542,8 @@ function getCollegeUsingUnitID($dbh, $unitID){
     $query = "select instnm as name,
                      unitid as id,
                      locale_decode as locale,
-                     city, stabbr as state_cd,
+                     CONCAT(city,',', stabbr) as location,
+                     webaddr as url,
                      instsize_decode as school_size
     from institutions, decode_instsize, decode_locale
     where
@@ -581,13 +573,6 @@ function extractUnitIDs($dataColleges){
 function getCollegesNearby($dbh, $lat, $lng, $distance, $unitIDs){
       $whereUnits = implode(",", $unitIDs);
 
-//      $query = "select unitid as id,
-//                round((((acos(sin(($lat *pi()/180)) * sin((`latitude`*pi()/180))+cos(($lat *pi()/180))
-//                                   * cos((`latitude`*pi()/180)) * cos((($lng - `longitude`)*pi()/180))))*180/pi())*60*1.1515))
-//                                   AS distance
-//                from institutions
-//                where unitID in ($whereUnits)
-//                having distance < 15";
       $query = "select unitid as id,
                 round((((acos(sin((? *pi()/180)) * sin((`latitude`*pi()/180))+cos((? *pi()/180))
                                    * cos((`latitude`*pi()/180)) * cos(((? - `longitude`)*pi()/180))))*180/pi())*60*1.1515))
@@ -651,11 +636,8 @@ function  saveCriteria($dbh, $request_data, $customer_id){
   }
 
 
-
-
-
-  $college_count = array( "college_count" => 3);
-  return $college_count;
+  $status = array( "status" => 1);
+  return $status;
 }
 
 ##############################################################################

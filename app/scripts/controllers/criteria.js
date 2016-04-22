@@ -37,64 +37,83 @@ angular.module('collegeApp')
     };
     $scope.getCriteria();
 
-    $scope.getLocale = function (){
-      collegeFactory.getLocale().then(function (data) {
+    // get reference data
+    $scope.getCriteriaRefData = function (){
+      collegeFactory.getCriteriaRefData().then(function (data) {
         if (data){
-          $scope.locales = data;
+          $scope.locales = data.locales;
+          $scope.sizes = data.sizes;
+          $scope.yrsOfSchool = data.yrsOfSchool;
+          $scope.TestScoreRelations = data.TestScoreRelations;
+          $scope.sports = data.sports;
+          $scope.runBy = data.runBy;
         }
       }, function(error) {
         // promise rejected, could be because server returned 404, 500 error...
         collegeFactory.msgError(error);
       });
     };
-    $scope.getLocale();
-
-    $scope.getTestScoreRelation = function (){
-      collegeFactory.getTestScoreRelation().then(function (data) {
-        if (data){
-          $scope.TestScoreRelations = data;
-        }
-      }, function(error) {
-        // promise rejected, could be because server returned 404, 500 error...
-        collegeFactory.msgError(error);
-      });
-    };
-    $scope.getTestScoreRelation();
-
-    $scope.getSchoolSizes = function (){
-      collegeFactory.getSchoolSizes().then(function (data) {
-        if (data){
-          $scope.sizes = data;
-        }
-      }, function(error) {
-        // promise rejected, could be because server returned 404, 500 error...
-        collegeFactory.msgError(error);
-      });
-    };
-    $scope.getSchoolSizes();
-    $scope.getSchoolSizes = function (){
-      collegeFactory.getSchoolSizes().then(function (data) {
-        if (data){
-          $scope.sizes = data;
-        }
-      }, function(error) {
-        // promise rejected, could be because server returned 404, 500 error...
-        collegeFactory.msgError(error);
-      });
-    };
-    $scope.getSchoolSizes();
-
-    $scope.getSports = function (){
-      collegeFactory.getSports().then(function (data) {
-        if (data){
-          $scope.sports = data;
-        }
-      }, function(error) {
-        // promise rejected, could be because server returned 404, 500 error...
-        collegeFactory.msgError(error);
-      });
-    };
-    $scope.getSports();
+    $scope.getCriteriaRefData();
+//
+//    $scope.getLocale = function (){
+//      collegeFactory.getLocale().then(function (data) {
+//        if (data){
+//          $scope.locales = data;
+//        }
+//      }, function(error) {
+//        // promise rejected, could be because server returned 404, 500 error...
+//        collegeFactory.msgError(error);
+//      });
+//    };
+//    $scope.getLocale();
+//
+//    $scope.getYrsOfSchool = function (){
+//      collegeFactory.getYrsOfSchool().then(function (data) {
+//        if (data){
+//          $scope.yrsOfSchool = data;
+//        }
+//      }, function(error) {
+//        // promise rejected, could be because server returned 404, 500 error...
+//        collegeFactory.msgError(error);
+//      });
+//    };
+//    $scope.getYrsOfSchool();
+//
+//    $scope.getTestScoreRelation = function (){
+//      collegeFactory.getTestScoreRelation().then(function (data) {
+//        if (data){
+//          $scope.TestScoreRelations = data;
+//        }
+//      }, function(error) {
+//        // promise rejected, could be because server returned 404, 500 error...
+//        collegeFactory.msgError(error);
+//      });
+//    };
+//    $scope.getTestScoreRelation();
+//
+//    $scope.getSchoolSizes = function (){
+//      collegeFactory.getSchoolSizes().then(function (data) {
+//        if (data){
+//          $scope.sizes = data;
+//        }
+//      }, function(error) {
+//        // promise rejected, could be because server returned 404, 500 error...
+//        collegeFactory.msgError(error);
+//      });
+//    };
+//    $scope.getSchoolSizes();
+//
+//    $scope.getSports = function (){
+//      collegeFactory.getSports().then(function (data) {
+//        if (data){
+//          $scope.sports = data;
+//        }
+//      }, function(error) {
+//        // promise rejected, could be because server returned 404, 500 error...
+//        collegeFactory.msgError(error);
+//      });
+//    };
+//    $scope.getSports();
 
     $scope.resetIt = function(formData, func){
       formData.func = func;
@@ -106,6 +125,8 @@ angular.module('collegeApp')
         case 'schoolSetting': {$scope.myForm.schoolSetting.enabled = false; break;}
         case 'schoolCost': {$scope.myForm.schoolCost.enabled = false; break;}
         case 'schoolSize': {$scope.myForm.schoolSize.enabled = false; break;}
+        case 'yrsOfSchool': {$scope.myForm.yrsOfSchool.enabled = false; break;}
+        case 'runBy': {$scope.myForm.runBy.enabled = false; break;}
       }
       collegeFactory.saveCriteria(formData).then(function (data) {
         if (data){
@@ -130,6 +151,8 @@ angular.module('collegeApp')
         case 'schoolSetting': {$scope.myForm.schoolSetting.enabled = true; break;}
         case 'schoolCost': {$scope.myForm.schoolCost.enabled = true; break;}
         case 'schoolSize': {$scope.myForm.schoolSize.enabled = true; break;}
+        case 'yrsOfSchool': {$scope.myForm.yrsOfSchool.enabled = true; break;}
+        case 'runBy': {$scope.myForm.runBy.enabled = true; break;}
       }
 
       collegeFactory.saveCriteria(formData).then(function (data) {

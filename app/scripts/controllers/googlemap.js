@@ -69,7 +69,7 @@ angular.module('collegeApp')
                   directionsDisplay.setDirections(response);
               }
           });
-          return;
+//          return;
       };
 
       $scope.calcRouteNEW = function (routePoints, waypoints) {
@@ -91,7 +91,7 @@ angular.module('collegeApp')
               collegeFactory.msgError(error);
           });
 
-          return;
+//          return;
       };
 
       $scope.getCollegesOnRoute = function () {
@@ -127,14 +127,14 @@ angular.module('collegeApp')
           collegeFactory.msgError(error);
         });
 
-        return;
+//        return;
       };
 
       $scope.addStop = function (college) {
         $scope.waypoints.push(college);
       };
       $scope.removeStop = function (college) {
-        var index = $scope.waypoints.indexOf(college)
+        var index = $scope.waypoints.indexOf(college);
         $scope.waypoints.splice(index,1);
       };
 

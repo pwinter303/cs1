@@ -49,6 +49,9 @@ function  processGet($customer_id){
     $dbh = createDatabaseConnection();
     $action = htmlspecialchars($_GET["action"]);
     switch ($action) {
+       case 'getCriteriaRefData':
+              $result = getCriteriaRefData($dbh);
+              break;
        case 'getLocale':
               $result = getLocale($dbh);
               break;
@@ -61,6 +64,12 @@ function  processGet($customer_id){
        case 'getTestScoreRelation':
               $result = getTestScoreRelation($dbh);
               break;
+       case 'getYrsOfSchool':
+             $result = getYrsOfSchool($dbh);
+             break;
+       case 'getRunBy':
+             $result = getRunBy($dbh);
+             break;
        case 'getColleges':
              $result = getColleges($dbh,$customer_id);
              break;
@@ -114,6 +123,30 @@ function  processPost($customer_id){
 }
 
 #################### GETS #####################################################
+function  getCriteriaRefData($dbh){
+    $finalResults = array();
+
+    $data = getLocale($dbh);
+    $finalResults{'locales'} = $data;
+
+    $data = getSchoolSizes($dbh);
+    $finalResults{'sizes'} = $data;
+
+    $data = getYrsOfSchool($dbh);
+    $finalResults{'yrsOfSchool'} = $data;
+
+    $data = getTestScoreRelation($dbh);
+    $finalResults{'TestScoreRelations'} = $data;
+
+    $data = getSports($dbh);
+    $finalResults{'sports'} = $data;
+
+    $data = getRunBy($dbh);
+    $finalResults{'runBy'} = $data;
+
+    return $finalResults;
+}
+
 function  getLocale($dbh){
     $query = "select locale as id, locale_decode as name from decode_locale";
     $data = execSqlMultiRowPREPARED($dbh, $query);
@@ -129,6 +162,24 @@ function  getSchoolSizes($dbh){
 function  getSports($dbh){
     $query = "select sport_cd as id, sport_nm as name from sports_decodes";
     $data = execSqlMultiRowPREPARED($dbh, $query);
+    return $data;
+}
+
+function  getYrsOfSchool($dbh){
+    $data = array(
+      array('id' => 1,  'name' => 'Four or more years'),
+      array('id' => 2,  'name' => 'At least 2 but less than 4 years'),
+      array('id' => 3,  'name' => 'Less than 2 years (below associate)')
+    );
+    return $data;
+}
+
+function  getRunBy($dbh){
+    $data = array(
+      array('id' => 1,  'name' => 'Public'),
+      array('id' => 2,  'name' => 'Private not-for-profit'),
+      array('id' => 3,  'name' => 'Private for-profit')
+    );
     return $data;
 }
 
@@ -198,6 +249,16 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
       ##var_dump($restOfArray);
       if (1 == $restOfArray{'enabled'}){
           switch ($criteria) {
+             case 'yrsOfSchool':
+                 $value = $restOfArray{'options'};
+                 $where = " and institutions.ICLEVEL in ($value)";
+                 array_push($whereArr, $where);
+                 break;
+             case 'runBy':
+                 $value = $restOfArray{'options'};
+                 $where = " and institutions.CONTROL in ($value)";
+                 array_push($whereArr, $where);
+                 break;
              case 'schoolSize':
                  $value = $restOfArray{'options'};
                  $where = " and institutions.instsize in ($value)";
@@ -270,13 +331,11 @@ function  getCollegeFunc($dbh, $customer_id, $count=0){
       $countEnd = ") as count";
     }
 
-    ## HACK: ICLEVEL = 1 is just 4 year colleges.. should be a drop down selection TODO
     $query = "$countSelect  select  $selectCols
     from institutions, decode_instsize, decode_locale
     where
       institutions.instsize = decode_instsize.instsize and
-      institutions.locale = decode_locale.locale and
-      iclevel = 1
+      institutions.locale = decode_locale.locale
       $where  $countEnd
     ";
     #echo "this is the query:$query\n";
@@ -308,7 +367,8 @@ function  getDirectionsAsPOST($dbh, $request_data){
 
     #var_dump($request_data->waypoints);
     if (isset($request_data->waypoints)){
-      $waypts = "=optimize:true|";
+      #$wayPts = "&waypoints=optimize:true|";
+      $wayPts = "optimize:true|";
       $wayPtLocations = array();
       foreach ($request_data->waypoints as $waypoint){
         array_push($wayPtLocations, $waypoint->location);
@@ -317,13 +377,14 @@ function  getDirectionsAsPOST($dbh, $request_data){
     }
 
     $myKey = "&key=AIzaSyBJW90ZQrxG82XCEqDn9uxBlef8x7Oebkc";
-    #$parameters = "origin=" . encodeURI(orig) . "&destination=" . encodeURI(dest) . waypoints + myKey;
-    $parameters = "origin=" . urlencode($orig) . "&destination=" . urlencode($dest) . "&waypoints=". urlencode($wayPts) . $myKey;
+    $parameters = "origin=" . urlencode($orig) . "&destination=" . urlencode($dest) . "&waypoints=" . urlencode($wayPts) . $myKey;
 
     $encodedParams = $parameters;
 
     $url = "https://maps.googleapis.com/maps/api/directions/json?" . $encodedParams;
+    #$urlUnFmttd = "https://maps.googleapis.com/maps/api/directions/json?" . "origin=" . $orig . "&destination=" . $dest . "&waypoints="  . $wayPts . $myKey;
     #echo "url is:$url\n";
+    #echo "urlUnFmttd is:$urlUnFmttd\n";
     error_reporting(0);
     header('Content-Type: application/json');
     #echo file_get_contents($_GET["url"]);
@@ -596,20 +657,16 @@ function  saveCriteria($dbh, $request_data, $customer_id){
   $criteria = $request_data->func;
   switch ($criteria) {
      case 'schoolSize':
+     case 'yrsOfSchool':
+     case 'runBy':
+     case 'sports':
+     case 'schoolSetting':
            saveCriteriaFunc($dbh, $customer_id, $request_data, "options");  # last param is the field
            saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
            break;
      case 'schoolCost':
            saveCriteriaFunc($dbh, $customer_id, $request_data, "min");  # last param is the field
            saveCriteriaFunc($dbh, $customer_id, $request_data, "max");
-           saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
-           break;
-     case 'schoolSetting':
-           saveCriteriaFunc($dbh, $customer_id, $request_data, "options");  # last param is the field
-           saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
-           break;
-     case 'sports':
-           saveCriteriaFunc($dbh, $customer_id, $request_data, "options");  # last param is the field
            saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
            break;
      case 'home':

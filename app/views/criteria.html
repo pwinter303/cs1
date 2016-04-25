@@ -1,6 +1,7 @@
 <div data-ng-controller="CriteriaCtrl">
 
-    <div class="container-fluid" ng-style="{'background-image': 'url(images/ivy.png)'}">
+    <!--<div class="container-fluid" ng-style="{'background-image': 'url(images/ivy.png)'}">-->
+    <div class="container-fluid">
     <br>
     <form role="form">
         <div class="col-lg-6">
@@ -317,8 +318,9 @@
             <div class="col-lg-6">
                 <h1>Schools Meeting Criteria:</h1>
                 <!--<div id="odometer" class="odometer">{{collegeCount.count}}</div>-->
-                <div class="odometer" odometer="visitors" odometer-options="{theme: 'digital', duration: 3000}">{{collegeCount.count}}</div>
-                <a href="#/collegelist" class="btn btn-info" role="button">Show me the schools</a>
+                <!--<div class="odometer" odometer="visitors" odometer-options="{theme: 'digital', duration: 3000}">{{collegeCount.count}}</div>-->
+                <ng-odometer value="collegeCount"></ng-odometer>
+                <a href="#/collegelist" class="btn btn-primary" role="button">Show me the schools</a>
                 <br><br>
                 <img src="images/temp-DeleteMe.jpg"/>
 

@@ -12,7 +12,9 @@ angular.module('collegeApp')
     .controller('GooglemapCtrl', ['$scope', 'uiGmapGoogleMapApi', 'collegeFactory', function ($scope, uiGmapGoogleMapApi, collegeFactory) {
 
     $scope.getColleges = function (){
-        collegeFactory.getColleges().then(function (data) {
+      var url = "college.php";
+      var action = "getColleges";
+      collegeFactory.getData(url, action).then(function (data) {
             if (data){
                 $scope.colleges = data;
             }
@@ -72,27 +74,27 @@ angular.module('collegeApp')
 //          return;
       };
 
-      $scope.calcRouteNEW = function (routePoints, waypoints) {
-          directionsDisplay.setMap($scope.map.control.getGMap());
-          var theRequest = {};
-          theRequest.routePoints = routePoints;
-          theRequest.waypoints = waypoints;
-
-          collegeFactory.getDirections(theRequest).then(function (data) {
-              if (data){
-                  // Process the route returned from Google Web Service
-                  //ToDo: Get result of webservice and correct it so it matches JS result
-                  if (data.status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
-                      directionsDisplay.setDirections(data);
-                  }
-              }
-          }, function(error) {
-              // promise rejected, could be because server returned 404, 500 error...
-              collegeFactory.msgError(error);
-          });
-
-//          return;
-      };
+//      $scope.calcRouteNEW = function (routePoints, waypoints) {
+//          directionsDisplay.setMap($scope.map.control.getGMap());
+//          var theRequest = {};
+//          theRequest.routePoints = routePoints;
+//          theRequest.waypoints = waypoints;
+//
+//          collegeFactory.getDirections(theRequest).then(function (data) {
+//              if (data){
+//                  // Process the route returned from Google Web Service
+//                  //ToDo: Get result of webservice and correct it so it matches JS result
+//                  if (data.status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
+//                      directionsDisplay.setDirections(data);
+//                  }
+//              }
+//          }, function(error) {
+//              // promise rejected, could be because server returned 404, 500 error...
+//              collegeFactory.msgError(error);
+//          });
+//
+////          return;
+//      };
 
       $scope.getCollegesOnRoute = function () {
         directionsDisplay.setMap($scope.map.control.getGMap());
@@ -132,10 +134,12 @@ angular.module('collegeApp')
 
       $scope.addStop = function (college) {
         $scope.waypoints.push(college);
+        $scope.getCollegesOnRoute();
       };
       $scope.removeStop = function (college) {
         var index = $scope.waypoints.indexOf(college);
         $scope.waypoints.splice(index,1);
+        $scope.getCollegesOnRoute();
       };
 
 

@@ -12,7 +12,10 @@ angular
   .module('collegeApp', [
     'ngRoute',
     'uiGmapgoogle-maps',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'smart-table',
+    'ngOdometer',
+    'ngDialog'
   ])
   .config(function ($routeProvider) {
     $routeProvider

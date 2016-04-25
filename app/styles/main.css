@@ -85,10 +85,26 @@ body {
 .angular-google-map-container { height: 400px; }
 
 body{
-    background-color: #00e64d;
+    /*https://pixabay.com/en/landscape-hill-sky-clouds-hilly-922581/*/
+    /*background-image: url("../images/sky-clipart.png");*/
+    background-image: url("../images/clouds.jpg");
+    background-size:100% auto;
 }
-.panel-heading.enabled {
-    background-color: #00cc00;
+
+.panel-default>.panel-heading {
+    /*background-color: #C1E1A6;*/
+    background-color: #75b433;
+}
+
+.glyphicon-star{
+    font-size: 15px;
+}
+
+div.panel-heading.enabled > div.panel-title.pull-right{
+    background-color: #118C4E;
+    padding-right:8px;
+    padding-left:8px;
+    color:white;
 }
 
 .odometer {

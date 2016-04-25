@@ -1,51 +1,52 @@
 <div data-ng-controller="CollegelistCtrl">
 
-
-    <div class="panel panel-default">
+    <div class="panel panel-default col-lg-10 col-lg-offset-1">
         <div class="panel-heading">My Colleges</div>
         <!-- Table -->
-        <table class="table">
-            <strong>
-                <div class="col-md-1"></div>
-                <div class="col-md-11">
-                    <div class="col-md-4 strong">College Name</div>
-                    <div class="col-md-2">Miles from Home</div>
-                    <div class="col-md-2">Location</div>
-                    <div class="col-md-2">Locale</div>
-                    <div class="col-md-2">Students</div>
-                </div>
-            </strong>
+            <table st-table="displayedColleges" st-safe-src="colleges" class="table table-striped">
+                <thead>
+                <tr>
+                    <th colspan="3">
+                        <input st-search placeholder="search" class="input-sm form-control" type="search"/>
+                    </th>
+                    <th colspan="7">
+                    </th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th st-sort="name">College Name</th>
+                    <th st-sort="distance">Miles from Home</th>
+                    <th st-sort="location">Location</th>
+                    <th st-sort="locale">Locale</th>
+                    <th st-sort="school_size">Students</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="college in displayedColleges">
+                    <td>
+                        <span data-ng-show="college.favorite" class="glyphicon glyphicon-star"  ng-click="addToFavorites(college)"></span>
+                        <span data-ng-hide="college.favorite" class="glyphicon glyphicon-star-empty"  ng-click="addToFavorites(college)"></span>
+                    </td>
+                    <td>
+                        <a href="http://{{college.url}}">{{college.name}}</a>
+                        <span class="glyphicon glyphicon-camera"  ng-click="getPics(college)"></span>
+                        <!--<span class="glyphicon glyphicon-camera"  ng-click="clickToOpen()"></span>-->
+                    </td>
+                    <td>{{college.distance}}</td>
+                    <td>{{college.location}}</td>
+                    <td>{{college.locale}}</td>
+                    <td>{{college.school_size}}</td>
+                    <td><span class="glyphicon glyphicon-trash" ng-click="trashIt(college)">
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
-            <div class="col-md-12" ng-repeat="college in colleges | orderBy:'name'" >
-                <div class="col-md-1">
-                    <span class="glyphicon glyphicon-thumbs-up" ng-click="addThumbUp(college.id)"></span>
-                    <span class="glyphicon glyphicon-thumbs-down" ng-click="addThumbDown(college.id)"></span>
-                </div>
-                <div class="col-md-11">
-                    <div class="col-md-4"><a href="http://{{college.url}}">{{college.name}}</a></div>
-                    <div class="col-md-2">{{college.distance}}</div>
-                    <div class="col-md-2">{{college.location}}</div>
-                    <div class="col-md-2">{{college.locale}}</div>
-                    <div class="col-md-2">{{college.school_size}}</div>
-                </div>
-            </div>
-        </table>
+        </div>
     </div>
+
+    <!--PICTURE OUTPUT - TEMP HACK FIXME -->
+    <div id="output1"></div>
 </div>
-
-
-    <!--<div class="container-fluid" >-->
-        <!--<h1>ROWING COLLEGES</h1>-->
-        <!--<button class="btn btn-primary btn-md" data-ng-click="getColleges()">GET COLLEGES</button>-->
-
-        <!--<div ng-repeat="college in colleges | orderBy:'name'">-->
-            <!--<div class="col-md-4"><a href="http://{{college.url}}">{{college.name}}</a></div>-->
-            <!--<div class="col-md-2">{{college.distance}}</div>-->
-            <!--<div class="col-md-2">{{college.location}}</div>-->
-            <!--<div class="col-md-2">{{college.locale}}</div>-->
-            <!--<div class="col-md-2">{{college.school_size}}</div>-->
-        <!--</div>-->
-
-    <!--</div>-->
-<!--</div>-->
-

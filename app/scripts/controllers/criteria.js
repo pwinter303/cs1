@@ -11,11 +11,15 @@
 angular.module('collegeApp')
     .controller('CriteriaCtrl', ['$scope','collegeFactory', function ($scope, collegeFactory) {
 
+    $scope.myCount = 12333;
+
     $scope.getCollegeCount = function (){
-      collegeFactory.getCollegeCount().then(function (data) {
+      var url = "college.php";
+      var action = "getCollegeCount";
+      collegeFactory.getData(url, action).then(function (data) {
         if (data){
           //$scope.collegeCountOld = $scope.collegeCount;
-          $scope.collegeCount = data;
+          $scope.collegeCount = data.count;
 
         }
       }, function(error) {
@@ -26,7 +30,9 @@ angular.module('collegeApp')
     $scope.getCollegeCount();
 
     $scope.getCriteria = function (){
-      collegeFactory.getCriteria().then(function (data) {
+      var url = "college.php";
+      var action = "getCriteriaForWeb";
+      collegeFactory.getData(url, action).then(function (data) {
         if (data){
           $scope.myForm = data;
         }
@@ -39,7 +45,9 @@ angular.module('collegeApp')
 
     // get reference data
     $scope.getCriteriaRefData = function (){
-      collegeFactory.getCriteriaRefData().then(function (data) {
+      var url = "college.php";
+      var action = "getCriteriaRefData";
+      collegeFactory.getData(url, action).then(function (data) {
         if (data){
           $scope.locales = data.locales;
           $scope.sizes = data.sizes;

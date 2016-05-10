@@ -416,12 +416,14 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
     foreach ($g as $item){
       foreach ($item->legs as $myLeg){
         foreach ($myLeg->steps as $myStep){
+
             $lat = $myStep->start_location->lat;
             $lng = $myStep->start_location->lng;   ### no "O" in lng
             array_push($latLngArr, array($lat, $lng));
             $lat = $myStep->end_location->lat;
             $lng = $myStep->end_location->lng;   ### no "O" in lng
             array_push($latLngArr, array($lat, $lng));
+            //echo "dir: " . $myStep->html_instructions . "Distance:" . $myStep->distance->text . "Lat/Lng" . $lat . $lng . "\n";
         }
       }
     }
@@ -433,6 +435,7 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
     #### FIND COLLEGES
     $finalUnitIDsArr = array();
     $distance = 2500;
+//    $distance = 5;   ## used for debugging
     foreach ($latLngArr as $point){
         $lat = $point[0];
         $lng = $point[1];
@@ -440,7 +443,7 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
         $finalUnitIDsArr = updateFinalArrayWithResults($dataCollegesNearRoute,$finalUnitIDsArr,$lat, $lng);
     }
 
-    ##var_dump($finalUnitIDsArr);
+    //echo "this is the finalUnitIDsArr after generating WayPoints and Finding Colleges:" . var_dump($finalUnitIDsArr) . "\n";
     $finalArr = array();
     foreach ($finalUnitIDsArr as $unitID => $rest){
       $dataArr = getCollegeUsingUnitID($dbh, $unitID);
@@ -453,8 +456,9 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
                     'googleDirections' => $dataResponse,
                     'collegesOnRoute' => $finalArr
                     );
-    ##return $finalArr;
+    //echo "this is the finalArr after Adding in College Info:" . var_dump($finalArr) . "\n";
     return $finalResults;
+
 }
 
 function genWaypoints($latLngArr){
@@ -465,9 +469,9 @@ function genWaypoints($latLngArr){
       list ($lat2,$lng2) = $latLngArr[$ctr + 1];
       $dist = distance($lat1, $lng1, $lat2, $lng2, ""); #### last param is unit (blank is miles)
       $dist = round($dist);
-      if ($dist > 21){
+      if ($dist > 11){
           list ($latNew, $lngNew) = midpoint($lat1, $lng1, $lat2, $lng2);
-          ##echo "dist is:$dist adding these:$latNew:$lngNew after $lat1:$lng1 and before $lat2:lng2\n";
+          //echo "lat1:$lat1,lat2:$lat2 dist is:$dist adding these:$latNew:$lngNew after $lat1:$lng1 and before $lat2:lng2\n";
           $newItem = array(array($latNew,$lngNew));
           array_splice( $latLngArr, $ctr + 1, 0, $newItem ); // add items to array
           #var_dump($latLngArr);
@@ -582,19 +586,24 @@ function updateFinalArrayWithResults($collegesFound, $finalArr, $lat, $lng){
     foreach ($collegesFound as $itemCollege){
       $id = $itemCollege{'id'};
       $dist = $itemCollege{'distance'};
+//      if ('164924' == $id){
+//        echo "id:$id is $dist miles away from this lat,lng: $lat, $lng\n";
+//      }
 
       if (array_key_exists($id, $finalArr)){
         if ($dist < $finalArr{$id}{'distance'}){
+//          echo "item exists in the array..updating it: $id|$dist|$lat|$lng\n";
           $finalArr{$id}{'distance'} = $dist;
           $finalArr{$id}{'lat'} = $lat;
           $finalArr{$id}{'lng'} = $lng;
         }
       } else {
+//        echo "item did NOT exists in the array..adding it: $id|$dist|$lat|$lng\n";
         $finalArr{$id}{'distance'} = $dist;
         $finalArr{$id}{'lat'} = $lat;
         $finalArr{$id}{'lng'} = $lng;
       }
-      #echo "id: $id distance:$dist\n";
+//      echo "id: $id distance:$dist\n";
     }
     return $finalArr;
 }

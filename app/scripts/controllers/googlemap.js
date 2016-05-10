@@ -11,19 +11,19 @@
 angular.module('collegeApp')
     .controller('GooglemapCtrl', ['$scope', 'uiGmapGoogleMapApi', 'collegeFactory', function ($scope, uiGmapGoogleMapApi, collegeFactory) {
 
-    $scope.getColleges = function (){
-      var url = "college.php";
-      var action = "getColleges";
-      collegeFactory.getData(url, action).then(function (data) {
-            if (data){
-                $scope.colleges = data;
-            }
-        }, function(error) {
-            // promise rejected, could be because server returned 404, 500 error...
-            collegeFactory.msgError(error);
-        });
-    };
-    $scope.getColleges();
+//    $scope.getColleges = function (){
+//      var url = "college.php";
+//      var action = "getColleges";
+//      collegeFactory.getData(url, action).then(function (data) {
+//            if (data){
+//                $scope.colleges = data;
+//            }
+//        }, function(error) {
+//            // promise rejected, could be because server returned 404, 500 error...
+//            collegeFactory.msgError(error);
+//        });
+//    };
+//    $scope.getColleges();
 
 
     angular.extend($scope, {

@@ -55,6 +55,7 @@ angular.module('collegeApp')
           $scope.TestScoreRelations = data.TestScoreRelations;
           $scope.sports = data.sports;
           $scope.runBy = data.runBy;
+          $scope.states = data.states;
         }
       }, function(error) {
         // promise rejected, could be because server returned 404, 500 error...
@@ -135,6 +136,7 @@ angular.module('collegeApp')
         case 'schoolSize': {$scope.myForm.schoolSize.enabled = false; break;}
         case 'yrsOfSchool': {$scope.myForm.yrsOfSchool.enabled = false; break;}
         case 'runBy': {$scope.myForm.runBy.enabled = false; break;}
+        case 'states': {$scope.myForm.states.enabled = false; break;}
       }
       collegeFactory.saveCriteria(formData).then(function (data) {
         if (data){
@@ -161,6 +163,7 @@ angular.module('collegeApp')
         case 'schoolSize': {$scope.myForm.schoolSize.enabled = true; break;}
         case 'yrsOfSchool': {$scope.myForm.yrsOfSchool.enabled = true; break;}
         case 'runBy': {$scope.myForm.runBy.enabled = true; break;}
+        case 'states': {$scope.myForm.states.enabled = true; break;}
       }
 
       collegeFactory.saveCriteria(formData).then(function (data) {

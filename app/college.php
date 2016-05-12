@@ -61,6 +61,9 @@ function  processGet($customer_id){
        case 'getSports':
               $result = getSports($dbh);
               break;
+       case 'getStates':
+              $result = getStates($dbh);
+              break;
        case 'getTestScoreRelation':
               $result = getTestScoreRelation($dbh);
               break;
@@ -141,6 +144,9 @@ function  getCriteriaRefData($dbh){
     $data = getSports($dbh);
     $finalResults{'sports'} = $data;
 
+    $data = getStates($dbh);
+    $finalResults{'states'} = $data;
+
     $data = getRunBy($dbh);
     $finalResults{'runBy'} = $data;
 
@@ -162,6 +168,16 @@ function  getSchoolSizes($dbh){
 function  getSports($dbh){
     $query = "select sport_cd as id, sport_nm as name from sports_decodes";
     $data = execSqlMultiRowPREPARED($dbh, $query);
+    return $data;
+}
+
+function  getStates($dbh){
+    $data = array(
+      array('id' => 'MA',  'name' => 'MA'),
+      array('id' => 'VT',  'name' => 'VT'),
+      array('id' => 'NH',  'name' => 'NH'),
+      array('id' => 'RI',  'name' => 'RI')
+    );
     return $data;
 }
 
@@ -259,6 +275,17 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
                  $where = " and institutions.CONTROL in ($value)";
                  array_push($whereArr, $where);
                  break;
+             case 'states':
+                 ### special logic to wrap the values in quotes (since they are alpha numeric)
+                 $value = $restOfArray{'options'};
+                 $valueArr = explode(",", $value);
+                 # Iterate through the array and convert items to strings and wrap with quotes
+                 array_walk($valueArr, create_function('&$str', '$str = "\"$str\"";'));
+                 $value = implode('", "', $valueArr);
+
+                 $where = " and institutions.STABBR in ($value)";
+                 array_push($whereArr, $where);
+                 break;
              case 'schoolSize':
                  $value = $restOfArray{'options'};
                  $where = " and institutions.instsize in ($value)";
@@ -314,7 +341,7 @@ function  getCollegeFunc($dbh, $customer_id, $count=0){
     $distCols = $componentsArr[1];
     $distHaving = $componentsArr[2];
 
-    ###echo "$where,$distCols,$distHaving\n";
+    ##echo "$where,$distCols,$distHaving\n";
 
     $where .= $distHaving;
     $selectCols = "instnm as name,
@@ -670,6 +697,7 @@ function  saveCriteria($dbh, $request_data, $customer_id){
      case 'runBy':
      case 'sports':
      case 'schoolSetting':
+     case 'states':
            saveCriteriaFunc($dbh, $customer_id, $request_data, "options");  # last param is the field
            saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
            break;

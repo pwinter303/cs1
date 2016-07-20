@@ -13,7 +13,12 @@ load data local infile 'c:/tmp/sportXREF.csv' into table sportsname_unitid_xref 
 alter table sports change UNITID unitid INT(6) null;
 
 ==== SQL =======================================
-SELECT inst.INSTNM FROM college_search.admissions_info adm, institutions inst where adm.UNITID = inst.UNITID
+
+SELECT inst.INSTNM, INSTSIZE FROM institutions inst where INST.INSTSIZE > 2 AND INST.ICLEVEL = 1 and INST.UNITID NOT IN (SELECT UNITID FROM college_search.admissions_info); 
+
+SELECT inst.INSTNM FROM college_search.admissions_info adm, institutions inst where adm.UNITID = inst.UNITID and INST.ICLEVEL in (1);
+
+
 select  unitid, instnm, STABBR, CITY,ZIP,WEBADDR from institutions;
 select * from institutions where instnm like '%Dartm%';
 select * from institutions where WEBADDR like '%summ%';

@@ -61,6 +61,9 @@ function  processGet($customer_id){
        case 'getSports':
               $result = getSports($dbh);
               break;
+       case 'getDivisions':
+              $result = getDivisions($dbh);
+              break;
        case 'getStates':
               $result = getStates($dbh);
               break;
@@ -144,6 +147,9 @@ function  getCriteriaRefData($dbh){
     $data = getSports($dbh);
     $finalResults{'sports'} = $data;
 
+    $data = getDivisions($dbh);
+    $finalResults{'divisions'} = $data;
+
     $data = getStates($dbh);
     $finalResults{'states'} = $data;
 
@@ -168,6 +174,16 @@ function  getSchoolSizes($dbh){
 function  getSports($dbh){
     $query = "select sport_cd as id, sport_nm as name from sports_decodes";
     $data = execSqlMultiRowPREPARED($dbh, $query);
+    return $data;
+}
+
+function  getDivisions($dbh){
+    $data = array(
+      array('id' => 'I',  'name' => 'I'),
+      array('id' => 'II',  'name' => 'II'),
+      array('id' => 'III',  'name' => 'III'),
+      array('id' => 'Any',  'name' => 'Any')
+    );
     return $data;
 }
 
@@ -221,7 +237,10 @@ function  getCriteriaForWeb($dbh, $customer_id){
 
     foreach ($data as $criteria => $restOfArray){
       foreach ($restOfArray as $field => $value){
-        if ('options' == $field){
+        #### Division is a new multi-select
+        #### FixMe ToDo:  Seems like this could be done better
+        ###if ('options' == $field){
+        if ('options' == $field  or  'divisions' == $field){
           # Define array that will hold the final value
           $finalArr = array();
           # turn the value retrieved from the database into an array
@@ -281,7 +300,9 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
                  $valueArr = explode(",", $value);
                  # Iterate through the array and convert items to strings and wrap with quotes
                  array_walk($valueArr, create_function('&$str', '$str = "\"$str\"";'));
-                 $value = implode('", "', $valueArr);
+                 #### Changed this since strings are already quoted... Dont need more quotes
+                 ####$value = implode('", "', $valueArr);
+                 $value = implode(',', $valueArr);
 
                  $where = " and institutions.STABBR in ($value)";
                  array_push($whereArr, $where);
@@ -309,13 +330,30 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
                 $distHaving = "having distance < $max and $min < distance ";
                 break;
              case 'sports':
-                $value = $restOfArray{'options'};
-                $valueArr = explode(",", $value);
+                $sports = $restOfArray{'options'};
+                $divisions = $restOfArray{'divisions'};
+
+                $sportsArr = explode(",", $sports);
+                $divisionsArr = explode(",", $divisions);
+                $valueArr = array();
+                #var_dump($sportsArr);
+                #var_dump($divisionsArr);
+                foreach($sportsArr as $sport){
+                  foreach ($divisionsArr as $division){
+                    ###echo "wow:$sport wowee:$division\n";
+                    $item = $sport . "-" . $division;
+                    array_push($valueArr,$item);
+                  }
+                }
+
                 # Iterate through the array and convert items to strings and wrap with quotes
                 array_walk($valueArr, create_function('&$str', '$str = "\"$str\"";'));
-                $value = implode('", "', $valueArr);
-                ####echo "this is value for sports $value\n";
-                $where = " and institutions.unitid in (select distinct sports.unitid from sports where sport_cd in ($value)) ";
+                #### Changed this since strings are already quoted... Dont need more quotes
+                ####$value = implode('", "', $valueArr);
+                $value = implode(',', $valueArr);
+                ###echo "this is value for sports $value\n";
+                $where = " and institutions.unitid in (select distinct sports.unitid from sports where CONCAT(sport_cd,'-',division) in ($value)) ";
+                ###echo "this is where: $where\n";
                 array_push($whereArr, $where);
                 break;
           }
@@ -695,10 +733,17 @@ function  saveCriteria($dbh, $request_data, $customer_id){
      case 'schoolSize':
      case 'yrsOfSchool':
      case 'runBy':
-     case 'sports':
      case 'schoolSetting':
      case 'states':
            saveCriteriaFunc($dbh, $customer_id, $request_data, "options");  # last param is the field
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
+           break;
+     case 'sports':
+           #echo "this is request_data:\n";
+           #var_dump($request_data);
+           ######sportsPreProcess($request_data);
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "options");  # last param is the field
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "divisions");  # last param is the field
            saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
            break;
      case 'schoolCost':
@@ -735,6 +780,31 @@ function  saveCriteria($dbh, $request_data, $customer_id){
 }
 
 ##############################################################################
+function  sportsPreProcess($request_data){
+  ## todo: make this more elegant
+  if (is_array($request_data->sports->options)){
+  } else {
+    echo "error - select a SPORT\n";
+  }
+  if (is_array($request_data->divisions->options)){
+  } else {
+    echo "error - select a DIVISION\n";
+  }
+
+  $values = array();
+  foreach ($request_data->sports->options as $sport){
+    foreach ($request_data->divisions->options as $div){
+        #Concatenate Sport Code and the Division Identifier
+        $newItem = $sport->id . "-" . $div->id;
+        # Create object using the new pair..
+        $obj = (object) array('id' => $newItem);
+        array_push($values,$obj);
+    }
+  }
+  $request_data->options = $values;
+
+}
+
 function  saveCriteriaFunc($dbh, $customer_id, $request_data, $field_cd){
 
   $criteria_cd = $request_data->func;
@@ -742,7 +812,11 @@ function  saveCriteriaFunc($dbh, $customer_id, $request_data, $field_cd){
   if (is_array($request_data->$field_cd)){
       ### HACK:  assumes all the OPTIONS fields are multiple select fields so value will be an object
       ### NOTE: the options MUST use 'id' as the key!
-      if ('options' == $field_cd){
+      #####echo "wooo hooo\n";
+      #####var_dump($request_data->$field_cd);
+      #### Divisions is a new multi-select
+      ####if ('options' == $field_cd){
+      if ('options' == $field_cd or 'divisions' == $field_cd ){
         $values = array();
         foreach ($request_data->$field_cd as $item){
           array_push($values,$item->id);

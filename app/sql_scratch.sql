@@ -1,12 +1,16 @@
 =================   LOADS   =======================
+
+truncate admissions_info;
+
 load data local infile 'c:/tmp/adm2014_data_stata.csv' into table admissions_info fields terminated by ','
-  enclosed by '"' lines terminated by '\n' IGNORE 1 LINES;
+  enclosed by '"' lines terminated by '\n' IGNORE 1 LINES (UNITID,	ADMCON1,	ADMCON2,	ADMCON3,	ADMCON4,	ADMCON5,	ADMCON6,	ADMCON7,	ADMCON8,	ADMCON9,	@ignore,	APPLCN,	@ignore,	APPLCNM,	@ignore,	APPLCNW,	@ignore,	ADMSSN,	@ignore,	ADMSSNM,	@ignore,	ADMSSNW,	@ignore,	ENRLT,	@ignore,	ENRLM,	@ignore,	ENRLW,	@ignore,	ENRLFT,	@ignore,	ENRLFTM,	@ignore,	ENRLFTW,	@ignore,	ENRLPT,	@ignore,	ENRLPTM,	@ignore,	ENRLPTW,	@ignore,	SATNUM,	@ignore,	SATPCT,	@ignore,	ACTNUM,	@ignore,	ACTPCT,	@ignore,	SATVR25,	@ignore,	SATVR75,	@ignore,	SATMT25,	@ignore,	SATMT75,	@ignore,	SATWR25,	@ignore,	SATWR75,	@ignore,	ACTCM25,	@ignore,	ACTCM75,	@ignore,	ACTEN25,	@ignore,	ACTEN75,	@ignore,	ACTMT25,	@ignore,	ACTMT75,	@ignore,	ACTWR25,	@ignore,	ACTWR75)
+
 
 load data local infile 'c:/tmp/hd2014.csv' into table institutions fields terminated by ','
   enclosed by '"' lines terminated by '\n' IGNORE 1 LINES;
 
 
-load data local infile 'c:/tmp/sportXREF.csv' into table sportsname_unitid_xref fields terminated by ','
+load data local infile 'c:/tmp/sportXREF.csv' into table sportsname_unitid_xrefcredential_status fields terminated by ','
   enclosed by '"' lines terminated by '\n';
 
 ==== ALTER =======================================
@@ -16,7 +20,7 @@ alter table sports change UNITID unitid INT(6) null;
 
 SELECT inst.INSTNM, INSTSIZE FROM institutions inst where INST.INSTSIZE > 2 AND INST.ICLEVEL = 1 and INST.UNITID NOT IN (SELECT UNITID FROM college_search.admissions_info); 
 
-SELECT inst.INSTNM FROM college_search.admissions_info adm, institutions inst where adm.UNITID = inst.UNITID and INST.ICLEVEL in (1);
+SELECT inst.INSTNM, adm.* FROM college_search.admissions_info adm, institutions inst where adm.UNITID = inst.UNITID and INST.ICLEVEL in (1) and instnm like '%Princet%'
 
 
 select  unitid, instnm, STABBR, CITY,ZIP,WEBADDR from institutions;

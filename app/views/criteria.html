@@ -297,13 +297,21 @@
                     <div id="collapseSports" class="panel-collapse collapse">
                         <div class="panel-body">
 
-                            <div class="col-md-7">School must have these sports:</div>
+                            <div class="col-md-4">School must have these sports:</div>
                             <div class="col-md-5">
                                 Select as many options as you'd like <br>(Ctrl click to select multiple).
                                 <select size="10" class="form-control"
                                         multiple="true"
                                         data-ng-model="myForm.sports.options"
                                         data-ng-options="s.name for s in sports track by s.id">
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                Select as many divisions as you'd like.
+                                <select size="10" class="form-control"
+                                        multiple="true"
+                                        data-ng-model="myForm.sports.divisions"
+                                        data-ng-options="d.name for d in divisions track by d.id">
                                 </select>
                             </div>
                             <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.sports, 'sports')">Save/Activate</button>

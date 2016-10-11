@@ -54,6 +54,7 @@ angular.module('collegeApp')
           $scope.yrsOfSchool = data.yrsOfSchool;
           $scope.TestScoreRelations = data.TestScoreRelations;
           $scope.sports = data.sports;
+          $scope.divisions = data.divisions;
           $scope.runBy = data.runBy;
           $scope.states = data.states;
         }

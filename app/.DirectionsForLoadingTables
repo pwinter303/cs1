@@ -1,0 +1,16 @@
+
+SPORTS
+Sports Table: Data comes from NCAA
+http://web1.ncaa.org/onlineDir/exec2/sponsorship
+
+Can't find the script used to extract info.  Form is a POST
+
+
+'c:/tmp/adm2014_data_stata.csv' --> admissions_info
+'c:/tmp/hd2014.csv' --> institutions
+'c:/tmp/sportXREF.csv' --> sportsname_unitid_xref
+
+Decodes:
+decode_instsize
+decode_locale
+sports_decodes

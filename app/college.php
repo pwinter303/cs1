@@ -217,9 +217,10 @@ function  getRunBy($dbh){
 
 function  getTestScoreRelation($dbh){
     $data = array(
-        array('id' => 'worst', 'name' => 'The lowest in the school'),
-        array('id' => 'average', 'name' => 'Average for those attending'),
-        array('id' => 'best', 'name' => 'The best in the school')
+        array('id' => 'safety', 'name' => 'Safety Schools'),
+        array('id' => 'match', 'name' => 'Good Matches'),
+        array('id' => 'reach', 'name' => 'Reach Schools'),
+        array('id' => 'notest', 'name' => 'No Test Info')
         );
     return $data;
 }
@@ -312,6 +313,37 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
                  $where = " and institutions.instsize in ($value)";
                  array_push($whereArr, $where);
                  break;
+             case 'testScore':
+                  $typesOfSchools = $restOfArray{'options'};
+                  $typesOfSchoolsArr = explode(",", $typesOfSchools);
+
+                  $sat = $restOfArray{'SAT'};
+                  $act = $restOfArray{'ACT'};
+
+                  $tempWhereArr = array();
+                  $where = "";
+                  foreach($typesOfSchoolsArr as $value){
+                    if ($value == 'match'){
+                      $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  ((SATVR25 + SATMT25) < $sat) and ((SATVR75 + SATMT75) > $sat) ) ) )";
+                      array_push($tempWhereArr, $where);
+                    }
+                    if ($value == 'reach'){
+                      $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where ( (SATVR25 + SATMT25) > $sat)  ) )";
+                      array_push($tempWhereArr, $where);
+                    }
+                    if ($value == 'safety'){
+                      $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  (SATVR75 + SATMT75) < $sat)  ) )";
+                      array_push($tempWhereArr, $where);
+                    }
+                    if ($value == 'notest'){
+                      $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  (SATVR75 + SATMT75) = 0)  ) )";
+                      array_push($tempWhereArr, $where);
+                    }
+                  }
+                  $finalWhere = "and (" . implode(" or ", $tempWhereArr) . ")";
+                  #echo "finalWhere:$finalWhere\n";
+                  array_push($whereArr, $finalWhere);
+                  break;
              case 'schoolSetting':
                 $value = $restOfArray{'options'};
                 $where = " and institutions.locale in ($value)";

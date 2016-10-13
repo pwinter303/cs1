@@ -65,65 +65,6 @@ angular.module('collegeApp')
     };
     $scope.getCriteriaRefData();
 //
-//    $scope.getLocale = function (){
-//      collegeFactory.getLocale().then(function (data) {
-//        if (data){
-//          $scope.locales = data;
-//        }
-//      }, function(error) {
-//        // promise rejected, could be because server returned 404, 500 error...
-//        collegeFactory.msgError(error);
-//      });
-//    };
-//    $scope.getLocale();
-//
-//    $scope.getYrsOfSchool = function (){
-//      collegeFactory.getYrsOfSchool().then(function (data) {
-//        if (data){
-//          $scope.yrsOfSchool = data;
-//        }
-//      }, function(error) {
-//        // promise rejected, could be because server returned 404, 500 error...
-//        collegeFactory.msgError(error);
-//      });
-//    };
-//    $scope.getYrsOfSchool();
-//
-//    $scope.getTestScoreRelation = function (){
-//      collegeFactory.getTestScoreRelation().then(function (data) {
-//        if (data){
-//          $scope.TestScoreRelations = data;
-//        }
-//      }, function(error) {
-//        // promise rejected, could be because server returned 404, 500 error...
-//        collegeFactory.msgError(error);
-//      });
-//    };
-//    $scope.getTestScoreRelation();
-//
-//    $scope.getSchoolSizes = function (){
-//      collegeFactory.getSchoolSizes().then(function (data) {
-//        if (data){
-//          $scope.sizes = data;
-//        }
-//      }, function(error) {
-//        // promise rejected, could be because server returned 404, 500 error...
-//        collegeFactory.msgError(error);
-//      });
-//    };
-//    $scope.getSchoolSizes();
-//
-//    $scope.getSports = function (){
-//      collegeFactory.getSports().then(function (data) {
-//        if (data){
-//          $scope.sports = data;
-//        }
-//      }, function(error) {
-//        // promise rejected, could be because server returned 404, 500 error...
-//        collegeFactory.msgError(error);
-//      });
-//    };
-//    $scope.getSports();
 
     $scope.resetIt = function(formData, func){
       formData.func = func;

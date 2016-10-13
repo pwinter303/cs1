@@ -169,26 +169,26 @@
                     <div id="collapseScores" class="panel-collapse collapse">
                         <div class="panel-body">
 
-                            <div class="col-md-7"></div>
-                            <div class="col-md-5">
-                                <div class="col-md-6">SAT</div>
-                                <div class="col-md-6">ACT</div>
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <div class="col-md-12">Combined SAT (or PSAT)</div>
+                                <!--<div class="col-md-6">ACT</div>-->
                             </div>
-                            <div class="col-md-7">Enter your scores (if applicable):</div>
-                            <div class="col-md-5">
-                                <div class="col-md-6">
+                            <div class="col-md-6">Enter your scores (if applicable):</div>
+                            <div class="col-md-6">
+                                <div class="col-md-12">
                                     <input type="text" class="form-control" data-ng-model="myForm.testScore.SAT">
                                 </div>
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" data-ng-model="myForm.testScore.ACT">
-                                </div>
+                                <!--<div class="col-md-6">-->
+                                    <!--<input type="text" class="form-control" data-ng-model="myForm.testScore.ACT">-->
+                                <!--</div>-->
                             </div>
                             <br>
                             <br>
                             <br>
-                            <div class="col-md-7">My scores should be:</div>
-                            <div class="col-md-5">
-                                Select as many options as you'd like <br>(Ctrl click to select multiple).
+                            <div class="col-md-6">Show Schools:</div>
+                            <div class="col-md-6">
+                                Select as many options as you'd like. (Ctrl click to select multiple).
                                 <select class="form-control"
                                         multiple="true"
                                         data-ng-model="myForm.testScore.options"

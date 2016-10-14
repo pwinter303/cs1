@@ -3,3 +3,9 @@ Questions To Be Answered
 - Where do I WANT to go - define criteria (eg: location, sports, etc)
 - Which ones should I see on my trip.
 
+ToDo:
+- Add rowing clubs to Sports table
+- Include acceptance rates in the college list
+- Include REACH, MATCH, SAFETY in the college list (if scores are provided)
+- Rework the college trip page... need to improve the flow.
+- May want to add rows to Admissions so that there is a 1:1 relationship with institutions. Or add an acceptance col to Institutions and populate it where possible with admission info.

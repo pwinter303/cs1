@@ -332,7 +332,7 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
                       array_push($tempWhereArr, $where);
                     }
                     if ($value == 'safety'){
-                      $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  (SATVR75 + SATMT75) < $sat)  ) )";
+                      $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  (SATVR75 + SATMT75) < $sat) and ((SATVR75 + SATMT75) > 0)  ) )";
                       array_push($tempWhereArr, $where);
                     }
                     if ($value == 'notest'){
@@ -397,54 +397,95 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
 }
 
 function  getCollegeCount($dbh, $customer_id){
-  $data = getCollegeFunc($dbh, $customer_id, 1);  #1 = return count
+  #$data = getCollegeFunc($dbh, $customer_id, 1);  #1 = return count
+  $componentsArr = createWhereClauseUsingCriteria($dbh, $customer_id);
+  $where = $componentsArr[0];
+  $distCols = $componentsArr[1];
+  $distHaving = $componentsArr[2];
+  $where .= $distHaving;
+
+  $query = "SELECT count(*) as count FROM (
+  select unitid $distCols from institutions
+  where 1=1 $where
+  ) as count";
+  ####echo "query:$query\n";
+  $data = execSqlSingleRowPREPARED($dbh, $query);
+
   return $data;
 }
 function  getColleges($dbh, $customer_id){
-  $data = getCollegeFunc($dbh, $customer_id);  #1 = return count
+  ####$data = getCollegeFunc($dbh, $customer_id);  #1 = return count
+  $componentsArr = createWhereClauseUsingCriteria($dbh, $customer_id);
+  $where = $componentsArr[0];
+  $distCols = $componentsArr[1];
+  $distHaving = $componentsArr[2];
+
+  $where .= $distHaving;
+
+  $query = "select instnm as name,
+             institutions.unitid as id,
+             locale_decode as locale,
+             CONCAT(city,',', stabbr) as location,
+             webaddr as url,
+             CASE
+                 WHEN ADMSSN = 0 THEN 'N/A'
+                 ELSE concat(round(ADMSSN/APPLCN*100),'%')
+             END AS acpt_rate,
+             instsize_decode as school_size $distCols
+  from institutions, decode_instsize, decode_locale, admissions_info
+  where
+    institutions.instsize = decode_instsize.instsize and
+    admissions_info.unitid = institutions.unitid and
+    institutions.locale = decode_locale.locale
+    $where  order by name
+  ";
+  #echo "this is the query:$query\n";
+  $data = execSqlMultiRowPREPARED($dbh, $query);
   return $data;
 }
 
-function  getCollegeFunc($dbh, $customer_id, $count=0){
-    $componentsArr = createWhereClauseUsingCriteria($dbh, $customer_id);
-    $where = $componentsArr[0];
-    $distCols = $componentsArr[1];
-    $distHaving = $componentsArr[2];
-
-    ##echo "$where,$distCols,$distHaving\n";
-
-    $where .= $distHaving;
-    $selectCols = "instnm as name,
-                             unitid as id,
-                             locale_decode as locale,
-                             CONCAT(city,',', stabbr) as location,
-                             webaddr as url,
-                             instsize_decode as school_size $distCols";
-
-    $countSelect = "";
-    $countEnd = "";
-    if ($count){
-      $countSelect = "SELECT count(*) as count FROM (";
-      $countEnd = ") as count";
-    }
-
-    $query = "$countSelect  select  $selectCols
-    from institutions, decode_instsize, decode_locale
-    where
-      institutions.instsize = decode_instsize.instsize and
-      institutions.locale = decode_locale.locale
-      $where  $countEnd
-    ";
-    #echo "this is the query:$query\n";
-
-    ### since types and params are defaulted to null in the called function you dont have to pass them
-    if ($count){
-      $data = execSqlSingleRowPREPARED($dbh, $query);
-    }else {
-      $data = execSqlMultiRowPREPARED($dbh, $query);
-    }
-    return $data;
-}
+##### OLD WAY... BROKE THE LOGIC OUT (ABOVE) SINCE IT WAS UNIQUE ENOUGH
+####
+//function  getCollegeFunc($dbh, $customer_id, $count=0){
+//    $componentsArr = createWhereClauseUsingCriteria($dbh, $customer_id);
+//    $where = $componentsArr[0];
+//    $distCols = $componentsArr[1];
+//    $distHaving = $componentsArr[2];
+//
+//    ##echo "$where,$distCols,$distHaving\n";
+//
+//    $where .= $distHaving;
+//    $selectCols = "instnm as name,
+//                             unitid as id,
+//                             locale_decode as locale,
+//                             CONCAT(city,',', stabbr) as location,
+//                             webaddr as url,
+//                             instsize_decode as school_size $distCols";
+//
+//    $countSelect = "";
+//    $countEnd = "";
+//    if ($count){
+//      $countSelect = "SELECT count(*) as count FROM (";
+//      $countEnd = ") as count";
+//    }
+//
+//    $query = "$countSelect  select  $selectCols
+//    from institutions, decode_instsize, decode_locale
+//    where
+//      institutions.instsize = decode_instsize.instsize and
+//      institutions.locale = decode_locale.locale
+//      $where  order by name $countEnd
+//    ";
+//    #echo "this is the query:$query\n";
+//
+//    ### since types and params are defaulted to null in the called function you dont have to pass them
+//    if ($count){
+//      $data = execSqlSingleRowPREPARED($dbh, $query);
+//    }else {
+//      $data = execSqlMultiRowPREPARED($dbh, $query);
+//    }
+//    return $data;
+//}
 
 
 ####################### POSTS ####################################################

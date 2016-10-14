@@ -18,6 +18,13 @@ alter table sports change UNITID unitid INT(6) null;
 
 ==== SQL =======================================
 
+#### add missing UNITID to admissions_info so there is a 1:1 relationship
+INSERT INTO admissions_info (unitid) 
+select unitid from institutions where iclevel = 1 and unitID not in (select unitid from admissions_info);
+
+
+
+
 SELECT inst.INSTNM, INSTSIZE FROM institutions inst where INST.INSTSIZE > 2 AND INST.ICLEVEL = 1 and INST.UNITID NOT IN (SELECT UNITID FROM college_search.admissions_info); 
 
 SELECT inst.INSTNM, adm.* FROM college_search.admissions_info adm, institutions inst where adm.UNITID = inst.UNITID and INST.ICLEVEL in (1) and instnm like '%Princet%'

@@ -44,6 +44,11 @@ angular
         controller: 'CollegelistCtrl',
         controllerAs: 'collegelist'
       })
+      .when('/plantrip', {
+        templateUrl: 'views/plantrip.html',
+        controller: 'PlantripCtrl',
+        controllerAs: 'plantrip'
+      })
       .otherwise({
         redirectTo: '/'
       });

@@ -1,3 +1,6 @@
+
+
+
 Questions To Be Answered
 - Where CAN I go - given SAT, ACT, Class Rank, GPA
 - Where do I WANT to go - define criteria (eg: location, sports, etc)
@@ -7,7 +10,9 @@ ToDo:
 - Add rowing clubs to Sports table
 - Include REACH, MATCH, SAFETY in the college list (if scores are provided)
 - Rework the college trip page... need to improve the flow.
-
+Login/Authentication
+Signup - I like the Balsamiq signup (very quick/easy)
+See the SPARKS site.. Their filter is very slick and they have a lot of good ideas
 
 
 DONE:

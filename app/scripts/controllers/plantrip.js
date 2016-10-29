@@ -8,10 +8,9 @@
  * Controller of the collegeApp
  */
 angular.module('collegeApp')
-  .controller('PlantripCtrl', function () {
-    this.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-  });
+  .controller('PlantripCtrl', ['$scope','collegeFactory', function ($scope, collegeFactory) {
+
+        $scope.tripsList = [{id:3,name:"WooHoo"},{id:4,name:"WooHoo2"}];
+
+
+  }]);

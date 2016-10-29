@@ -1,1 +1,61 @@
-<p>This is the plantrip view.</p>
+
+<div data-ng-controller="PlantripCtrl">
+
+
+
+    <div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3 ">
+        <div class="panel panel-default">
+            <div class="panel-heading"><h3>Chose Existing Trip</h3></div>
+            <div class="panel-body">
+                <div class="col-md-10 col-md-offset-1">
+
+                    <form role="form">
+                        <select size="2" class="form-control"
+                                multiple="false"
+                                data-ng-model="myForm.existingTrips.options"
+                                data-ng-options="trip.name for trip in tripsList track by trip.id">
+                        </select>
+                        <button class="btn btn-primary" data-ng-click="addGroup(newGroup)">Get Trip Info</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3 ">
+        <div class="panel panel-default">
+            <div class="panel-heading"><h3>Add A New Trip</h3></div>
+            <div class="panel-body">
+                <div class="col-md-12">
+
+                    <form role="form">
+                        <div class="col-md-5 text-right">
+                            Trip Name:
+                        </div>
+                        <div class="col-md-7">
+                            <input type="text" class="form-control" data-ng-model="trip.name" placeholder="enter the name of your trip">
+                        </div>
+
+                        <div class="col-md-5 text-right">
+                            From (starting town or address):
+                        </div>
+                        <div class="col-md-7">
+                            <input type="text" class="form-control" data-ng-model="trip.name" placeholder="starting address or city">
+                        </div>
+                        <div class="col-md-5 text-right">
+                            To (destination town or address):
+                        </div>
+                        <div class="col-md-7">
+                            <input type="text" class="form-control" data-ng-model="trip.name" placeholder="destination address or city">
+                            <button class="btn btn-primary" data-ng-click="addGroup(newGroup)">Add Trip</button>
+                        </div>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

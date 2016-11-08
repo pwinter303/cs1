@@ -352,6 +352,39 @@
             </div>
 
 
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div data-ng-class="{ 'panel-heading': 1, 'enabled': myForm.acptRate.enabled }">
+                        <div class="panel-title pull-left">
+                            <a href="javascript:;" data-toggle="collapse" data-parent="#accordion" data-target="#collapseAcptRate">
+                                Acceptance Rates
+                            </a>
+                        </div>
+                        <div class="panel-title pull-right" ng-show="myForm.acptRate.enabled">Active</div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div id="collapseAcptRate" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="col-md-7"></div>
+                            <div class="col-md-5">
+                                <div class="col-md-6">Minimum</div>
+                                <div class="col-md-6">Maximum</div>
+                            </div>
+                            <div class="col-md-7">Acceptance Rates:</div>
+                            <div class="col-md-5">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" data-ng-model="myForm.acptRate.min">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" data-ng-model="myForm.acptRate.max">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-md" data-ng-click="saveIt(myForm.acptRate, 'acptRate')">Save/Activate</button>
+                            <button class="btn btn-primary btn-md" data-ng-click="resetIt(myForm.acptRate, 'acptRate')">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
         </div>

@@ -191,6 +191,9 @@ function  getStates($dbh){
     $data = array(
       array('id' => 'MA',  'name' => 'MA'),
       array('id' => 'VT',  'name' => 'VT'),
+      array('id' => 'PA',  'name' => 'PA'),
+      array('id' => 'CT',  'name' => 'CT'),
+      array('id' => 'NY',  'name' => 'NY'),
       array('id' => 'NH',  'name' => 'NH'),
       array('id' => 'RI',  'name' => 'RI')
     );
@@ -349,6 +352,12 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
                 $where = " and institutions.locale in ($value)";
                 array_push($whereArr, $where);
                 break;
+             case 'acptRate':
+                 $min = $restOfArray{'min'};
+                 $max = $restOfArray{'max'};
+                 $where = " and (ADMSSN <> 0) and  (ADMSSN/APPLCN*100) between $min and $max";
+                 array_push($whereArr, $where);
+                 break;
              case 'home':
                 $zipCode = $restOfArray{'zipCode'};
                 $min = $restOfArray{'minDistanceAway'};
@@ -405,10 +414,10 @@ function  getCollegeCount($dbh, $customer_id){
   $where .= $distHaving;
 
   $query = "SELECT count(*) as count FROM (
-  select unitid $distCols from institutions
-  where 1=1 $where
+  select institutions.unitid $distCols from institutions, admissions_info
+  where institutions.unitid = admissions_info.unitid $where
   ) as count";
-  ####echo "query:$query\n";
+  #####echo "query:$query\n";
   $data = execSqlSingleRowPREPARED($dbh, $query);
 
   return $data;
@@ -423,15 +432,15 @@ function  getColleges($dbh, $customer_id){
   $where .= $distHaving;
 
   $query = "select instnm as name,
-             institutions.unitid as id,
-             locale_decode as locale,
-             CONCAT(city,',', stabbr) as location,
-             webaddr as url,
-             CASE
-                 WHEN ADMSSN = 0 THEN 'N/A'
-                 ELSE concat(round(ADMSSN/APPLCN*100),'%')
-             END AS acpt_rate,
-             instsize_decode as school_size $distCols
+            institutions.unitid as id,
+            locale_decode as locale,
+            CONCAT(city,',', stabbr) as location,
+            webaddr as url,
+            CASE
+               WHEN ADMSSN = 0 THEN 'N/A'
+               ELSE concat(round(ADMSSN/APPLCN*100),'%')
+            END AS acpt_rate,
+            instsize_decode as school_size $distCols
   from institutions, decode_instsize, decode_locale, admissions_info
   where
     institutions.instsize = decode_instsize.instsize and
@@ -824,6 +833,11 @@ function  saveCriteria($dbh, $request_data, $customer_id){
            saveCriteriaFunc($dbh, $customer_id, $request_data, "max");
            saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
            break;
+     case 'acptRate':
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "min");  # last param is the field
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "max");
+           saveCriteriaFunc($dbh, $customer_id, $request_data, "enabled");
+           break;
      case 'home':
            saveCriteriaFunc($dbh, $customer_id, $request_data, "zipCode");  # last param is the field
            saveCriteriaFunc($dbh, $customer_id, $request_data, "minDistanceAway");
@@ -886,7 +900,7 @@ function  saveCriteriaFunc($dbh, $customer_id, $request_data, $field_cd){
       ### HACK:  assumes all the OPTIONS fields are multiple select fields so value will be an object
       ### NOTE: the options MUST use 'id' as the key!
       #####echo "wooo hooo\n";
-      #####var_dump($request_data->$field_cd);
+      ######var_dump($request_data->$field_cd);
       #### Divisions is a new multi-select
       ####if ('options' == $field_cd){
       if ('options' == $field_cd or 'divisions' == $field_cd ){

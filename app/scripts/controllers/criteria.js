@@ -78,6 +78,7 @@ angular.module('collegeApp')
         case 'schoolSize': {$scope.myForm.schoolSize.enabled = false; break;}
         case 'yrsOfSchool': {$scope.myForm.yrsOfSchool.enabled = false; break;}
         case 'runBy': {$scope.myForm.runBy.enabled = false; break;}
+        case 'acptRate': {$scope.myForm.acptRate.enabled = false; break;}
         case 'states': {$scope.myForm.states.enabled = false; break;}
       }
       collegeFactory.saveCriteria(formData).then(function (data) {
@@ -105,6 +106,7 @@ angular.module('collegeApp')
         case 'schoolSize': {$scope.myForm.schoolSize.enabled = true; break;}
         case 'yrsOfSchool': {$scope.myForm.yrsOfSchool.enabled = true; break;}
         case 'runBy': {$scope.myForm.runBy.enabled = true; break;}
+        case 'acptRate': {$scope.myForm.acptRate.enabled = true; break;}
         case 'states': {$scope.myForm.states.enabled = true; break;}
       }
 

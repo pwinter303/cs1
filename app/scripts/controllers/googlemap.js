@@ -11,29 +11,11 @@
 angular.module('collegeApp')
     .controller('GooglemapCtrl', ['$scope', 'uiGmapGoogleMapApi', 'collegeFactory', function ($scope, uiGmapGoogleMapApi, collegeFactory) {
 
-//    $scope.getColleges = function (){
-//      var url = "college.php";
-//      var action = "getColleges";
-//      collegeFactory.getData(url, action).then(function (data) {
-//            if (data){
-//                $scope.colleges = data;
-//            }
-//        }, function(error) {
-//            // promise rejected, could be because server returned 404, 500 error...
-//            collegeFactory.msgError(error);
-//        });
-//    };
-//    $scope.getColleges();
-
-
     angular.extend($scope, {
         map: {
             zoom: 7,
+          //FIXME: This should be based on the persons home address
             center: {latitude: 40.75, longitude: -74.65},
-//            center: {
-//                latitude: 35.681382,
-//                longitude: 139.766084
-//            },
             options: {
                 maxZoom: 20,
                 minZoom: 3,
@@ -48,52 +30,36 @@ angular.module('collegeApp')
         waypoints: []
         });
     $scope.routePoints.start = "Duxbury,MA";
-    $scope.routePoints.end = "State College,PA";
+    $scope.routePoints.end = "Duxbury,MA";
     $scope.collegesOnRoute = "";
+//    $scope.routePoints.end = "State College,PA";
+//    $scope.collegesOnRoute = "";
 
+//  This section creates the Direction Renderer  that is used to render the map using info obtained in the PHP
     uiGmapGoogleMapApi.then(function(maps) {
       var directionsDisplay = new maps.DirectionsRenderer();
 
-      $scope.calcRoute = function (routePoints) {
-          directionsDisplay.setMap($scope.map.control.getGMap());
-          var directionsService = new maps.DirectionsService();
-          var start = routePoints.start.latlng;
-          var end = routePoints.end.latlng;
-          var request = {
-              origin: start,
-              destination: end,
-              travelMode: maps.TravelMode.WALKING
-          };
-          //ToDo: Replace this with a call to a service that will call GoogleMaps WebService
-          //ToDo: Get result of webservice and correct it so it matches JS result
-          directionsService.route(request, function(response, status) {
-              if (status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
-                  directionsDisplay.setDirections(response);
-              }
-          });
-//          return;
-      };
+//      FIXME: This code can be removed, since the route is being done in PHP
+//      ALTHOUGH.....MAY WANT TO KEEP IT SINCE IT ALLOWS FOR DEBUGGING (ie: RUN CODE via PHP then run it via this JS)
 
-//      $scope.calcRouteNEW = function (routePoints, waypoints) {
+//      $scope.calcRoute = function (routePoints) {
 //          directionsDisplay.setMap($scope.map.control.getGMap());
-//          var theRequest = {};
-//          theRequest.routePoints = routePoints;
-//          theRequest.waypoints = waypoints;
+//          var directionsService = new maps.DirectionsService();
 //
-//          collegeFactory.getDirections(theRequest).then(function (data) {
-//              if (data){
-//                  // Process the route returned from Google Web Service
-//                  //ToDo: Get result of webservice and correct it so it matches JS result
-//                  if (data.status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
-//                      directionsDisplay.setDirections(data);
-//                  }
+//          var start = routePoints.start.latlng;
+//          var end = routePoints.end.latlng;
+//          var request = {
+//              origin: start,
+//              destination: end,
+//              travelMode: maps.TravelMode.WALKING
+//          };
+//          //ToDo: Replace this with a call to a service that will call GoogleMaps WebService
+//          //ToDo: Get result of webservice and correct it so it matches JS result
+//          directionsService.route(request, function(response, status) {
+//              if (status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
+//                  directionsDisplay.setDirections(response);
 //              }
-//          }, function(error) {
-//              // promise rejected, could be because server returned 404, 500 error...
-//              collegeFactory.msgError(error);
 //          });
-//
-////          return;
 //      };
 
       $scope.getCollegesOnRoute = function () {
@@ -102,7 +68,7 @@ angular.module('collegeApp')
         theRequest.routePoints = $scope.routePoints;
         theRequest.waypoints = $scope.waypoints;
 
-        //temp hack.. ToDo. FixMe
+        //temp hack.. ToDo. FixMe:  I think this can safely be removed..
         var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
 
           collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {

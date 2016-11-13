@@ -2,87 +2,73 @@
 <div data-ng-controller="PlantripCtrl">
 
 
-
+    <!-- MY TRIPS -->
+    <!-- MY TRIPS -->
+    <!-- MY TRIPS -->
     <div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3 ">
         <div class="panel panel-default">
             <div class="panel-heading">My Trips</div>
             <div class="panel-body">
-                <!-- Table -->
-                <table st-table="trips" st-safe-src="tripsList" class="table table-striped">
+
+
+                <table st-table="trips" class="table table-striped">
                     <thead>
                     <tr>
+                        <th>Trip Name</th>
+                        <th>From</th>
+                        <th>To</th>
                         <th></th>
-                        <th st-sort="name">Trip Name</th>
-                        <th st-sort="junk"></th>
-                        <th st-sort="junk1"></th>
                         <th></th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="trip in tripsList">
-                        <td>
-                            {{trip.name}}
-                        </td>
-                        <td><button class="btn btn-xs btn-primary" data-ng-click="addGroup(newGroup)">Get Trip Info</button></td>
-                        <td><span class="glyphicon glyphicon-trash" ng-click="trashIt(college)">
-                                </span>
-                        </td>
+                    <tr ng-repeat="trip in trips">
+                        <td>{{trip.name}}</td>
+                        <td>{{trip.from}}</td>
+                        <td>{{trip.to}}</td>
+                        <td><button class="btn btn-xs btn-primary" data-ng-click="getTripDetails(trip)">Get Trip Info</button></td>
+                        <td><span class="glyphicon glyphicon-trash" ng-click="deleteTrip(trip)"></span></td>
                     </tr>
                     </tbody>
                 </table>
-            </div>
-        </div>
-    </div>
+                <button class="btn btn-xs btn-primary" data-ng-click="addTripShow=!addTripShow">Add a Trip</button>
 
 
-<div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3 ">
-        <div class="panel panel-default">
-            <div class="panel-heading"><h3>Chose Existing Trip</h3></div>
-            <div class="panel-body">
-                <div class="col-md-10 col-md-offset-1">
+                <!-- ADD TRIP -->
+                <!-- ADD TRIP -->
+                <!-- ADD TRIP -->
+                <div class="col-md-12" ng-show="addTripShow">
 
                     <form role="form">
-                        <select size="2" class="form-control"
-                                multiple="false"
-                                data-ng-model="myForm.existingTrips.options"
-                                data-ng-options="trip.name for trip in tripsList track by trip.id">
-                        </select>
-                        <button class="btn btn-primary" data-ng-click="addGroup(newGroup)">Get Trip Info</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3 ">
-        <div class="panel panel-default">
-            <div class="panel-heading"><h3>Add A New Trip</h3></div>
-            <div class="panel-body">
-                <div class="col-md-12">
-
-                    <form role="form">
-                        <div class="col-md-5 text-right">
-                            Trip Name:
+                        <div class="form-group">
+                            <label for="tripName">Trip Name</label>
+                            <input type="input" class="form-control" id="tripName" data-ng-model="trip.name" placeholder="Enter a Name for your trip">
                         </div>
-                        <div class="col-md-7">
-                            <input type="text" class="form-control" data-ng-model="trip.name" placeholder="enter the name of your trip">
+                        <div class="form-group">
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input class="form-check-input" ng-model="roundTrip" type="checkbox"> Round Trip
+                                </label>
+                            </div>
                         </div>
-
-                        <div class="col-md-5 text-right">
-                            From (starting town or address):
+                        <div class="form-group">
+                            <label for="tripStart">Starting Point</label>
+                            <input type="input" class="form-control" id="tripStart" data-ng-model="trip.startingPoint" placeholder="Enter starting address or city">
                         </div>
-                        <div class="col-md-7">
-                            <input type="text" class="form-control" data-ng-model="trip.name" placeholder="starting address or city">
+                        <div class="form-group">
+                            <label for="tripEnd">Ending Point</label>
+                            <input type="input" class="form-control" id="tripEnd" data-ng-model="trip.endingPoint" placeholder="Enter an ending address or city">
                         </div>
-                        <div class="col-md-5 text-right">
-                            To (destination town or address):
+                        <div class="form-group">
+                            <label for="tripCollege">Select Colleges (You'll be able to add more later)</label>
+                            <select size="5" class="form-control"
+                                    multiple="true"
+                                    id="collegePicked"
+                                    data-ng-model="trip.pickedCollege"
+                                    data-ng-options="clg.name for clg in colleges track by clg.id">
+                            </select>
                         </div>
-                        <div class="col-md-7">
-                            <input type="text" class="form-control" data-ng-model="trip.name" placeholder="destination address or city">
-                            <button class="btn btn-primary" data-ng-click="addGroup(newGroup)">Add Trip</button>
-                        </div>
-
-
+                        <button class="btn btn-primary" data-ng-click="addTrip(trip)">Add Trip</button>
                     </form>
                 </div>
             </div>
@@ -90,4 +76,57 @@
     </div>
 
 
-</div>
+    <!-- TRIP INFO -->
+    <!-- TRIP INFO -->
+    <!-- TRIP INFO -->
+    <div class="col-lg-12 col-md-12 col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">put trip name here</div>
+            <div class="panel-body">
+
+                <div class="col-lg-4 col-md-4 col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Current Info</div>
+                        <div class="panel-body">
+                            START: {{startEndAddresses.start}}
+                            <br>
+                            <div data-ng-repeat="waypoint in tripWaypoints">
+                                    {{waypoint.id}}
+                            </div>
+                            END: {{startEndAddresses.end}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8 col-md-8 col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Other Colleges</div>
+                        <div class="panel-body">
+                            <table st-table="displayedColleges" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th st-sort="name">College Name</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="college in colleges">
+                                        <td>
+                                            <span data-ng-show="college.favorite" class="glyphicon glyphicon-star"  ng-click="addToFavorites(college)"></span>
+                                            <span data-ng-hide="college.favorite" class="glyphicon glyphicon-star-empty"  ng-click="addToFavorites(college)"></span>
+                                        </td>
+                                        <td>
+                                            {{college.name}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+                </div>
+        </div>
+        </div>
+    </div>

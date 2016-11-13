@@ -85,6 +85,9 @@ function  processGet($customer_id){
        case 'getCriteriaForWeb':
               $result = getCriteriaForWeb($dbh,$customer_id);
               break;
+       case 'getTrips':
+              $result = getTrips($dbh,$customer_id);
+              break;
        case 'getCustomersCollegeUnitIDs':
               $result = getCustomersCollegeUnitIDs($dbh, $customer_id);
               break;
@@ -115,6 +118,16 @@ function  processPost($customer_id){
        case 'saveLocation':
              $result = saveLocation($dbh, $request, $customer_id);
              break;
+       case 'addTrip':
+             $result = addTrip($dbh, $request, $customer_id);
+             break;
+       case 'deleteTrip':
+             $result = deleteTrip($dbh, $request, $customer_id);
+             break;
+       #### did this as a POST to easily pass extra information
+       case 'getTripDetails':
+              $result = getTripDetails($dbh,$request,$customer_id);
+              break;
        case 'getDirections':
              $result = getDirectionsAsPOST($dbh, $request);
              break;
@@ -226,6 +239,48 @@ function  getTestScoreRelation($dbh){
         array('id' => 'notest', 'name' => 'No Test Info')
         );
     return $data;
+}
+
+function  getTrips($dbh, $customer_id){
+    $query = "select trip_id as id, trip_name as name from trips where customer_id = $customer_id";
+    $data = execSqlMultiRowPREPARED($dbh, $query);
+    return $data;
+}
+
+
+function getTripDetails($dbh,$request_data,$customer_id){
+  $tripID = $request_data->id;
+  $query = "select trip_point_id as tripPtID, address as addr, unitID as unitID, point_type_cd as pointTypeCd, addr_unitid_cd as addrUnitCd from trip_points where trip_id = ?";
+  $types = 'i';  ## pass
+  $params = array($tripID);
+
+  $data = execSqlMultiRowPREPARED($dbh, $query, $types, $params);
+
+  //  primary key is just 0, 1, 2 etc... integer counting the array items
+  //  fieldValuePairs is the column name and the value
+  $finalArr = array();
+  foreach ($data as $primaryKey => $fieldValuePairs){
+//      var_dump($fieldValuePairs);
+      if ($fieldValuePairs{'pointTypeCd'} == "START"){
+        $startAddr = $fieldValuePairs{'addr'};
+      }
+      if ($fieldValuePairs{'pointTypeCd'} == "END"){
+        $endAddr = $fieldValuePairs{'addr'};
+      }
+      if ($fieldValuePairs{'pointTypeCd'} == "WAYPT"){
+        $valArr = array("id" => $fieldValuePairs{'tripPtID'}, "unitid" => $fieldValuePairs{'unitID'});
+        array_push($finalArr, $valArr);
+      }
+  }
+
+  $finalData = array(
+    array('start' => $startAddr, 'end' => $endAddr),
+    $finalArr
+  );
+
+
+//  return $data;
+  return $finalData;
 }
 
 function  getLatLngForZipCode($dbh,$zipCode){
@@ -906,6 +961,7 @@ function  saveCriteriaFunc($dbh, $customer_id, $request_data, $field_cd){
       if ('options' == $field_cd or 'divisions' == $field_cd ){
         $values = array();
         foreach ($request_data->$field_cd as $item){
+          ### hard-coded ID
           array_push($values,$item->id);
         }
       } else {
@@ -925,6 +981,76 @@ function  saveCriteriaFunc($dbh, $customer_id, $request_data, $field_cd){
 
   $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
   return $rowsAffected;
+}
+
+function  addTrip($dbh, $request_data, $customer_id){
+    $name = $request_data->name;
+
+    $query = "INSERT INTO trips (customer_id, trip_name) VALUES
+             (?, ?)";
+
+    $types = 'is';  ## pass
+    $params = array($customer_id, $name);
+
+    $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
+    $tripID = mysqli_insert_id($dbh);
+
+    $pointTypeCd = "START";
+    $addrUnitIDCd="A";
+    $addr = $request_data->startingPoint;
+    $unitID = "";
+    addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitID);
+
+    $pointTypeCd = "END";
+    $addr = $request_data->endingPoint;
+    addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitID);
+
+    $pointTypeCd = "WAYPT";
+    $addrUnitIDCd="U";
+    $addr = "";
+    #### HACK.. should be a cleaner way to do this FIXME   TODO
+    foreach ($request_data->pickedCollege as $item){
+      $unitID = $item->id;
+      ###echo "$unitID\n";
+    }
+    addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitID);
+
+    $data = array(
+      array('recordsAdded' => $rowsAffected),
+    );
+    return $data;
+}
+
+function  addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitID){
+    $query = "INSERT INTO trip_points   (trip_id, address, UNITID, point_type_cd, addr_unitid_cd)  VALUES
+             (?, ?, ?, ?, ?)";
+
+    $types = 'isiss';  ## pass
+    $params = array($tripID,$addr, $unitID,$pointTypeCd,$addrUnitIDCd);
+    $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
+
+}
+
+
+
+function  deleteTrip($dbh, $request_data, $customer_id){
+    $id = $request_data->id;
+
+
+    $query = "DELETE from trip_points where trip_id = ?";
+    $types = 'i';  ## pass
+    $params = array($id);
+    $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
+
+    $query = "DELETE from trips where customer_id = ? and trip_id = ?";
+    $types = 'ii';  ## pass
+    $params = array($customer_id, $id);
+
+    $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
+    $data = array(
+      array('recordsDeleted' => $rowsAffected),
+    );
+    return $data;
 }
 
 function  saveLocation(){

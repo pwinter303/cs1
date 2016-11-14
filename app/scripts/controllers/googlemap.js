@@ -73,9 +73,7 @@ angular.module('collegeApp')
 
           collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
           if (data){
-            // Process the route returned from Google Web Service
-            //ToDo: Replace this with a call to a service that will call GoogleMaps WebService
-            //ToDo: Get result of webservice and correct it so it matches JS result
+            // Process the route returned from PHP code
             if (data.status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
               directionsDisplay.setDirections(data);
             }

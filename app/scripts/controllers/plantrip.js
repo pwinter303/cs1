@@ -12,6 +12,8 @@ angular.module('collegeApp')
 
   //$scope.trips = [{id:3,name:"WooHoo"},{id:4,name:"WooHoo2"}];
 
+  $scope.tripListShow = true;
+  $scope.tripPlanningShow = false;
   $scope.addTripShow = false;
   $scope.roundTrip = false;
   $scope.trip = {startingPoint:'',endingPoint:''};
@@ -77,20 +79,22 @@ angular.module('collegeApp')
   $scope.getTripDetails = function(formData){
     var url = "college.php";
     formData.action = "getTripDetails";
-    $scope.activeTripID = formData.id;
+    $scope.activeTripID = formData.tripID;
     collegeFactory.saveData(url, formData).then(function (data) {
       if (data){
           $scope.startEndAddresses = data[0];
           $scope.tripWaypoints = data[1];
           // Spin through colleges and hide them if they're already part of the trip
           for(var iData=0; iData< $scope.colleges.length; iData++){
-              for(var i=0; i < $scope.tripWaypoints.length;i++){
-                $scope.colleges[iData].showMe = true;
-                if($scope.tripWaypoints[i].unitID === $scope.colleges[iData].unitID){
+            $scope.colleges[iData].showMe = true;
+            for(var i=0; i < $scope.tripWaypoints.length;i++){
+                if($scope.tripWaypoints[i].schoolID === $scope.colleges[iData].schoolID){
                   $scope.colleges[iData].showMe = false;
                 }
               }
           }
+          $scope.tripListShow = false;
+          $scope.tripPlanningShow = true;
         }
     }, function(error) {
       // promise rejected, could be because server returned 404, 500 error...
@@ -105,6 +109,17 @@ angular.module('collegeApp')
         collegeFactory.msgSuccess('Removed');
         // Remove college from waypoint array
         // Add college to college list array
+        // Spin through colleges and hide them if they're already part of the trip
+        for(var i =0; i < $scope.tripWaypoints.length; i++){
+          if($scope.tripWaypoints[i].tripPtID === formData.tripPtID){
+            $scope.tripWaypoints.splice(i, 1);
+          }
+        }
+        for(var iData=0; iData< $scope.colleges.length; iData++){
+            if($scope.colleges[iData].schoolID === formData.schoolID){
+              $scope.colleges[iData].showMe = true;
+            }
+        }
       }
     }, function(error) {
       // promise rejected, could be because server returned 404, 500 error...
@@ -115,16 +130,17 @@ angular.module('collegeApp')
   $scope.addCollegeToTrip = function(formData){
     var url = "college.php";
     formData.action = "addCollegeToTrip";
-    formData.id = $scope.activeTripID;
+    formData.tripID = $scope.activeTripID;
     collegeFactory.saveData(url, formData).then(function (data) {
       if (data){
-        // Remove college from college list array
-        // Add college to waypoint array
         //FIXME: clean up formData which contains the college being added
-        //FIXME: using id for different things.  TripID  TripPtID
-        // clean it up any explitly name field
+        for(var iData=0; iData< $scope.colleges.length; iData++){
+          if($scope.colleges[iData].schoolID === formData.schoolID){
+            $scope.colleges[iData].showMe = false;
+          }
+        }
         // also should the push be using data from the college array?
-        formData.id = data.tripPtID
+        formData.tripPtID = data.tripPtID
         $scope.tripWaypoints.push(formData);
       }
     }, function(error) {

@@ -248,16 +248,16 @@ function  getTestScoreRelation($dbh){
 }
 
 function  getTrips($dbh, $customer_id){
-    $query = "select trip_id as id, trip_name as name from trips where customer_id = $customer_id";
+    $query = "select trip_id as tripID, trip_name as name from trips where customer_id = $customer_id";
     $data = execSqlMultiRowPREPARED($dbh, $query);
     return $data;
 }
 
 
 function getTripDetails($dbh,$request_data,$customer_id){
-  $tripID = $request_data->id;
+  $tripID = $request_data->tripID;
   $query = "select
-  trip_point_id as tripPtID, address as addr, unitID as unitID,
+  trip_point_id as tripPtID, address as addr, unitID as schoolID,
   point_type_cd as pointTypeCd, addr_unitid_cd as addrUnitCd
   ,(select instnm from institutions where trip_points.unitid = institutions.unitid) as collegeName
   from trip_points where trip_id = ?";
@@ -278,8 +278,8 @@ function getTripDetails($dbh,$request_data,$customer_id){
         $endAddr = $fieldValuePairs{'addr'};
       }
       if ($fieldValuePairs{'pointTypeCd'} == "WAYPT"){
-        $valArr = array("id" => $fieldValuePairs{'tripPtID'},
-        "unitid" => $fieldValuePairs{'unitID'},
+        $valArr = array("tripPtID" => $fieldValuePairs{'tripPtID'},
+        "schoolID" => $fieldValuePairs{'schoolID'},
         "name" => $fieldValuePairs{'collegeName'});
         array_push($finalArr, $valArr);
       }
@@ -294,21 +294,21 @@ function getTripDetails($dbh,$request_data,$customer_id){
 }
 
 function addCollegeToTrip($dbh, $request_data, $customer_id){
-    $tripID = $request_data->id;
-    $unitID = $request_data->unitID;
+    $tripID = $request_data->tripID;
+    $schoolID = $request_data->schoolID;
     $pointTypeCd = "WAYPT";
     $addrUnitIDCd="U";
     $addr = "";
-    $tripPointID = addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitID);
+    $tripPointID = addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $schoolID);
     return array('tripPtID' => $tripPointID);
 }
 
 
 function deleteCollegeFromTrip($dbh, $request_data, $customer_id){
-      $tripPoint = $request_data->id;
+      $tripPtID = $request_data->tripPtID;
       $query = "DELETE from trip_points where trip_point_id = ?";
       $types = 'i';  ## pass
-      $params = array($tripPoint);
+      $params = array($tripPtID);
       $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
 
       return array($rowsAffected);
@@ -520,7 +520,7 @@ function  getColleges($dbh, $customer_id){
   $where .= $distHaving;
 
   $query = "select instnm as name,
-            institutions.unitid as id,
+            institutions.unitid as schoolID,
             locale_decode as locale,
             CONCAT(city,',', stabbr) as location,
             webaddr as url,
@@ -540,49 +540,6 @@ function  getColleges($dbh, $customer_id){
   $data = execSqlMultiRowPREPARED($dbh, $query);
   return $data;
 }
-
-##### OLD WAY... BROKE THE LOGIC OUT (ABOVE) SINCE IT WAS UNIQUE ENOUGH
-####
-//function  getCollegeFunc($dbh, $customer_id, $count=0){
-//    $componentsArr = createWhereClauseUsingCriteria($dbh, $customer_id);
-//    $where = $componentsArr[0];
-//    $distCols = $componentsArr[1];
-//    $distHaving = $componentsArr[2];
-//
-//    ##echo "$where,$distCols,$distHaving\n";
-//
-//    $where .= $distHaving;
-//    $selectCols = "instnm as name,
-//                             unitid as id,
-//                             locale_decode as locale,
-//                             CONCAT(city,',', stabbr) as location,
-//                             webaddr as url,
-//                             instsize_decode as school_size $distCols";
-//
-//    $countSelect = "";
-//    $countEnd = "";
-//    if ($count){
-//      $countSelect = "SELECT count(*) as count FROM (";
-//      $countEnd = ") as count";
-//    }
-//
-//    $query = "$countSelect  select  $selectCols
-//    from institutions, decode_instsize, decode_locale
-//    where
-//      institutions.instsize = decode_instsize.instsize and
-//      institutions.locale = decode_locale.locale
-//      $where  order by name $countEnd
-//    ";
-//    #echo "this is the query:$query\n";
-//
-//    ### since types and params are defaulted to null in the called function you dont have to pass them
-//    if ($count){
-//      $data = execSqlSingleRowPREPARED($dbh, $query);
-//    }else {
-//      $data = execSqlMultiRowPREPARED($dbh, $query);
-//    }
-//    return $data;
-//}
 
 
 ####################### POSTS ####################################################
@@ -845,7 +802,7 @@ function updateFinalArrayWithResults($collegesFound, $finalArr, $lat, $lng){
 
 function getCollegeUsingUnitID($dbh, $unitID){
     $query = "select instnm as name,
-                     unitid as id,
+                     unitid as schoolID,
                      locale_decode as locale,
                      CONCAT(city,',', stabbr) as location,
                      webaddr as url,
@@ -870,7 +827,8 @@ function getCustomersCollegeUnitIDs($dbh, $customer_id){
 function extractUnitIDs($dataColleges){
   $unitIDsArr = array();
   foreach ($dataColleges as $College){
-    array_push($unitIDsArr, $College{'id'});
+//    array_push($unitIDsArr, $College{'id'});
+    array_push($unitIDsArr, $College{'schoolID'});
   }
   return $unitIDsArr;
 }
@@ -878,7 +836,7 @@ function extractUnitIDs($dataColleges){
 function getCollegesNearby($dbh, $lat, $lng, $distance, $unitIDs){
       $whereUnits = implode(",", $unitIDs);
 
-      $query = "select unitid as id,
+      $query = "select unitid as schoolID,
                 round((((acos(sin((? *pi()/180)) * sin((`latitude`*pi()/180))+cos((? *pi()/180))
                                    * cos((`latitude`*pi()/180)) * cos(((? - `longitude`)*pi()/180))))*180/pi())*60*1.1515))
                                    AS distance
@@ -1043,10 +1001,10 @@ function  addTrip($dbh, $request_data, $customer_id){
     $addr = "";
     #### HACK.. should be a cleaner way to do this FIXME   TODO
     foreach ($request_data->pickedCollege as $item){
-      $unitID = $item->id;
+      $schoolID = $item->schoolID;
       ###echo "$unitID\n";
     }
-    addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitID);
+    addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $schoolID);
 
     $data = array(
       array('recordsAdded' => $rowsAffected),
@@ -1054,12 +1012,12 @@ function  addTrip($dbh, $request_data, $customer_id){
     return $data;
 }
 
-function  addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitID){
+function  addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $schoolID){
     $query = "INSERT INTO trip_points   (trip_id, address, UNITID, point_type_cd, addr_unitid_cd)  VALUES
              (?, ?, ?, ?, ?)";
 
     $types = 'isiss';  ## pass
-    $params = array($tripID,$addr, $unitID,$pointTypeCd,$addrUnitIDCd);
+    $params = array($tripID,$addr, $schoolID,$pointTypeCd,$addrUnitIDCd);
     $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
     $tripPointID = mysqli_insert_id($dbh);
     return $tripPointID;
@@ -1068,17 +1026,17 @@ function  addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitI
 
 
 function  deleteTrip($dbh, $request_data, $customer_id){
-    $id = $request_data->id;
+    $tripID = $request_data->tripID;
 
 
     $query = "DELETE from trip_points where trip_id = ?";
     $types = 'i';  ## pass
-    $params = array($id);
+    $params = array($tripID);
     $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
 
     $query = "DELETE from trips where customer_id = ? and trip_id = ?";
     $types = 'ii';  ## pass
-    $params = array($customer_id, $id);
+    $params = array($customer_id, $tripID);
 
     $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
     $data = array(

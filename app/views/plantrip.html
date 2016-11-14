@@ -5,7 +5,7 @@
     <!-- MY TRIPS -->
     <!-- MY TRIPS -->
     <!-- MY TRIPS -->
-    <div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3 ">
+    <div class="col-lg-6 col-md-6 col-xs-12 col-lg-offset-3 col-md-offset-3"  ng-show="tripListShow">
         <div class="panel panel-default">
             <div class="panel-heading">My Trips</div>
             <div class="panel-body">
@@ -65,7 +65,7 @@
                                     multiple="true"
                                     id="collegePicked"
                                     data-ng-model="trip.pickedCollege"
-                                    data-ng-options="clg.name for clg in colleges track by clg.id">
+                                    data-ng-options="clg.name for clg in colleges track by clg.schoolID">
                             </select>
                         </div>
                         <button class="btn btn-primary" data-ng-click="addTrip(trip)">Add Trip</button>
@@ -79,9 +79,9 @@
     <!-- TRIP INFO -->
     <!-- TRIP INFO -->
     <!-- TRIP INFO -->
-    <div class="col-lg-12 col-md-12 col-xs-12">
+    <div class="col-lg-12 col-md-12 col-xs-12" ng-show="tripPlanningShow">
         <div class="panel panel-default">
-            <div class="panel-heading">put trip name here</div>
+            <div class="panel-heading">Trip Planning</div>
             <div class="panel-body">
 
                 <div class="col-lg-4 col-md-4 col-xs-12">
@@ -89,8 +89,8 @@
                         <div class="panel-heading">Current Info</div>
                         <div class="panel-body">
                             START: {{startEndAddresses.start}}
-                            <br>
-                            <div data-ng-repeat="waypoint in tripWaypoints">
+                            <br><strong>Colleges that we'll visit:</strong><br>
+                            <div data-ng-repeat="waypoint in tripWaypoints | orderBy:'name' ">
                                     <span class="glyphicon glyphicon-minus-sign"  ng-click="deleteCollegeFromTrip(waypoint)"></span>
                                     {{waypoint.name}}
                             </div>
@@ -112,7 +112,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="college in colleges">
+                                    <tr ng-repeat="college in colleges | filter:{showMe: 'True'}">
                                         <td>
                                             <span class="glyphicon glyphicon-plus-sign"  ng-click="addCollegeToTrip(college)"></span>
                                         </td>
@@ -122,8 +122,6 @@
                                     </tr>
                                 </tbody>
                             </table>
-
-
                         </div>
                     </div>
                 </div>

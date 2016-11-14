@@ -91,7 +91,8 @@
                             START: {{startEndAddresses.start}}
                             <br>
                             <div data-ng-repeat="waypoint in tripWaypoints">
-                                    {{waypoint.id}}
+                                    <span class="glyphicon glyphicon-minus-sign"  ng-click="deleteCollegeFromTrip(waypoint)"></span>
+                                    {{waypoint.name}}
                             </div>
                             END: {{startEndAddresses.end}}
                         </div>
@@ -113,8 +114,7 @@
                                 <tbody>
                                     <tr ng-repeat="college in colleges">
                                         <td>
-                                            <span data-ng-show="college.favorite" class="glyphicon glyphicon-star"  ng-click="addToFavorites(college)"></span>
-                                            <span data-ng-hide="college.favorite" class="glyphicon glyphicon-star-empty"  ng-click="addToFavorites(college)"></span>
+                                            <span class="glyphicon glyphicon-plus-sign"  ng-click="addCollegeToTrip(college)"></span>
                                         </td>
                                         <td>
                                             {{college.name}}

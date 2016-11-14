@@ -124,6 +124,12 @@ function  processPost($customer_id){
        case 'deleteTrip':
              $result = deleteTrip($dbh, $request, $customer_id);
              break;
+       case 'addCollegeToTrip':
+             $result = addCollegeToTrip($dbh, $request, $customer_id);
+             break;
+       case 'deleteCollegeFromTrip':
+             $result = deleteCollegeFromTrip($dbh, $request, $customer_id);
+             break;
        #### did this as a POST to easily pass extra information
        case 'getTripDetails':
               $result = getTripDetails($dbh,$request,$customer_id);
@@ -250,7 +256,11 @@ function  getTrips($dbh, $customer_id){
 
 function getTripDetails($dbh,$request_data,$customer_id){
   $tripID = $request_data->id;
-  $query = "select trip_point_id as tripPtID, address as addr, unitID as unitID, point_type_cd as pointTypeCd, addr_unitid_cd as addrUnitCd from trip_points where trip_id = ?";
+  $query = "select
+  trip_point_id as tripPtID, address as addr, unitID as unitID,
+  point_type_cd as pointTypeCd, addr_unitid_cd as addrUnitCd
+  ,(select instnm from institutions where trip_points.unitid = institutions.unitid) as collegeName
+  from trip_points where trip_id = ?";
   $types = 'i';  ## pass
   $params = array($tripID);
 
@@ -268,7 +278,9 @@ function getTripDetails($dbh,$request_data,$customer_id){
         $endAddr = $fieldValuePairs{'addr'};
       }
       if ($fieldValuePairs{'pointTypeCd'} == "WAYPT"){
-        $valArr = array("id" => $fieldValuePairs{'tripPtID'}, "unitid" => $fieldValuePairs{'unitID'});
+        $valArr = array("id" => $fieldValuePairs{'tripPtID'},
+        "unitid" => $fieldValuePairs{'unitID'},
+        "name" => $fieldValuePairs{'collegeName'});
         array_push($finalArr, $valArr);
       }
   }
@@ -278,10 +290,31 @@ function getTripDetails($dbh,$request_data,$customer_id){
     $finalArr
   );
 
-
-//  return $data;
   return $finalData;
 }
+
+function addCollegeToTrip($dbh, $request_data, $customer_id){
+    $tripID = $request_data->id;
+    $unitID = $request_data->unitID;
+    $pointTypeCd = "WAYPT";
+    $addrUnitIDCd="U";
+    $addr = "";
+    $tripPointID = addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitID);
+    return array('tripPtID' => $tripPointID);
+}
+
+
+function deleteCollegeFromTrip($dbh, $request_data, $customer_id){
+      $tripPoint = $request_data->id;
+      $query = "DELETE from trip_points where trip_point_id = ?";
+      $types = 'i';  ## pass
+      $params = array($tripPoint);
+      $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
+
+      return array($rowsAffected);
+}
+
+
 
 function  getLatLngForZipCode($dbh,$zipCode){
     $query = "select latitude, longitude from zip_codes where postal_code = ? ";
@@ -1028,7 +1061,8 @@ function  addTripPoint($dbh, $tripID, $pointTypeCd, $addrUnitIDCd, $addr, $unitI
     $types = 'isiss';  ## pass
     $params = array($tripID,$addr, $unitID,$pointTypeCd,$addrUnitIDCd);
     $rowsAffected = execSqlActionPREPARED($dbh, $query, $types, $params);
-
+    $tripPointID = mysqli_insert_id($dbh);
+    return $tripPointID;
 }
 
 

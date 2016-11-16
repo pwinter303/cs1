@@ -23,7 +23,7 @@ angular.module('collegeApp')
     if ($scope.roundTrip) {
       $scope.trip.endingPoint = $scope.trip.startingPoint;
     }
-  })
+  });
 
   $scope.$watch('roundTrip', function (checkBoxValue) {
     if (checkBoxValue) {
@@ -31,7 +31,7 @@ angular.module('collegeApp')
     } else {
       $scope.trip.endingPoint = '';
     }
-  })
+  });
 
   $scope.getTrips = function (){
     var url = "college.php";
@@ -141,7 +141,7 @@ angular.module('collegeApp')
           }
         }
         // also should the push be using data from the college array?
-        formData.tripPtID = data.tripPtID
+        formData.tripPtID = data.tripPtID;
         $scope.tripWaypoints.push(formData);
       }
     }, function(error) {

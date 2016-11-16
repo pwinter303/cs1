@@ -113,10 +113,11 @@ angular.module('collegeApp')
     <!-- credit goes to: -->
     <!--gis.stackexchange.com/questions/15197/google-maps-v3-in-javascript-api-render-route-obtained-with-web-api/187869#187869-->
     function renderDirections(map, response, request, renderer){
-      var copyOfResponse = response;
+//      var copyOfResponse = response;
       typecastRoutes(response.routes);
 //        console.log(response);
-      var justRoutes = response.routes;
+//      2016-11-16 commented it out
+//      var justRoutes = response.routes;
 
 
       renderer.setOptions({
@@ -131,7 +132,7 @@ angular.module('collegeApp')
         draggable : true,
         map : map
       });
-    };
+    }
 
     function extractAndDisplayDirections(response){
       var route = response.routes[0];

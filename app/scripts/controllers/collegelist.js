@@ -46,7 +46,7 @@ angular.module('collegeApp')
                     //it doesn't exist
                     var xJJ = 1;
                   }
-                }
+                };
                 $scope.appendText();
               }]
             });
@@ -119,7 +119,7 @@ angular.module('collegeApp')
       image.attr({
         width: Math.ceil(scale*image.width()),
         height: Math.ceil(scale*image.height())
-      })
+      });
 
       // Fade in
       image

@@ -14,7 +14,7 @@ angular.module('collegeApp')
 
     ////=============================================================================///
     dataFactory.getData = function(url, action) {
-        var url = url;
+//        var url = url;
         var passedData = {action: action};
         // Start Standard Code... GET
         var promise = $http.get(url , {params: passedData });

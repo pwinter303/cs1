@@ -15,6 +15,7 @@ angular.module('collegeApp')
   $scope.tripListShow = true;
   $scope.tripPlanningShow = false;
   $scope.addTripShow = false;
+  $scope.addCollegeShow = false;
   $scope.roundTrip = false;
   $scope.trip = {startingPoint:'',endingPoint:''};
 

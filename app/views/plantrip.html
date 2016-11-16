@@ -97,21 +97,14 @@
                             END: {{startEndAddresses.end}}
                         </div>
                     </div>
-                </div>
+                    <button class="btn btn-xs btn-primary" data-ng-click="addCollegeShow=!addCollegeShow">Add More Colleges To Trip</button>
 
-                <div class="col-lg-8 col-md-8 col-xs-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">Other Colleges</div>
-                        <div class="panel-body">
-                            <table st-table="displayedColleges" class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th st-sort="name">College Name</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                    <div data-ng-show="addCollegeShow">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Other Colleges</div>
+                            <div class="panel-body">
+                                <table st-table="displayedColleges" class="table table-striped">
+                                    <tbody>
                                     <tr ng-repeat="college in colleges | filter:{showMe: 'True'}">
                                         <td>
                                             <span class="glyphicon glyphicon-plus-sign"  ng-click="addCollegeToTrip(college)"></span>
@@ -120,11 +113,15 @@
                                             {{college.name}}
                                         </td>
                                     </tr>
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+
                 </div>
-        </div>
+
+
+            </div>
         </div>
     </div>

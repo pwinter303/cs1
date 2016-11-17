@@ -60,7 +60,8 @@
                             <input type="input" class="form-control" id="tripEnd" data-ng-model="trip.endingPoint" placeholder="Enter an ending address or city">
                         </div>
                         <div class="form-group">
-                            <label for="tripCollege">Select Colleges (You'll be able to add more later)</label>
+                            <!--<label for="tripCollege">Select Colleges (You'll be able to add more later)</label>-->
+                            <label>Select Colleges (You'll be able to add more later)</label>
                             <select size="5" class="form-control"
                                     multiple="true"
                                     id="collegePicked"
@@ -76,10 +77,13 @@
     </div>
 
 
+
+
     <!-- TRIP INFO -->
     <!-- TRIP INFO -->
     <!-- TRIP INFO -->
     <div class="col-lg-12 col-md-12 col-xs-12" ng-show="tripPlanningShow">
+    <!--<div class="col-lg-12 col-md-12 col-xs-12" ng-if="tripPlanningShow">-->
         <div class="panel panel-default">
             <div class="panel-heading">Trip Planning</div>
             <div class="panel-body">
@@ -98,6 +102,7 @@
                         </div>
                     </div>
                     <button class="btn btn-xs btn-primary" data-ng-click="addCollegeShow=!addCollegeShow">Add More Colleges To Trip</button>
+                    <button class="btn btn-xs btn-primary" data-ng-click="tripListShow=!tripListShow">HACK FIXME ShowTripList</button>
 
                     <div data-ng-show="addCollegeShow">
                         <div class="panel panel-default">
@@ -121,7 +126,23 @@
 
                 </div>
 
+                <div class="col-lg-8 col-md-8 col-xs-12">
+                    <div class="col-md-9">
+                        <ui-gmap-google-map
+                                id="map-canvas"
+                                center="map.center"
+                                zoom="map.zoom"
+                                draggable="true"
+                                options="map.options"
+                                control="map.control"
+                                >
+                        </ui-gmap-google-map>
+                    </div>
+                    <div class="col-md-3" id="directions-panel">
+                    </div>
+                </div>
 
             </div>
         </div>
     </div>
+</div>

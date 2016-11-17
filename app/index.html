@@ -98,7 +98,11 @@
     <script src="bower_components/angular-resource/angular-resource.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCRrLPRz21ZMfk9xGTrEOB-2hQ0VNNPF90&sensor=false"></script>
+    <!--<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCRrLPRz21ZMfk9xGTrEOB-2hQ0VNNPF90&sensor=false"></script>-->
+    <!-- I was getting errors decoding the directions until I included the geometry library-->
+    <!-- It would work without it but only if the page load was delayed -->
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCRrLPRz21ZMfk9xGTrEOB-2hQ0VNNPF90&&libraries=geometry"></script>
+
     <script src="bower_components/underscore/underscore-min.js"></script>
     <script src="bower_components/angular-google-maps/dist/angular-google-maps.min.js"></script>
     <script src="bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>

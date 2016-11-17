@@ -106,7 +106,13 @@ angular.module('collegeApp')
     var url = "college.php";
     formData.action = "getTripDetails";
     $scope.activeTripID = formData.tripID;
-    $scope.getCollegesOnRoute();
+
+//    GET ROUTE INFO AND RENDER IT!
+//    $scope.getCollegesOnRoute();
+//    $scope.getCollegesOnRouteNEW();
+    $scope.getErrDone();
+
+
     collegeFactory.saveData(url, formData).then(function (data) {
       if (data){
         $scope.startEndAddresses = data[0];
@@ -207,19 +213,109 @@ angular.module('collegeApp')
   $scope.getColleges();
 
 
+//  $scope.getErrDone = function (){
+//    var theRequest = {};
+//    theRequest.routePoints = $scope.routePoints;
+//    theRequest.waypoints = [{location: 'Harrisburg,PA'}];
+//    collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
+//      if (data){
+//        $scope.collegesOnRoute = data.collegesOnRoute;
+//        $scope.googleDirections = data.googleDirections;
+//        $scope.renderDirectionsPLW($scope.googleDirections);
+//      }
+//    }, function(error) {
+//      // promise rejected, could be because server returned 404, 500 error...
+//      collegeFactory.msgError(error);
+//    })
+//  };
+//
+
+
 //  This section creates the Direction Renderer  that is used to render the map using info obtained in the PHP
 uiGmapGoogleMapApi.then(function(maps) {
   var directionsDisplay = new maps.DirectionsRenderer();
 
-  $scope.getCollegesOnRoute = function () {
+  $scope.getDirectionsPLW = function (requestData) {
+    collegeFactory.getDirections(requestData).then(function (data) {
+      if (data){
+
+      }
+    }, function(error) {
+      // promise rejected, could be because server returned 404, 500 error...
+      collegeFactory.msgError(error);
+    })
+  }
+
+  $scope.getErrDone = function (){
+    var theRequest = {};
+    theRequest.routePoints = $scope.routePoints;
+    theRequest.waypoints = [{location: 'Harrisburg,PA'}];
+    collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
+      if (data){
+        $scope.collegesOnRoute = data.collegesOnRoute;
+        $scope.googleDirections = data.googleDirections;
+        $scope.renderDirectionsPLW($scope.googleDirections);
+      }
+    }, function(error) {
+      // promise rejected, could be because server returned 404, 500 error...
+      collegeFactory.msgError(error);
+    })
+  };
+
+  $scope.renderDirectionsPLW = function (googleDirections) {
+    directionsDisplay.setMap($scope.map.control.getGMap());
+    $scope.map.control.refresh();
+    var displayedMap = $scope.map.control.getGMap();
+    // fixme: this should be eliminated but theRequest must have the right attributes
+    var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
+
+    renderDirections(displayedMap, $scope.googleDirections, request, directionsDisplay);
+    extractAndDisplayDirections($scope.googleDirections);
+
+//    renderDirections(displayedMap, googleDirections, request, directionsDisplay);
+//    extractAndDisplayDirections(googleDirections);
+  }
+
+  $scope.getCollegesOnRouteNEW = function () {
+    directionsDisplay.setMap($scope.map.control.getGMap());
+    var theRequest = {};
+    theRequest.routePoints = $scope.routePoints;
+    theRequest.waypoints = [{location: 'Harrisburg,PA'}];
+    // fixme: this should be eliminated but theRequest must have the right attributes
+    var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
+
+    collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
+//      directionsDisplay.setMap($scope.map.control.getGMap());
+      if (data){
+//        directionsDisplay.setMap($scope.map.control.getGMap());
+        $scope.collegesOnRoute = data.collegesOnRoute;
+        $scope.googleDirections = data.googleDirections;
+        $scope.map.control.refresh();
+        var displayedMap = $scope.map.control.getGMap();
+        renderDirections(displayedMap, $scope.googleDirections, request, directionsDisplay);
+        extractAndDisplayDirections($scope.googleDirections);
+      }
+    }, function(error) {
+      // promise rejected, could be because server returned 404, 500 error...
+      collegeFactory.msgError(error);
+    });
+
+//        return;
+  };
+
+  $scope.JustTheMap = function () {
+
+  }
+
+    $scope.getCollegesOnRoute = function () {
     directionsDisplay.setMap($scope.map.control.getGMap());
     var theRequest = {};
     theRequest.routePoints = $scope.routePoints;
     //theRequest.waypoints = $scope.waypoints;
     theRequest.waypoints = [{location: 'Harrisburg,PA'}];
+    // fixme: this should be eliminated but theRequest must have the right attributes
+    var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
 
-    //temp hack.. ToDo. FixMe:  I think this can safely be removed..
-      var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
 
     collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
       if (data){
@@ -308,11 +404,12 @@ uiGmapGoogleMapApi.then(function(maps) {
         route.legs.forEach(function(leg){
           leg.start_location = asLatLng(leg.start_location);
           leg.end_location   = asLatLng(leg.end_location);
-
+          var $myCtr=0;
           leg.steps.forEach(function(step){
             step.start_location = asLatLng(step.start_location);
             step.end_location   = asLatLng(step.end_location);
             step.path = asPath(step.polyline);
+            $myCtr++;
           });
 
         });

@@ -92,13 +92,13 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">Current Info</div>
                         <div class="panel-body">
-                            START: {{startEndAddresses.start}}
+                            START: {{startAddress}}
                             <br><strong>Colleges that we'll visit:</strong><br>
                             <div data-ng-repeat="waypoint in tripWaypoints | orderBy:'name' ">
                                     <span class="glyphicon glyphicon-minus-sign"  ng-click="deleteCollegeFromTrip(waypoint)"></span>
                                     {{waypoint.name}}
                             </div>
-                            END: {{startEndAddresses.end}}
+                            END: {{endAddress}}
                         </div>
                     </div>
                     <button class="btn btn-xs btn-primary" data-ng-click="addCollegeShow=!addCollegeShow">Add More Colleges To Trip</button>

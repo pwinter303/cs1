@@ -107,39 +107,25 @@ angular.module('collegeApp')
     formData.action = "getTripDetails";
     $scope.activeTripID = formData.tripID;
 
-//    GET ROUTE INFO AND RENDER IT!
-//    $scope.getCollegesOnRoute();
-//    $scope.getCollegesOnRouteNEW();
-    $scope.getErrDone();
-
-
-    collegeFactory.saveData(url, formData).then(function (data) {
+    collegeFactory.getDataUsingPost(url, formData).then(function (data) {
       if (data){
-        $scope.startEndAddresses = data[0];
-        $scope.tripWaypoints = data[1];
+        $scope.startAddress = data.tripPoints.start;
+        $scope.endAddress = data.tripPoints.end;
+        $scope.tripWaypoints = data.tripPoints.wayPts;
 
-        // pass start and end off to get colleges on route
-        // get the list of colleges returned
-        // then do the show - hide logic on the 2nd set of colleges
-        // OR... should get colleges on route just return the schoolID
-        // and distance and then the script can update the college array that is
-        // already local..
-        // also.. keep in mind adding college to trip or deleting it
-        // will need to perform the same logic....
+        $scope.googleDirections = data.googleDirections;
+        $scope.renderDirectionsPLW($scope.googleDirections);
 
-
-
-
-          // Spin through colleges and hide them if they're already part of the trip
-          for(var iData=0; iData< $scope.colleges.length; iData++){
-            $scope.colleges[iData].showMe = true;
-            for(var i=0; i < $scope.tripWaypoints.length;i++){
-                if($scope.tripWaypoints[i].schoolID === $scope.colleges[iData].schoolID){
-                  $scope.colleges[iData].showMe = false;
-                }
+        // Spin through colleges and hide them if they're already part of the trip
+        for(var iData=0; iData< $scope.colleges.length; iData++){
+          $scope.colleges[iData].showMe = true;
+          for(var i=0; i < $scope.tripWaypoints.length;i++){
+              if($scope.tripWaypoints[i].schoolID === $scope.colleges[iData].schoolID){
+                $scope.colleges[iData].showMe = false;
               }
-          }
-          $scope.tripListShow = false;
+            }
+        }
+        $scope.tripListShow = false;
 
 
         }
@@ -211,8 +197,8 @@ angular.module('collegeApp')
     });
   };
   $scope.getColleges();
-
-
+//
+//
 //  $scope.getErrDone = function (){
 //    var theRequest = {};
 //    theRequest.routePoints = $scope.routePoints;
@@ -228,32 +214,18 @@ angular.module('collegeApp')
 //      collegeFactory.msgError(error);
 //    })
 //  };
-//
 
-
-//  This section creates the Direction Renderer  that is used to render the map using info obtained in the PHP
-uiGmapGoogleMapApi.then(function(maps) {
-  var directionsDisplay = new maps.DirectionsRenderer();
-
-  $scope.getDirectionsPLW = function (requestData) {
-    collegeFactory.getDirections(requestData).then(function (data) {
-      if (data){
-
-      }
-    }, function(error) {
-      // promise rejected, could be because server returned 404, 500 error...
-      collegeFactory.msgError(error);
-    })
-  }
-
-  $scope.getErrDone = function (){
+  $scope.getDirections = function (requestData) {
+    var url = "college.php";
     var theRequest = {};
     theRequest.routePoints = $scope.routePoints;
     theRequest.waypoints = [{location: 'Harrisburg,PA'}];
-    collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
+//    theRequest.waypoints = [{location: '41.43206,-81.38992'}];
+    theRequest.waypoints = [{location: '42.8188000,-75.5350000'}];
+    theRequest.action = "getDirections";
+    collegeFactory.getDataUsingPost(url,theRequest).then(function (data) {
       if (data){
-        $scope.collegesOnRoute = data.collegesOnRoute;
-        $scope.googleDirections = data.googleDirections;
+        $scope.googleDirections = data;
         $scope.renderDirectionsPLW($scope.googleDirections);
       }
     }, function(error) {
@@ -262,94 +234,26 @@ uiGmapGoogleMapApi.then(function(maps) {
     })
   };
 
+
+//FIXME: could  should this be moved into a service?  BUT $scope is maninpulated
+//    and I didnt think that was acceptable to do in a service
+
+//  This section creates the Direction Renderer  that is used to render the map using info obtained in the PHP
+uiGmapGoogleMapApi.then(function(maps) {
+  var directionsDisplay = new maps.DirectionsRenderer();
+
   $scope.renderDirectionsPLW = function (googleDirections) {
     directionsDisplay.setMap($scope.map.control.getGMap());
     $scope.map.control.refresh();
     var displayedMap = $scope.map.control.getGMap();
-    // fixme: this should be eliminated but theRequest must have the right attributes
-    var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
+    //Original request below.  Origin and Destination are in the googleDirections object so
+    // simplified request to only include the travelMode
+    //var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
+    var request = {travelMode: google.maps.TravelMode.DRIVING};
 
-    renderDirections(displayedMap, $scope.googleDirections, request, directionsDisplay);
-    extractAndDisplayDirections($scope.googleDirections);
-
-//    renderDirections(displayedMap, googleDirections, request, directionsDisplay);
-//    extractAndDisplayDirections(googleDirections);
+    renderDirections(displayedMap, googleDirections, request, directionsDisplay);
+    extractAndDisplayDirections(googleDirections);
   }
-
-  $scope.getCollegesOnRouteNEW = function () {
-    directionsDisplay.setMap($scope.map.control.getGMap());
-    var theRequest = {};
-    theRequest.routePoints = $scope.routePoints;
-    theRequest.waypoints = [{location: 'Harrisburg,PA'}];
-    // fixme: this should be eliminated but theRequest must have the right attributes
-    var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
-
-    collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
-//      directionsDisplay.setMap($scope.map.control.getGMap());
-      if (data){
-//        directionsDisplay.setMap($scope.map.control.getGMap());
-        $scope.collegesOnRoute = data.collegesOnRoute;
-        $scope.googleDirections = data.googleDirections;
-        $scope.map.control.refresh();
-        var displayedMap = $scope.map.control.getGMap();
-        renderDirections(displayedMap, $scope.googleDirections, request, directionsDisplay);
-        extractAndDisplayDirections($scope.googleDirections);
-      }
-    }, function(error) {
-      // promise rejected, could be because server returned 404, 500 error...
-      collegeFactory.msgError(error);
-    });
-
-//        return;
-  };
-
-  $scope.JustTheMap = function () {
-
-  }
-
-    $scope.getCollegesOnRoute = function () {
-    directionsDisplay.setMap($scope.map.control.getGMap());
-    var theRequest = {};
-    theRequest.routePoints = $scope.routePoints;
-    //theRequest.waypoints = $scope.waypoints;
-    theRequest.waypoints = [{location: 'Harrisburg,PA'}];
-    // fixme: this should be eliminated but theRequest must have the right attributes
-    var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
-
-
-    collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
-      if (data){
-        // Process the route returned from PHP code
-        if (data.status == maps.DirectionsStatus.OK) {                       //jshint ignore:line
-          directionsDisplay.setDirections(data);
-        }
-        $scope.collegesOnRoute = data.collegesOnRoute;
-        $scope.googleDirections = data.googleDirections;
-        for(var w = 0; w < $scope.waypoints.length; w++) {
-          $scope.waypoints[w].distance = 0;
-        }
-
-        // This is needed because the map is originally initialized when
-        //    the div is hidden so it doesnt initialize properly.  When the
-        //    div is shown for the first time it must be refreshed.
-        //    There were other options for getting around the issue but refresh worked
-        //    and is the cleanest
-        //    other option:  https://github.com/angular-ui/angular-google-maps/issues/76
-        $scope.map.control.refresh();
-
-        //renderDirections(this.myMap, result, this.myRequest, this.myDirectionsDisplay);
-        var displayedMap = $scope.map.control.getGMap();
-        renderDirections(displayedMap, $scope.googleDirections, request, directionsDisplay);
-        extractAndDisplayDirections($scope.googleDirections);
-
-      }
-    }, function(error) {
-      // promise rejected, could be because server returned 404, 500 error...
-      collegeFactory.msgError(error);
-    });
-
-//        return;
-    };
 
 });  // end of uiGoogleMapApi
 
@@ -372,26 +276,11 @@ uiGmapGoogleMapApi.then(function(maps) {
           //  ub : request,
           request : request
         },
-        draggable : true,
+        draggable : false,
+//        draggable : true, commented 2016-11-18
         map : map
       });
     }
-
-    function extractAndDisplayDirections(response){
-      var route = response.routes[0];
-      var summaryPanel = document.getElementById('directions-panel');
-      summaryPanel.innerHTML = '';
-      // For each route, display summary information.
-      for (var i = 0; i < route.legs.length; i++) {
-        var routeSegment = i + 1;
-        summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
-          '</b><br>';
-        summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
-        summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
-        summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
-      }
-    }
-
 
     <!-- -->
     function typecastRoutes(routes){
@@ -429,6 +318,20 @@ uiGmapGoogleMapApi.then(function(maps) {
       return google.maps.geometry.encoding.decodePath( encodedPolyObject.points );
     }
 
+    function extractAndDisplayDirections(response){
+      var route = response.routes[0];
+      var summaryPanel = document.getElementById('directions-panel');
+      summaryPanel.innerHTML = '';
+      // For each route, display summary information.
+      for (var i = 0; i < route.legs.length; i++) {
+        var routeSegment = i + 1;
+        summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+          '</b><br>';
+        summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+        summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+        summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+      }
+    }
 
     function geocodeAddress(geocoder, resultsMap, address) {
       geocoder.geocode({'address': address}, function(results, status) {

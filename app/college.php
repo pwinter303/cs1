@@ -135,9 +135,11 @@ function  processPost($customer_id){
        case 'getTripDetails':
               $result = getTripDetails($dbh,$request,$customer_id);
               break;
+       #### did this as a POST to easily pass extra information
        case 'getDirections':
              $result = getDirections($dbh, $request);
              break;
+      #### did this as a POST to easily pass extra information
       case 'getCollegesOnRoute':
              $result = getCollegesOnRoute($dbh,$request,$customer_id);
              break;
@@ -254,19 +256,50 @@ function  getTrips($dbh, $customer_id){
     return $data;
 }
 
-
 function getTripDetails($dbh,$request_data,$customer_id){
   $tripID = $request_data->tripID;
+  $dataTripPoints = getTripPoints($dbh,$tripID,$customer_id);
+//  var_dump($dataTripPoints);
+//  die;
+  $start = $dataTripPoints{"start"};
+  $end = $dataTripPoints{"end"};
+  $stops = $dataTripPoints{"wayPts"};
+  $dataDirections = getDirectionsBest($dbh, $start, $end, $stops);
+  ### Get College UnitIDs and Distances.  Should UnitIDs/LatLng get passed from JS? or College Array?
+  ###$dataDirections = getDirections($dbh, $request_data);
+  $dataColleges = array();
+
+  $finalResults = array(
+                  'tripPoints' => $dataTripPoints,
+                  'googleDirections' => $dataDirections,
+                  'collegeDistances' => $dataColleges
+                  );
+
+  return $finalResults;
+}
+
+function getTripPoints($dbh,$tripID,$customer_id){
+
   $query = "select
-  trip_point_id as tripPtID, address as addr, unitID as schoolID,
-  point_type_cd as pointTypeCd, addr_unitid_cd as addrUnitCd
-  ,(select instnm from institutions where trip_points.unitid = institutions.unitid) as collegeName
-  from trip_points where trip_id = ?";
+  trip_point_id as tripPtID,
+  address as addr,
+  trip_points.unitID as schoolID,
+  point_type_cd as pointTypeCd,
+  addr_unitid_cd as addrUnitCd,
+  instnm as collegeName,
+  latitude as lat,
+  longitude as lng,
+  CONCAT(city,',', stabbr) as location
+  from trip_points
+       left join institutions on trip_points.unitid = institutions.unitid
+  where
+       trip_id = ?";
   $types = 'i';  ## pass
   $params = array($tripID);
 
   $data = execSqlMultiRowPREPARED($dbh, $query, $types, $params);
-
+//  var_dump($data);
+//  die;
   //  primary key is just 0, 1, 2 etc... integer counting the array items
   //  fieldValuePairs is the column name and the value
   $finalArr = array();
@@ -278,17 +311,22 @@ function getTripDetails($dbh,$request_data,$customer_id){
       if ($fieldValuePairs{'pointTypeCd'} == "END"){
         $endAddr = $fieldValuePairs{'addr'};
       }
+
+      ## location: '42.8188000,-75.5350000'
       if ($fieldValuePairs{'pointTypeCd'} == "WAYPT"){
-        $valArr = array("tripPtID" => $fieldValuePairs{'tripPtID'},
+        $valArr = array(
+        "tripPtID" => $fieldValuePairs{'tripPtID'},
         "schoolID" => $fieldValuePairs{'schoolID'},
-        "name" => $fieldValuePairs{'collegeName'});
+        "name" => $fieldValuePairs{'collegeName'},
+        "location" => $fieldValuePairs{'location'},
+        "latLng" => $fieldValuePairs{'lat'} . "," . $fieldValuePairs{'lng'}
+        );
         array_push($finalArr, $valArr);
       }
   }
 
-  $finalData = array(
-    array('start' => $startAddr, 'end' => $endAddr),
-    $finalArr
+  $finalData =
+    array('start' => $startAddr, 'end' => $endAddr, 'wayPts' => $finalArr
   );
 
   return $finalData;
@@ -554,6 +592,32 @@ function  getDirectionsFROMFILE($dbh, $request_data){
     ##echo $data;
     return($data);
 }
+//function  getDirectionsPLW($dbh, $request_data){
+//      $dataRouteJSON  = getDirections($dbh, $request_data);
+//      $dataResponse = json_decode($dataRouteJSON);
+//      return $dataResponse;
+//}
+
+
+function  getDirectionsBest($dbh, $orig, $dest, $waypoints){
+    ### This is the preferred version because it is cleaner
+    ### I kept the other version in case I want to call it directly from Javascript
+    ### orig and dest are locations ie: Duxbury, MA.  wayPtLocations is an array of locations
+    $wayPts = "";
+    if (isset($waypoints)){
+      $wayPts = "optimize:true|";
+      $wayPtLocations = array();
+      foreach ($waypoints as $waypoint){
+        array_push($wayPtLocations, $waypoint{"latLng"});
+      }
+      $wayPts .= implode("|", $wayPtLocations);
+    }
+//    echo "$wayPts";
+//    die;
+    $data = getDirectionsGMF($orig, $dest, $wayPts);
+    $dataResponse = json_decode($data);
+    return $dataResponse;
+}
 
 function  getDirections($dbh, $request_data){
     $orig = $request_data->routePoints->start;
@@ -575,7 +639,8 @@ function  getDirections($dbh, $request_data){
     ## $myfile = fopen("c:/tmp/googleMapResults.txt", "w") or die("Unable to open file!");
     ## fwrite($myfile, $data);
 
-    return($data);
+    $dataResponse = json_decode($data);
+    return $dataResponse;
 }
 
 function getCollegesOnRoute($dbh, $request_data, $customer_id){
@@ -585,8 +650,9 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
 }
 
 function getCollegesOnRouteNEW($dbh, $request_data, $customer_id){
-    $dataRouteJSON  = getDirections($dbh, $request_data);
-    $dataResponse = json_decode($dataRouteJSON);
+//    $dataRouteJSON  = getDirections($dbh, $request_data);
+//    $dataResponse = json_decode($dataRouteJSON);
+    $dataResponse  = getDirections($dbh, $request_data);
 
     #### Extract Waypoints that Google Calculated
     $latLngArr = getWaypointsGMF($dataResponse);

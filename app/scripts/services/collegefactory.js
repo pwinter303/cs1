@@ -141,6 +141,11 @@ angular.module('collegeApp')
         toastr.error(text);
     };
 
+    dataFactory.msgInfo = function(text) {
+        toastr.options = {'timeOut': '2000'};
+        toastr.info(text);
+    };
+
     return dataFactory;
 
     }]);

@@ -31,10 +31,9 @@ angular.module('collegeApp')
   });
 
   // FIXME: done just to get map working
-  $scope.routePoints.start = "Duxbury,MA";
-  $scope.routePoints.end = "Lewisburg,PA";
-  $scope.collegesOnRoute = "";
-
+//  $scope.routePoints.start = "Duxbury,MA";
+//  $scope.routePoints.end = "Lewisburg,PA";
+//  $scope.collegesOnRoute = "";
 
   $scope.tripListShow = true;
   $scope.tripPlanningShow = false;
@@ -116,6 +115,8 @@ angular.module('collegeApp')
         $scope.googleDirections = data.googleDirections;
         $scope.renderDirectionsPLW($scope.googleDirections);
 
+        $scope.colleges = data.colleges;
+
         // Spin through colleges and hide them if they're already part of the trip
         for(var iData=0; iData< $scope.colleges.length; iData++){
           $scope.colleges[iData].showMe = true;
@@ -126,8 +127,7 @@ angular.module('collegeApp')
             }
         }
         $scope.tripListShow = false;
-
-
+        addMarker('40.9844890','-76.8862750','BUCKNELL');
         }
     }, function(error) {
       // promise rejected, could be because server returned 404, 500 error...
@@ -140,20 +140,10 @@ angular.module('collegeApp')
     formData.action = "deleteCollegeFromTrip";
     collegeFactory.saveData(url, formData).then(function (data) {
       if (data){
+        var objParms = {"tripID":$scope.activeTripID};
+        $scope.getTripDetails(objParms);
+        collegeFactory.msgInfo('Calculating Route');
         collegeFactory.msgSuccess('Removed');
-        // Remove college from waypoint array
-        // Add college to college list array
-        // Spin through colleges and hide them if they're already part of the trip
-        for(var i =0; i < $scope.tripWaypoints.length; i++){
-          if($scope.tripWaypoints[i].tripPtID === formData.tripPtID){
-            $scope.tripWaypoints.splice(i, 1);
-          }
-        }
-        for(var iData=0; iData< $scope.colleges.length; iData++){
-            if($scope.colleges[iData].schoolID === formData.schoolID){
-              $scope.colleges[iData].showMe = true;
-            }
-        }
       }
     }, function(error) {
       // promise rejected, could be because server returned 404, 500 error...
@@ -167,15 +157,10 @@ angular.module('collegeApp')
     formData.tripID = $scope.activeTripID;
     collegeFactory.saveData(url, formData).then(function (data) {
       if (data){
-        //FIXME: clean up formData which contains the college being added
-        for(var iData=0; iData< $scope.colleges.length; iData++){
-          if($scope.colleges[iData].schoolID === formData.schoolID){
-            $scope.colleges[iData].showMe = false;
-          }
-        }
-        // also should the push be using data from the college array?
-        formData.tripPtID = data.tripPtID;
-        $scope.tripWaypoints.push(formData);
+        var objParms = {"tripID":$scope.activeTripID};
+        $scope.getTripDetails(objParms);
+        collegeFactory.msgInfo('Calculating Route');
+        collegeFactory.msgSuccess('Added');
       }
     }, function(error) {
       // promise rejected, could be because server returned 404, 500 error...
@@ -197,46 +182,10 @@ angular.module('collegeApp')
     });
   };
   $scope.getColleges();
-//
-//
-//  $scope.getErrDone = function (){
-//    var theRequest = {};
-//    theRequest.routePoints = $scope.routePoints;
-//    theRequest.waypoints = [{location: 'Harrisburg,PA'}];
-//    collegeFactory.getCollegesOnRoute(theRequest).then(function (data) {
-//      if (data){
-//        $scope.collegesOnRoute = data.collegesOnRoute;
-//        $scope.googleDirections = data.googleDirections;
-//        $scope.renderDirectionsPLW($scope.googleDirections);
-//      }
-//    }, function(error) {
-//      // promise rejected, could be because server returned 404, 500 error...
-//      collegeFactory.msgError(error);
-//    })
-//  };
-
-  $scope.getDirections = function (requestData) {
-    var url = "college.php";
-    var theRequest = {};
-    theRequest.routePoints = $scope.routePoints;
-    theRequest.waypoints = [{location: 'Harrisburg,PA'}];
-//    theRequest.waypoints = [{location: '41.43206,-81.38992'}];
-    theRequest.waypoints = [{location: '42.8188000,-75.5350000'}];
-    theRequest.action = "getDirections";
-    collegeFactory.getDataUsingPost(url,theRequest).then(function (data) {
-      if (data){
-        $scope.googleDirections = data;
-        $scope.renderDirectionsPLW($scope.googleDirections);
-      }
-    }, function(error) {
-      // promise rejected, could be because server returned 404, 500 error...
-      collegeFactory.msgError(error);
-    })
-  };
-
 
 //FIXME: could  should this be moved into a service?  BUT $scope is maninpulated
 //    and I didnt think that was acceptable to do in a service
+
 
 //  This section creates the Direction Renderer  that is used to render the map using info obtained in the PHP
 uiGmapGoogleMapApi.then(function(maps) {
@@ -332,6 +281,17 @@ uiGmapGoogleMapApi.then(function(maps) {
         summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
       }
     }
+
+    function addMarker(lat,lng,title) {
+      var displayedMap = $scope.map.control.getGMap();
+      var CentralPark = new google.maps.LatLng(lat,lng);
+      var marker = new google.maps.Marker({
+        position: CentralPark,
+        map: displayedMap,
+        title: title
+      });
+    }
+
 
     function geocodeAddress(geocoder, resultsMap, address) {
       geocoder.geocode({'address': address}, function(results, status) {

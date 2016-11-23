@@ -265,14 +265,14 @@ function getTripDetails($dbh,$request_data,$customer_id){
   $end = $dataTripPoints{"end"};
   $stops = $dataTripPoints{"wayPts"};
   $dataDirections = getDirectionsBest($dbh, $start, $end, $stops);
-  ### Get College UnitIDs and Distances.  Should UnitIDs/LatLng get passed from JS? or College Array?
-  ###$dataDirections = getDirections($dbh, $request_data);
-  $dataColleges = array();
+
+  ### Get Colleges and determine how far off the route they are
+  $dataColleges = getCollegesWithDistance($dbh, $customer_id, $dataDirections);
 
   $finalResults = array(
                   'tripPoints' => $dataTripPoints,
                   'googleDirections' => $dataDirections,
-                  'collegeDistances' => $dataColleges
+                  'colleges' => $dataColleges
                   );
 
   return $finalResults;
@@ -647,6 +647,32 @@ function getCollegesOnRoute($dbh, $request_data, $customer_id){
   $data = getCollegesOnRouteNEW($dbh, $request_data, $customer_id);
   ####$data = getCollegesOnRouteOLD($dbh, $request_data, $customer_id);
   return($data);
+}
+
+function getCollegesWithDistance($dbh, $customer_id, $directionsResponse){
+    ### This gets all the colleges and the calculates the distance off the route
+    ###      it returns an array of colleges
+
+    #### Extract Waypoints that Google Calculated
+    $latLngArr = getWaypointsGMF($directionsResponse);
+
+    #### GENERATE MISSING WAYPOINTS
+    $latLngArr = genWaypointsGMF($latLngArr);
+
+    $dataColleges = getColleges($dbh, $customer_id);
+
+    $unit = "M";  ### Miles
+    $itemsInArray = count($dataColleges);
+    $itm = 0;
+    while ($itm < $itemsInArray){
+        $lat = $dataColleges[$itm]{'lat'};
+        $lng = $dataColleges[$itm]{'lng'};
+        $distanceOffRoute = getClosestDistance($lat, $lng, $latLngArr, $unit);
+        $dataColleges[$itm]{'distance'} = round($distanceOffRoute,0);
+        $itm++;
+    }
+
+    return $dataColleges;
 }
 
 function getCollegesOnRouteNEW($dbh, $request_data, $customer_id){

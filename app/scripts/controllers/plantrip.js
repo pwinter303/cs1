@@ -8,7 +8,7 @@
  * Controller of the collegeApp
  */
 angular.module('collegeApp')
-  .controller('PlantripCtrl', ['$scope', 'uiGmapGoogleMapApi', 'collegeFactory', function ($scope, uiGmapGoogleMapApi, collegeFactory) {
+  .controller('PlantripCtrl', ['$scope', 'uiGmapGoogleMapApi', 'collegeFactory', '$location', '$anchorScroll', function ($scope, uiGmapGoogleMapApi, collegeFactory, $location, $anchorScroll) {
 
 
   angular.extend($scope, {
@@ -35,6 +35,7 @@ angular.module('collegeApp')
 //  $scope.routePoints.end = "Lewisburg,PA";
 //  $scope.collegesOnRoute = "";
 
+  $scope.progressBarShow= false;
   $scope.tripListShow = true;
   $scope.tripPlanningShow = false;
   $scope.addTripShow = false;
@@ -101,6 +102,16 @@ angular.module('collegeApp')
   };
 
   $scope.getTripDetails = function(formData){
+
+    $scope.tripListShow = false;
+    $scope.addCollegeShow = false;
+    $scope.progressBarShow= true;
+//    // set the location.hash to the id of the element you wish to scroll to.
+//    $location.hash('progressPLW');
+//    // call $anchorScroll()
+//    $anchorScroll();
+//
+
     $scope.tripPlanningShow = true;
     var url = "college.php";
     formData.action = "getTripDetails";
@@ -126,7 +137,7 @@ angular.module('collegeApp')
               }
             }
         }
-        $scope.tripListShow = false;
+        $scope.progressBarShow= false;
         addMarker('40.9844890','-76.8862750','BUCKNELL');
         }
     }, function(error) {
@@ -142,8 +153,8 @@ angular.module('collegeApp')
       if (data){
         var objParms = {"tripID":$scope.activeTripID};
         $scope.getTripDetails(objParms);
-        collegeFactory.msgInfo('Calculating Route');
-        collegeFactory.msgSuccess('Removed');
+
+        collegeFactory.msgSuccess('College Removed');
       }
     }, function(error) {
       // promise rejected, could be because server returned 404, 500 error...
@@ -159,8 +170,7 @@ angular.module('collegeApp')
       if (data){
         var objParms = {"tripID":$scope.activeTripID};
         $scope.getTripDetails(objParms);
-        collegeFactory.msgInfo('Calculating Route');
-        collegeFactory.msgSuccess('Added');
+        collegeFactory.msgSuccess('College Added');
       }
     }, function(error) {
       // promise rejected, could be because server returned 404, 500 error...

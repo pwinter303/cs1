@@ -52,6 +52,94 @@ angular.module('collegeApp')
     }
   });
 
+
+//    FIXME: I think these should be moved to a separate module and then injected..
+
+  $scope.addMarker = function (lat,lng,title) {
+    var displayedMap = $scope.map.control.getGMap();
+    var gmPoint = new google.maps.LatLng(lat,lng);
+//      var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+//      var image = 'https://cdn1.iconfinder.com/data/icons/education-vol-2/48/074-512.png';
+    var image = 'http://localhost:8083/cs1/app/images/Univ40.png';
+    var marker = new google.maps.Marker({
+      position: gmPoint,
+      map: displayedMap,
+      label: 'Z',
+      icon: image,
+      title: title
+    });
+  };
+
+//  credit goes to: gis.stackexchange.com/questions/15197/google-maps-v3-in-javascript-api-render-route-obtained-with-web-api/187869#187869
+    $scope.renderDirections = function (map, response, request, renderer){
+      $scope.typecastRoutes(response.routes);
+      renderer.setOptions({
+        directions : {
+          routes : response.routes,
+          // PLW: In VERSION 3 REPLACED UB with 'request' !!!!!!!!
+          // "ub" is important and not returned by web service it's an
+          // object containing "origin", "destination" and "travelMode"
+          //  ub : request,
+          request : request
+        },
+        draggable : false,
+//        draggable : true, commented 2016-11-18
+        map : map
+      });
+  };
+
+
+    $scope.typecastRoutes = function (routes){
+      routes.forEach(function(route){
+        route.bounds = $scope.asBounds(route.bounds);
+        // I don't think `overview_path` is used but it exists on the
+        // response of DirectionsService.route()
+        route.overview_path = $scope.asPath(route.overview_polyline);
+
+        route.legs.forEach(function(leg){
+          leg.start_location = $scope.asLatLng(leg.start_location);
+          leg.end_location   = $scope.asLatLng(leg.end_location);
+          var $myCtr=0;
+          leg.steps.forEach(function(step){
+            step.start_location = $scope.asLatLng(step.start_location);
+            step.end_location   = $scope.asLatLng(step.end_location);
+            step.path = $scope.asPath(step.polyline);
+            $myCtr++;
+          });
+
+        });
+      });
+    };
+
+  $scope.asBounds = function(boundsObject){
+      return new google.maps.LatLngBounds($scope.asLatLng(boundsObject.southwest),
+        $scope.asLatLng(boundsObject.northeast));
+  };
+
+  $scope.asLatLng = function(latLngObject){
+      return new google.maps.LatLng(latLngObject.lat, latLngObject.lng);
+  };
+
+  $scope.asPath = function(encodedPolyObject){
+      return google.maps.geometry.encoding.decodePath( encodedPolyObject.points );
+  };
+
+  $scope.extractAndDisplayDirections = function (response){
+      var route = response.routes[0];
+      var summaryPanel = document.getElementById('directions-panel');
+      summaryPanel.innerHTML = '';
+      // For each route, display summary information.
+      for (var i = 0; i < route.legs.length; i++) {
+        var routeSegment = i + 1;
+        summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+          '</b><br>';
+        summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+        summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+        summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+      }
+  };
+
+
   $scope.getTrips = function (){
     var url = "college.php";
     var action = "getTrips";
@@ -133,7 +221,7 @@ angular.module('collegeApp')
             }
         }
         $scope.progressBarShow= false;
-        addMarker('41.9844890','-76.8862750','BUCKNELL');
+        $scope.addMarker('41.9844890','-76.8862750','BUCKNELL');
         }
     }, function(error) {
       // promise rejected, could be because server returned 404, 500 error...
@@ -205,99 +293,13 @@ uiGmapGoogleMapApi.then(function(maps) {
     //var request = {origin: 'Boston, MA', destination: 'Hanover,NH', travelMode: google.maps.TravelMode.DRIVING};
     var request = {travelMode: google.maps.TravelMode.DRIVING};
 
-    renderDirections(displayedMap, googleDirections, request, directionsDisplay);
-    extractAndDisplayDirections(googleDirections);
+    $scope.renderDirections(displayedMap, googleDirections, request, directionsDisplay);
+    $scope.extractAndDisplayDirections(googleDirections);
   };
 
 });  // end of uiGoogleMapApi
 
-//  credit goes to: gis.stackexchange.com/questions/15197/google-maps-v3-in-javascript-api-render-route-obtained-with-web-api/187869#187869
-    function renderDirections(map, response, request, renderer){
 
-      typecastRoutes(response.routes);
-//        console.log(response);
-//      2016-11-16 commented it out
-//      var justRoutes = response.routes;
-
-      renderer.setOptions({
-        directions : {
-          routes : response.routes,
-          // PLW: In VERSION 3 REPLACED UB with 'request' !!!!!!!!
-          // "ub" is important and not returned by web service it's an
-          // object containing "origin", "destination" and "travelMode"
-          //  ub : request,
-          request : request
-        },
-        draggable : false,
-//        draggable : true, commented 2016-11-18
-        map : map
-      });
-    }
-
-    function typecastRoutes(routes){
-      routes.forEach(function(route){
-        route.bounds = asBounds(route.bounds);
-        // I don't think `overview_path` is used but it exists on the
-        // response of DirectionsService.route()
-        route.overview_path = asPath(route.overview_polyline);
-
-        route.legs.forEach(function(leg){
-          leg.start_location = asLatLng(leg.start_location);
-          leg.end_location   = asLatLng(leg.end_location);
-          var $myCtr=0;
-          leg.steps.forEach(function(step){
-            step.start_location = asLatLng(step.start_location);
-            step.end_location   = asLatLng(step.end_location);
-            step.path = asPath(step.polyline);
-            $myCtr++;
-          });
-
-        });
-      });
-    }
-
-    function asBounds(boundsObject){
-      return new google.maps.LatLngBounds(asLatLng(boundsObject.southwest),
-        asLatLng(boundsObject.northeast));
-    }
-
-    function asLatLng(latLngObject){
-      return new google.maps.LatLng(latLngObject.lat, latLngObject.lng);
-    }
-
-    function asPath(encodedPolyObject){
-      return google.maps.geometry.encoding.decodePath( encodedPolyObject.points );
-    }
-
-    function extractAndDisplayDirections(response){
-      var route = response.routes[0];
-      var summaryPanel = document.getElementById('directions-panel');
-      summaryPanel.innerHTML = '';
-      // For each route, display summary information.
-      for (var i = 0; i < route.legs.length; i++) {
-        var routeSegment = i + 1;
-        summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
-          '</b><br>';
-        summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
-        summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
-        summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
-      }
-    }
-
-    function addMarker(lat,lng,title) {
-      var displayedMap = $scope.map.control.getGMap();
-      var gmPoint = new google.maps.LatLng(lat,lng);
-//      var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
-//      var image = 'https://cdn1.iconfinder.com/data/icons/education-vol-2/48/074-512.png';
-      var image = 'http://localhost:8083/cs1/app/images/Univ40.png';
-      var marker = new google.maps.Marker({
-        position: gmPoint,
-        map: displayedMap,
-        label: 'Z',
-        icon: image,
-        title: title
-      });
-    }
 
 // WIP
 //    function geocodeAddress(geocoder, resultsMap, address) {

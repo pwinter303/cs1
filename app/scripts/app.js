@@ -29,11 +29,6 @@ angular
         controller: 'AboutCtrl',
         controllerAs: 'about'
       })
-      .when('/googlemap', {
-        templateUrl: 'views/googlemap.html',
-        controller: 'GooglemapCtrl',
-        controllerAs: 'googleMap'
-      })
       .when('/criteria', {
         templateUrl: 'views/criteria.html',
         controller: 'CriteriaCtrl',

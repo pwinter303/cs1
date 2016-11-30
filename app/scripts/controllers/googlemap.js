@@ -110,8 +110,8 @@ angular.module('collegeApp')
     });  // end of uiGoogleMapApi
 
 
-    <!-- credit goes to: -->
-    <!--gis.stackexchange.com/questions/15197/google-maps-v3-in-javascript-api-render-route-obtained-with-web-api/187869#187869-->
+
+
     function renderDirections(map, response, request, renderer){
 //      var copyOfResponse = response;
       typecastRoutes(response.routes);
@@ -150,7 +150,7 @@ angular.module('collegeApp')
     }
 
 
-    <!-- -->
+
     function typecastRoutes(routes){
       routes.forEach(function(route){
         route.bounds = asBounds(route.bounds);

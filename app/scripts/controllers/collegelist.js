@@ -44,7 +44,6 @@ angular.module('collegeApp')
                 $scope.appendText = function(){
                   if($("#output").length == 0) {
                     //it doesn't exist
-                    var xJJ = 1;
                   }
                 };
                 $scope.appendText();
@@ -80,7 +79,7 @@ angular.module('collegeApp')
       $('#output')
         .empty();
 
-      if(data && data.images)
+      if(data && data.images){
         for(var n in data.images)
         {
           var image = $('<img>')
@@ -89,6 +88,7 @@ angular.module('collegeApp')
             .appendTo('#output')
             .load(imageLoaded);
         }
+      }
     }
 
 

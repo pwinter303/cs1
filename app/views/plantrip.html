@@ -111,15 +111,26 @@
                         </div>
                     </div>
                     <button class="btn btn-xs btn-primary" data-ng-click="addCollegeShow=!addCollegeShow">Add More Colleges To Trip</button>
-                    <button class="btn btn-xs btn-primary" data-ng-click="tripListShow=!tripListShow">HACK FIXME ShowTripList</button>
+                    <button class="btn btn-xs btn-primary" data-ng-click="tripListShow=!tripListShow">Show Trip List</button>
 
                     <div data-ng-show="addCollegeShow">
                         <div class="panel panel-default">
-                            <div class="panel-heading">Other Colleges</div>
+                            <div class="panel-heading">Other Colleges To See</div>
                             <div class="panel-body">
-                                <table st-table="displayedColleges" class="table table-striped">
+                                <!--  st-safe-src is the REAL array - set in the controller -->
+                                <!--  st-table is a copy of it, and is used in the ng-repeat -->
+                                <table st-table="collegesTable" st-safe-src="colleges" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th st-sort="name">College Name</th>
+                                            <th st-sort="distance">Miles Off Route</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
-                                    <tr ng-repeat="college in colleges | filter:{showMe: 'True'}">
+                                    <tr ng-repeat="college in collegesTable | filter:{showMe: 'True'}">
+                                    <!--<tr ng-repeat="college in collegesTable">-->
                                         <td>
                                             <span class="glyphicon glyphicon-plus-sign"  ng-click="addCollegeToTrip(college)"></span>
                                         </td>

@@ -30,11 +30,6 @@ angular.module('collegeApp')
     waypoints: []
   });
 
-  // FIXME: done just to get map working
-//  $scope.routePoints.start = "Duxbury,MA";
-//  $scope.routePoints.end = "Lewisburg,PA";
-//  $scope.collegesOnRoute = "";
-
   $scope.progressBarShow= false;
   $scope.tripListShow = true;
   $scope.tripPlanningShow = false;
@@ -138,7 +133,7 @@ angular.module('collegeApp')
             }
         }
         $scope.progressBarShow= false;
-        addMarker('40.9844890','-76.8862750','BUCKNELL');
+        addMarker('41.9844890','-76.8862750','BUCKNELL');
         }
     }, function(error) {
       // promise rejected, could be because server returned 404, 500 error...
@@ -212,19 +207,17 @@ uiGmapGoogleMapApi.then(function(maps) {
 
     renderDirections(displayedMap, googleDirections, request, directionsDisplay);
     extractAndDisplayDirections(googleDirections);
-  }
+  };
 
 });  // end of uiGoogleMapApi
 
-    <!-- credit goes to: -->
-    <!--gis.stackexchange.com/questions/15197/google-maps-v3-in-javascript-api-render-route-obtained-with-web-api/187869#187869-->
+//  credit goes to: gis.stackexchange.com/questions/15197/google-maps-v3-in-javascript-api-render-route-obtained-with-web-api/187869#187869
     function renderDirections(map, response, request, renderer){
-//      var copyOfResponse = response;
+
       typecastRoutes(response.routes);
 //        console.log(response);
 //      2016-11-16 commented it out
 //      var justRoutes = response.routes;
-
 
       renderer.setOptions({
         directions : {
@@ -241,7 +234,6 @@ uiGmapGoogleMapApi.then(function(maps) {
       });
     }
 
-    <!-- -->
     function typecastRoutes(routes){
       routes.forEach(function(route){
         route.bounds = asBounds(route.bounds);
@@ -294,33 +286,38 @@ uiGmapGoogleMapApi.then(function(maps) {
 
     function addMarker(lat,lng,title) {
       var displayedMap = $scope.map.control.getGMap();
-      var CentralPark = new google.maps.LatLng(lat,lng);
+      var gmPoint = new google.maps.LatLng(lat,lng);
+//      var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+//      var image = 'https://cdn1.iconfinder.com/data/icons/education-vol-2/48/074-512.png';
+      var image = 'http://localhost:8083/cs1/app/images/Univ40.png';
       var marker = new google.maps.Marker({
-        position: CentralPark,
+        position: gmPoint,
         map: displayedMap,
+        label: 'Z',
+        icon: image,
         title: title
       });
     }
 
-
-    function geocodeAddress(geocoder, resultsMap, address) {
-      geocoder.geocode({'address': address}, function(results, status) {
-        if (status === google.maps.GeocoderStatus.OK) {
-          resultsMap.setCenter(results[0].geometry.location);
-//                var marker = new google.maps.Marker({
-          var marker = new MarkerWithLabel({
-            map: resultsMap,
-            title: 'Hello World!',
-            labelContent: "UHTFD",
-            labelAnchor: new google.maps.Point(22, 0),
-            labelClass: "labels", // the CSS class for the label
-            labelStyle: {opacity: 0.75},
-            position: results[0].geometry.location
-          });
-        } else {
-          alert('Geocode was not successful for the following reason: ' + status);
-        }
-      });
-    }
-
+// WIP
+//    function geocodeAddress(geocoder, resultsMap, address) {
+//      geocoder.geocode({'address': address}, function(results, status) {
+//        if (status === google.maps.GeocoderStatus.OK) {
+//          resultsMap.setCenter(results[0].geometry.location);
+////                var marker = new google.maps.Marker({
+//          var marker = new MarkerWithLabel({
+//            map: resultsMap,
+//            title: 'Hello World!',
+//            labelContent: "UHTFD",
+//            labelAnchor: new google.maps.Point(22, 0),
+//            labelClass: "labels", // the CSS class for the label
+//            labelStyle: {opacity: 0.75},
+//            position: results[0].geometry.location
+//          });
+//        } else {
+//          alert('Geocode was not successful for the following reason: ' + status);
+//        }
+//      });
+//    }
+//
   }]);

@@ -18,7 +18,7 @@
                             <tr>
                                 <th></th>
                                 <th st-sort="name">College Name</th>
-                                <th st-sort="acpt_rate">Acpt Rate</th>
+                                <th st-sort="acpt_rate">Admission Info</th>
                                 <th st-sort="distance">Miles from Home</th>
                                 <th st-sort="location">Location</th>
                                 <th st-sort="locale">Locale</th>
@@ -37,7 +37,7 @@
                                 <span class="glyphicon glyphicon-camera"  ng-click="getPics(college)"></span>
                                 <!--<span class="glyphicon glyphicon-camera"  ng-click="clickToOpen()"></span>-->
                             </td>
-                            <td>{{college.acpt_rate}}</td>
+                            <td>AccptRate: {{college.acpt_rate}}<br>AvgSAT: {{college.sat_avg_rng_low}} - {{college.sat_avg_rng_high}}</td>
                             <td>{{college.distance}}</td>
                             <td>{{college.location}}</td>
                             <td>{{college.locale}}</td>

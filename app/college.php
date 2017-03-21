@@ -569,6 +569,8 @@ function  getColleges($dbh, $customer_id){
                WHEN ADMSSN = 0 THEN 'N/A'
                ELSE concat(round(ADMSSN/APPLCN*100),'%')
             END AS acpt_rate,
+            SATVR25 + SATMT25 as sat_avg_rng_low,
+            SATVR75 + SATMT75 as sat_avg_rng_high,
             instsize_decode as school_size $distCols
   from institutions, decode_instsize, decode_locale, admissions_info
   where

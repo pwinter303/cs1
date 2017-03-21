@@ -20,13 +20,21 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       // bower:js
-      'app/bower_components/jquery/dist/jquery.js',
       'app/bower_components/angular/angular.js',
+      'app/bower_components/jquery/jquery.js',
       'app/bower_components/bootstrap/dist/js/bootstrap.js',
       'app/bower_components/angular-resource/angular-resource.js',
       'app/bower_components/angular-route/angular-route.js',
       'app/bower_components/angular-sanitize/angular-sanitize.js',
       'app/bower_components/toastr/toastr.js',
+      'app/bower_components/underscore/underscore.js',
+      'app/bower_components/angular-simple-logger/dist/angular-simple-logger.js',
+      'app/bower_components/lodash/lodash.js',
+      'app/bower_components/angular-google-maps/dist/angular-google-maps.js',
+      'app/bower_components/odometer/odometer.js',
+      'app/bower_components/angular-odometer/dist/angular-odometer.js',
+      'app/bower_components/ng-dialog/js/ngDialog.js',
+      'app/bower_components/angular-smart-table/dist/smart-table.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
       // endbower
       'app/scripts/**/*.js',

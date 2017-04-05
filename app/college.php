@@ -497,6 +497,18 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
                                  AS distance";
                 $distHaving = "having distance < $max and $min < distance ";
                 break;
+             case 'loc2':
+                $zipCode = $restOfArray{'zipCode'};
+                $min = $restOfArray{'minDistanceAway'};
+                $max = $restOfArray{'maxDistanceAway'};
+                $data = getLatLngForZipCode($dbh, $zipCode);
+                $latitude = $data{'latitude'};
+                $longitude = $data{'longitude'};
+                $distCols = ",round((((acos(sin(($latitude*pi()/180)) * sin((`latitude`*pi()/180))+cos(($latitude*pi()/180))
+                                 * cos((`latitude`*pi()/180)) * cos((($longitude- `longitude`)*pi()/180))))*180/pi())*60*1.1515))
+                                 AS distance2";
+                $distHaving = "having distance2 < $max and $min < distance2 ";
+                break;
              case 'sports':
                 $sports = $restOfArray{'options'};
                 $divisions = $restOfArray{'divisions'};

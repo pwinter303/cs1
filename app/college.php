@@ -22,15 +22,21 @@ date_default_timezone_set('America/New_York');
 //    $response{'StatusCd'} = 401;
 //    return $response;
 //}
+
+//var_dump($result);
 $json = json_encode($result);
+//$error = json_last_error();
+
+//var_dump($error === JSON_ERROR_UTF8);
+//die;
+//var_dump($json);
 echo $json;
 ########################################################
 function processRequest(){
 //  if (isset($_SESSION['customer_id'])) {
 //    $customer_id = $_SESSION['customer_id'];
 //  }   else  {
-//     die ('invalid customer id');
-//  }
+//     die ('invalid customer id'); // TODO: temp hack
     $customer_id = 2;  // TODO: temp hack
     switch ($_SERVER['REQUEST_METHOD']) {
        case 'POST':
@@ -593,6 +599,7 @@ function  getColleges($dbh, $customer_id){
   ";
   #echo "this is the query:$query\n";
   $data = execSqlMultiRowPREPARED($dbh, $query);
+  #echo "this is the data:$data\n";
   return $data;
 }
 
@@ -978,7 +985,7 @@ function  saveCriteriaFunc($dbh, $customer_id, $request_data, $field_cd){
   }
   ###echo "this is value:$value\n";
 
-  $query = "INSERT INTO criteria (customer_id, criteria_cd, field_cd, the_value) VALUES
+    $query = "INSERT INTO criteria (customer_id, criteria_cd, field_cd, the_value) VALUES
            (?,          ?,      ?,          ?) ON DUPLICATE KEY UPDATE the_value = ? ";
 
   $types = 'issss';  ## pass

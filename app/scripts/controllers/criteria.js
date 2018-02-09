@@ -14,8 +14,8 @@ angular.module('collegeApp')
     $scope.myCount = 12333;
 
     $scope.getCollegeCount = function (){
-      var url = "college.php";
-      var action = "getCollegeCount";
+      var url = 'college.php';
+      var action = 'getCollegeCount';
       collegeFactory.getData(url, action).then(function (data) {
         if (data){
           //$scope.collegeCountOld = $scope.collegeCount;
@@ -30,8 +30,8 @@ angular.module('collegeApp')
     $scope.getCollegeCount();
 
     $scope.getCriteria = function (){
-      var url = "college.php";
-      var action = "getCriteriaForWeb";
+      var url = 'college.php';
+      var action = 'getCriteriaForWeb';
       collegeFactory.getData(url, action).then(function (data) {
         if (data){
           $scope.myForm = data;
@@ -45,8 +45,8 @@ angular.module('collegeApp')
 
     // get reference data
     $scope.getCriteriaRefData = function (){
-      var url = "college.php";
-      var action = "getCriteriaRefData";
+      var url = 'college.php';
+      var action = 'getCriteriaRefData';
       collegeFactory.getData(url, action).then(function (data) {
         if (data){
           $scope.locales = data.locales;

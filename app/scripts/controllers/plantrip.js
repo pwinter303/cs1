@@ -7,6 +7,8 @@
  * # PlantripCtrl
  * Controller of the collegeApp
  */
+
+/*jshint unused:false */
 angular.module('collegeApp')
   .controller('PlantripCtrl', ['$scope', 'uiGmapGoogleMapApi', 'collegeFactory', '$location', '$anchorScroll', function ($scope, uiGmapGoogleMapApi, collegeFactory, $location, $anchorScroll) {
 
@@ -141,8 +143,8 @@ angular.module('collegeApp')
 
 
   $scope.getTrips = function (){
-    var url = "college.php";
-    var action = "getTrips";
+    var url = 'college.php';
+    var action = 'getTrips';
     collegeFactory.getData(url, action).then(function (data) {
       if (data){
         $scope.trips = data;
@@ -155,8 +157,8 @@ angular.module('collegeApp')
   $scope.getTrips();
 
   $scope.addTrip = function(formData){
-    var url = "college.php";
-    formData.action = "addTrip";
+    var url = 'college.php';
+    formData.action = 'addTrip';
     collegeFactory.saveData(url, formData).then(function (data) {
       if (data){
         collegeFactory.msgSuccess('Added');
@@ -170,8 +172,8 @@ angular.module('collegeApp')
   };
 
   $scope.deleteTrip = function(formData){
-    var url = "college.php";
-    formData.action = "deleteTrip";
+    var url = 'college.php';
+    formData.action = 'deleteTrip';
     collegeFactory.saveData(url, formData).then(function (data) {
       if (data){
         collegeFactory.msgSuccess('Deleted');
@@ -196,8 +198,8 @@ angular.module('collegeApp')
 //
 
     $scope.tripPlanningShow = true;
-    var url = "college.php";
-    formData.action = "getTripDetails";
+    var url = 'college.php';
+    formData.action = 'getTripDetails';
     $scope.activeTripID = formData.tripID;
 
     collegeFactory.getDataUsingPost(url, formData).then(function (data) {
@@ -230,11 +232,11 @@ angular.module('collegeApp')
   };
 
   $scope.deleteCollegeFromTrip = function(formData){
-    var url = "college.php";
-    formData.action = "deleteCollegeFromTrip";
+    var url = 'college.php';
+    formData.action = 'deleteCollegeFromTrip';
     collegeFactory.saveData(url, formData).then(function (data) {
       if (data){
-        var objParms = {"tripID":$scope.activeTripID};
+        var objParms = {'tripID':$scope.activeTripID};
         $scope.getTripDetails(objParms);
 
         collegeFactory.msgSuccess('College Removed');
@@ -246,12 +248,12 @@ angular.module('collegeApp')
   };
 
   $scope.addCollegeToTrip = function(formData){
-    var url = "college.php";
-    formData.action = "addCollegeToTrip";
+    var url = 'college.php';
+    formData.action = 'addCollegeToTrip';
     formData.tripID = $scope.activeTripID;
     collegeFactory.saveData(url, formData).then(function (data) {
       if (data){
-        var objParms = {"tripID":$scope.activeTripID};
+        var objParms = {'tripID':$scope.activeTripID};
         $scope.getTripDetails(objParms);
         collegeFactory.msgSuccess('College Added');
       }
@@ -262,8 +264,8 @@ angular.module('collegeApp')
   };
 
   $scope.getColleges = function (){
-    var url = "college.php";
-    var action = "getColleges";
+    var url = 'college.php';
+    var action = 'getColleges';
     collegeFactory.getData(url, action).then(function (data) {
       if (data){
         $scope.colleges = data;

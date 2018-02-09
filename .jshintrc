@@ -10,7 +10,11 @@
   "strict": true,
   "undef": true,
   "unused": true,
+   // Tolerate using this in a non-constructor
+  "validthis": true,
   "globals": {
-    "angular": false
+    "angular": false,
+      "$": false,
+      "google": false
   }
 }

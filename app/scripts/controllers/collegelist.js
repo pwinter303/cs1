@@ -42,7 +42,8 @@ angular.module('collegeApp')
 //                }
 //                $scope.processPics();
                 $scope.appendText = function(){
-                  if($("#output").length == 0) {
+//                  if($("#output").length == 0) {
+                  if($("#output").length === 0) {
                     //it doesn't exist
                   }
                 };

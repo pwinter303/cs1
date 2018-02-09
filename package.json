@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "autoprefixer": "^7.2.5",
     "autoprefixer-core": "^6.0.1",
     "grunt": "^1.0.1",
     "grunt-angular-templates": "^1.1.0",

@@ -338,12 +338,12 @@ module.exports = function (grunt) {
           collapseBooleanAttributes: true,
           removeCommentsFromCDATA: true
         },
-        files: [{
-          expand: true,
-          cwd: '<%= yeoman.dist %>',
-          src: ['*.html'],
-          dest: '<%= yeoman.dist %>'
-        }]
+          files: [{
+              expand: true,
+              cwd: '<%= yeoman.app %>',
+              src: ['*.html', 'views/*.html'],
+              dest: '<%= yeoman.dist %>'
+          }]
       }
     },
 
@@ -411,7 +411,16 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
-      }
+      },
+        otherfiles: {
+            expand: true,
+            cwd: '<%= yeoman.app %>',
+            dest: '<%= yeoman.dist %>',
+            //PLW needed to add this to base Gruntfile
+            //copy php and sql files from app to dist.. exclude config file
+            // exclude DB patch and revert files from base code..
+            src: ['*.php', '*.sql','!config.php', '!dbRefreshTables.php', '!DB*.sql']
+        }
     },
 
     // Run some tasks in parallel to speed up the build process
@@ -424,6 +433,7 @@ module.exports = function (grunt) {
       ],
       dist: [
         'copy:styles',
+        'copy:otherfiles',
         'imagemin',
         'svgmin'
       ]
@@ -499,6 +509,7 @@ module.exports = function (grunt) {
     'newer:jshint',
     'newer:jscs',
     'test-PLW-NoKarma',
-    'build'
+    'build',
+    'copy:otherfiles'
   ]);
 };

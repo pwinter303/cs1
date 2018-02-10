@@ -341,10 +341,10 @@ module.exports = function (grunt) {
         htmlmin: {
             dist: {
                 options: {
-                    collapseWhitespace: true,
+                    collapseWhitespace: false,
                     conservativeCollapse: true,
-                    collapseBooleanAttributes: true,
-                    removeCommentsFromCDATA: true
+                    collapseBooleanAttributes: false,
+                    removeCommentsFromCDATA: false
                 },
                 files: [{
                     expand: true,
@@ -523,30 +523,12 @@ module.exports = function (grunt) {
         'htmlmin'
     ]);
 
-	// simple build task
-	grunt.registerTask('PLW-Temp', [
-	  'clean:dist',
-	  'clean:server',
-	  'useminPrepare',
-	  'concat:generated',
-	  'cssmin:generated',
-	  'uglify:generated',
-      'concat',
-	  'copy:dist',
-	  'copy:styles',
-      'copy:otherfiles',
-      'postcss',
-      'cssmin',
-	  'filerev',
-	  'cdnify',
-	  'usemin'
-	]);
-
-
-    grunt.registerTask('PLW-TempYYY', [
+//    USE THIS ONE TO RUN:  from Command:  grunt PLW-Final
+    grunt.registerTask('PLW-Final', [
         'clean:dist',
         'clean:server',
         'useminPrepare',
+        'concurrent:dist',
         'concat',
         'uglify',
         'copy:dist',
@@ -555,17 +537,17 @@ module.exports = function (grunt) {
         'cssmin',
         'filerev',
         'cdnify',
-//      'htmlmin',
+        'htmlmin',
         'usemin'
     ]);
 
 
     // simple build task
-    grunt.registerTask('PLW-TempZZZ', [
+    grunt.registerTask('PLW-Testing', [
         'clean:dist',
         'clean:server',
-        'useminPrepare',
-        'cssmin',
+        'htmlmin',
+        'usemin'
     ]);
 
 

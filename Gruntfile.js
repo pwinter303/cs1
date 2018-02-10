@@ -265,6 +265,14 @@ module.exports = function (grunt) {
             }
         },
 
+
+        uglify: {
+                options: {
+                    beautify: true,
+                    mangle: false
+                }
+        },
+
         // Performs rewrites based on filerev and the useminPrepare configuration
         usemin: {
             html: ['<%= yeoman.dist %>/{,*/}*.html'],
@@ -422,6 +430,17 @@ module.exports = function (grunt) {
                 src: ['*.php', '*.sql','!config.php', '!dbRefreshTables.php', '!DB*.sql']
             }
         },
+// PLW Added this to concatenate Bower Items
+//        This isn't used.. I ended up fixing the index.html file so the correct files were pulled in
+//        concat: {
+//            options: {
+//                separator: ';'
+//            },
+//            dist: {
+//                src: ['app/bower_components/toastr/toastr.css', 'app/bower_components/ng-dialog/css/ngDialog.css'],
+//                dest: '.tmp/styles/vendor.css'
+//            }
+//        },
 
         // Run some tasks in parallel to speed up the build process
         concurrent: {
@@ -491,17 +510,17 @@ module.exports = function (grunt) {
         'wiredep',
         'useminPrepare',
         'concurrent:dist',
-//        'postcss',
-//        'ngtemplates',
-//        'concat',
-//        'ngAnnotate',
-//        'copy:dist',
-//        'cdnify',
-//        'cssmin',
-//        'uglify',
-//        'filerev',
-//        'usemin'
-////        'htmlmin'
+        'postcss',
+        'ngtemplates',
+        'concat',
+        'ngAnnotate',
+        'copy:dist',
+        'cdnify',
+        'cssmin',
+        'uglify',
+        'filerev',
+        'usemin',
+        'htmlmin'
     ]);
 
 	// simple build task
@@ -512,12 +531,43 @@ module.exports = function (grunt) {
 	  'concat:generated',
 	  'cssmin:generated',
 	  'uglify:generated',
+      'concat',
 	  'copy:dist',
+	  'copy:styles',
       'copy:otherfiles',
+      'postcss',
+      'cssmin',
 	  'filerev',
 	  'cdnify',
 	  'usemin'
 	]);
+
+
+    grunt.registerTask('PLW-TempYYY', [
+        'clean:dist',
+        'clean:server',
+        'useminPrepare',
+        'concat',
+        'uglify',
+        'copy:dist',
+        'copy:otherfiles',
+        'postcss',
+        'cssmin',
+        'filerev',
+        'cdnify',
+//      'htmlmin',
+        'usemin'
+    ]);
+
+
+    // simple build task
+    grunt.registerTask('PLW-TempZZZ', [
+        'clean:dist',
+        'clean:server',
+        'useminPrepare',
+        'cssmin',
+    ]);
+
 
 //  FixMe: replace test-PLW-NoKarma with test once the Karma tests are accurate and running
     grunt.registerTask('default', [

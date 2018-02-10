@@ -45,3 +45,33 @@ CREATE TABLE `admissions_info`   (
 `ACTWR25`   INTEGER(3)   NULL COMMENT 'ACT Writing 25th percentile score',
 `ACTWR75`   INTEGER(3)   NULL COMMENT 'ACT Writing 75th percentile score',
 PRIMARY KEY ( UNITID )   );
+
+
+CREATE TABLE IF NOT EXISTS `college_search`.`trips` (
+  `trip_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `trip_name` VARCHAR(145) NULL,
+  `customer_id` INT(11) NOT NULL,
+  INDEX `fk_trips_customer1_idx` (`customer_id` ASC),
+  PRIMARY KEY (`trip_id`),
+  CONSTRAINT `fk_trips_customer1`
+    FOREIGN KEY (`customer_id`)
+    REFERENCES `college_search`.`customer` (`customer_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+CREATE TABLE IF NOT EXISTS `college_search`.`trip_points` (
+  `trip_point_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `UNITID` INT(6) NULL,
+  `point_type_cd` VARCHAR(10) NULL,
+  `address` VARCHAR(145) NULL,
+  `addr_unitid_cd` VARCHAR(5) NULL,
+  `trip_id` INT(11) NOT NULL,
+  PRIMARY KEY (`trip_point_id`, `trip_id`),
+  INDEX `fk_trip_points_trips1_idx` (`trip_id` ASC),
+  CONSTRAINT `fk_trip_points_trips1`
+    FOREIGN KEY (`trip_id`)
+    REFERENCES `college_search`.`trips` (`trip_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB

@@ -8,7 +8,8 @@ date_default_timezone_set('America/New_York');
 
 
 function  getDirectionsGMF($orig, $dest, $wayPts){
-    $myKey = "&key=AIzaSyBJW90ZQrxG82XCEqDn9uxBlef8x7Oebkc";
+//    $myKey = "&key=AIzaSyBJW90ZQrxG82XCEqDn9uxBlef8x7Oebkc";
+    $myKey = "&key=AIzaSyCab-1RSi3hLrQX5mO2aE7CIcmbWTOLFfU";
     $parameters = "origin=" . urlencode($orig) . "&destination=" . urlencode($dest) . "&waypoints=" . urlencode($wayPts) . $myKey;
     $encodedParams = $parameters;
 

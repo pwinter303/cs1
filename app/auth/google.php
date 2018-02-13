@@ -19,7 +19,7 @@ $url = 'https://accounts.google.com/o/oauth2/token';
 $params = [
     'code' => $request->code,
     'client_id' => $request->clientId,
-    'client_secret' => 'gOHwtqIltaKam4W5CSzP-TfR',
+    'client_secret' => '',
     'redirect_uri' => $request->redirectUri,
     'grant_type' => 'authorization_code'
 ];

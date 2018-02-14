@@ -7,7 +7,6 @@ use \Firebase\JWT\JWT;
 
 require '../../config/config.php';
 
-
 $request = json_decode(file_get_contents('php://input'));
 
 $googleSecret = GOOGLESECRET;

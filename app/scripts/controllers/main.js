@@ -35,4 +35,14 @@ angular.module('collegeApp')
                     }
                 });
         };
-  });
+
+        $scope.logout = function() {
+            $auth.logout()
+        }
+
+        $scope.checkLoggedIn = function() {
+         var x =  $auth.isAuthenticated();
+            alert(x);
+        }
+
+    });

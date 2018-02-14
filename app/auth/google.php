@@ -1,100 +1,106 @@
 <?php
-#echo "hi<br>";
-#echo $_SERVER['HTTP_REFERER'];
 
-// var_dump(file_get_contents('php://input'));
+require '../../vendor/autoload.php';
 
- $request = json_decode(file_get_contents('php://input'));
- #var_dump($request);
- // echo $request->code;
- // echo "\n";
- // echo $request->clientId;
+use \GuzzleHttp\guzzle;
+use \Firebase\JWT\JWT;
+
+require '../../config/config.php';
 
 
-#var_dump($params);
+$request = json_decode(file_get_contents('php://input'));
 
-$url = 'https://accounts.google.com/o/oauth2/token';
-
+$googleSecret = GOOGLESECRET;
 
 $params = [
     'code' => $request->code,
     'client_id' => $request->clientId,
-    'client_secret' => 'gOHwtqIltaKam4W5CSzP-TfR',
+    'client_secret' => $googleSecret,
     'redirect_uri' => $request->redirectUri,
     'grant_type' => 'authorization_code'
 ];
 
-$ch = curl_init( $url );
-curl_setopt( $ch, CURLOPT_POST, 1);
-curl_setopt( $ch, CURLOPT_POSTFIELDS, $params);
-curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-curl_setopt( $ch, CURLOPT_HEADER, 0);
-curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+print "this is the access code:$request->code\n";
 
-$accessTokenResponse = curl_exec( $ch );
+$client = new GuzzleHttp\Client();
 
-// $accessToken = json_decode($accessTokenResponse->getBody(), true);
+// Step 1. Exchange authorization code for access token.
+$response = $client->request('POST', 'https://accounts.google.com/o/oauth2/token', [
+    'form_params' => $params
+]);
+$accessTokenResponse = json_decode($response->getBody(), true);
 
-$decodedResponse = json_decode($accessTokenResponse);
-echo "accessTokenResponse:\n"; 
-var_dump($decodedResponse);
-
-
-echo "this is access token: " . $decodedResponse->access_token . "\n";
-
-// $profileResponse = $client->request('GET', '', [
-//     'headers' => array('Authorization' => 'Bearer ' . $accessToken['access_token'])
-// ]);
-
-$url = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
-$url = 'https://www.googleapis.com/auth/plus.profile.emails.read';
-
-// $params = [
-//     'headers' => ['Authorization ' => 'Bearer ' .  "$decodedResponse->access_token"]
-// ];
-
-$params = [
-    'headers' => array('Authorization' => 'Bearer ' . "$decodedResponse->access_token")
-];
+//THIS IS WHAT IS STORED IN THE $accessTokenResponse
+// from: https://developers.google.com/identity/protocols/OpenIDConnect
+//access_token	A token that can be sent to a Google API.
+//id_token	A JWT that contains identity information about the user that is digitally signed by Google.
+//expires_in	The remaining lifetime of the access token.
+//token_type	Identifies the type of token returned. At this time, this field always has the value Bearer.
+//refresh_token (optional)	This field is only present if access_type=offline is included in the authentication request. For details, see Refresh tokens.
 
 
-echo "params:\n";
-var_dump($params);
+echo "this is access token response: \n";
+var_dump($accessTokenResponse);
 
-$ch1 = curl_init( $url );
-curl_setopt( $ch1, CURLOPT_HTTPGET, 1);
-curl_setopt( $ch1, CURLOPT_POSTFIELDS, 0);
-curl_setopt( $ch1, CURLOPT_FOLLOWLOCATION, 1);
-curl_setopt( $ch1, CURLOPT_HEADER, 1);
-curl_setopt( $ch1, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt( $ch1, CURLOPT_HTTPHEADER, $params);
+$accessToken = $accessTokenResponse['access_token'];
+$idToken = $accessTokenResponse['id_token'];
+$expiresIn = $accessTokenResponse['expires_in'];
+$tokenType = $accessTokenResponse['token_type'];
 
-$profileResponse = curl_exec( $ch1 );
-echo "this is the profile Response:\n";
-var_dump($profileResponse);
-$decodedProfileResponse = json_decode($profileResponse);
+echo "this is the idToken which is the JWT:$idToken\n";
+echo "this is the googleSecret:$googleSecret\n";
 
-echo "decodedProfileResponse:\n";
-var_dump($decodedProfileResponse);
+//
+//$gSecretDecode = base64_decode($googleSecret);
+//
+//$decoded = JWT::decode( $idToken, base64_decode(strtr($googleSecret, '-_', '+/')) );
+//var_dump($decoded);
 
 
+//THIS WORKS... in that it decodes the JWT from Google which has the eMail... BUT it doesnt do the straight decode using the secret key
+$tks = explode('.', $idToken);
+list($headb64, $bodyb64, $cryptob64) = $tks;
 
-$opts = array(
-  'http'=>array(
-    'method'=>"GET",
-    'header'=> array('Authorization' => 'Bearer ' . "$decodedResponse->access_token")
-));
+$header = JWT::jsonDecode(JWT::urlsafeB64Decode($headb64));
+$body = JWT::jsonDecode(JWT::urlsafeB64Decode($bodyb64));
+var_dump($header);
+print "done dumping header";
+var_dump($body);
+print "done dumping body";
+var_dump($cryptob64);
+print "done dumping Crypto";
 
-$context = stream_context_create($opts);
+////This didnt work... got JWT errors
+//// Get public keys from URL as an array
+//$publicKeyURL = 'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com';
+//$key = json_decode(file_get_contents($publicKeyURL), true);
+//var_dump($key);
 
-// Open the file using the HTTP headers set above
-$file = file_get_contents($url, false, $context);
+//$decoded = JWT::decode($idToken, $key, array('RS256'));
 
-var_dump($file);
+////$key = "example_key";
+//$token = array(
+//    "iss" => "http://example.org",
+//    "aud" => "http://example.com",
+//    "iat" => 1356999524,
+//    "nbf" => 1357000000
+//);
+//
+///**
+// * IMPORTANT:
+// * You must specify supported algorithms for your application. See
+// * https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
+// * for a list of spec-compliant algorithms.
+// */
+//$jwt = JWT::encode($token, $googleSecret);
+//$decoded = JWT::decode($jwt, $googleSecret, array('HS256'));
+//print_r($decoded);
 
-
-
-
-
+// from: https://stackoverflow.com/questions/15104682/how-to-get-user-email-with-google-access-token
+$url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=" . $accessToken;
+$profileResponse = $client->request('GET',$url);
+$profile = json_decode($profileResponse->getBody(), true);
+echo "this is profile:\n ";
+var_dump($profile);
 
 ?>

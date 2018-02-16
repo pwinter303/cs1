@@ -538,6 +538,7 @@ module.exports = function (grunt) {
         'concat',
         'uglify',
         'copy:dist',
+        'copy:PHPVendorFiles',
         'copy:otherfiles',
         'postcss',
         'cssmin',

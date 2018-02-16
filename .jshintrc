@@ -15,6 +15,7 @@
   "globals": {
     "angular": false,
       "$": false,
-      "google": false
+      "google": false,
+      "toastr": false
   }
 }

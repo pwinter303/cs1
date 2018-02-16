@@ -19,7 +19,7 @@ body {
 
 /* Custom page header */
 .header {
-  border-bottom: 1px solid #e5e5e5;
+  /*border-bottom: 1px solid #e5e5e5;*/
   margin-bottom: 10px;
 }
 /* Make the masthead heading the same height as the navigation */
@@ -120,4 +120,28 @@ div.panel-heading.enabled > div.panel-title.pull-right{
 @keyframes progress-indeterminate {
     from { left: -25%; width: 25%; }
     to { left: 100%; width: 25%;}
+}
+
+.signup-or-separator {
+    position: relative;
+    height: 34px;
+    text-align: center;
+    background: none;
+}
+
+.signup-or-separator hr {
+    width: 90%;
+    margin: -16px auto 10px auto;
+    border-top: 1px solid #dce0e0;
+}
+
+.signup-or-separator .text {
+    display: inline-block;
+    padding: 8px;
+    margin: 0;
+    background-color: #fff;
+}
+
+.navbar {
+    background-color: #2db2ea;
 }

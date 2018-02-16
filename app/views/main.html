@@ -1,18 +1,49 @@
-<div class="jumbotron">
+<div class="container">
+    <div class="row">
+        <div class="center-form panel">
+            <div class="panel-body">
+                <h2 class="text-center">Log in</h2>
+                <form method="post" ng-submit="login()" name="loginForm">
+                    <div class="form-group has-feedback">
+                        <input class="form-control input-lg" type="text" name="email" ng-model="user.email" placeholder="Email" required autofocus>
+                        <span class="ion-at form-control-feedback"></span>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <input class="form-control input-lg" type="password" name="password" ng-model="user.password" placeholder="Password" required>
+                        <span class="ion-key form-control-feedback"></span>
+                    </div>
+                    <button type="submit" ng-disabled="loginForm.$invalid" class="btn btn-lg  btn-block btn-success">Log in</button>
+                    <br/>
+                    <p class="text-center text-muted">
+                        <small>Don't have an account yet? <a href="/#/signup">Sign up</a></small>
+                    </p>
+                    <div class="signup-or-separator">
+                        <h6 class="text">or</h6>
+                        <hr>
+                    </div>
+                </form>
 
+                <a class="btn btn-block btn-social btn-facebook" ng-click="authenticate('facebook')">
+                    <span class="fa fa-facebook"></span> Sign in with Facebook
+                </a>
 
+                <a class="btn btn-block btn-social btn-google" ng-click="authenticate('google')">
+                    <span class="fa fa-google-plus "></span> Sign in with Google
+                </a>
 
-    <button ng-click="authenticate('facebook')">Sign in with Facebook</button>
-    <button ng-click="authenticate('google')">Sign in with Google</button>
+                <a class="btn btn-block  btn-social btn-instagram" ng-click="authenticate('instagram')">
+                    <span class="fa fa-instagram "></span> Sign in with Instagram
+                </a>
 
-    <button ng-click="authenticate('linkedin')">Sign in with LinkedIn</button>
-    <button ng-click="authenticate('instagram')">Sign in with Instagram</button>
-    <button ng-click="authenticate('twitter')">Sign in with Twitter</button>
+                <a class="btn btn-block btn-social btn-twitter" ng-click="authenticate('twitter')">
+                    <span class="fa fa-twitter"></span> Sign in with Twitter
+                </a>
 
-    <button ng-click="authenticate('yahoo')">Sign in with Yahoo</button>
-
-
-    <button ng-click="logout()">Log Me Out</button>
-    <button ng-click="checkLoggedIn()">Check Login Status</button>
-
+                <a class="btn btn-block btn-social btn-yahoo" ng-click="authenticate('yahoo')">
+                    <i class="ion-social-yahoo"></i> Sign in with Yahoo
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+

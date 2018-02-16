@@ -1,148 +1,164 @@
 <!doctype html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
 
     <!-- PLW Place CDNs Here -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-social/5.1.1/bootstrap-social.min.css" />
+    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
     <!-- (app) causes the cssmin task in grunt to read the files from app/bower etc-->
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(app) styles/vendor.css -->
     <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/toastr/toastr.css" />
     <link rel="stylesheet" href="bower_components/ng-dialog/css/ngDialog.css" />
     <link rel="stylesheet" href="bower_components/ng-dialog/css/ngDialog-theme-default.css" />
-
-    <!-- Odometer includes -->
-    <link rel="stylesheet" href="bower_components/ng-dialog/css/ngDialog.min.css" />
-    <link rel="stylesheet" href="bower_components/ng-dialog/css/ngDialog-theme-default.min.css" />
-
-    <!-- ngDialog includes -->
-    <link rel="stylesheet" href="bower_components/odometer/themes/odometer-theme-default.css" />
+    <link rel="stylesheet" href="bower_components/odometer/themes/odometer-theme-minimal.css" />
 
     <!-- endbower -->
     <!-- endbuild -->
 
 
-      <!-- build:css(app) styles/main.css -->
+    <!-- build:css(app) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
-  </head>
-  <body ng-app="collegeApp">
-    <!--[if lte IE 8]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
+</head>
+<body ng-app="collegeApp">
+<!--[if lte IE 8]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
 
-    <!-- Add your site or application content here -->
-    <div class="header">
-      <div class="navbar navbar-default" role="navigation">
+<!-- Add your site or application content here -->
+<div class="header">
+    <div class="navbar navbar-default" role="navigation">
         <div class="container">
-          <div class="navbar-header">
+            <div class="navbar-header">
 
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
 
-            <a class="navbar-brand" href="#/">Find Me A College</a>
-          </div>
+                <a class="navbar-brand" href="#/">Find Me A College</a>
+            </div>
 
-          <div ng-controller="NavCtrl" class="collapse navbar-collapse" id="js-navbar-collapse">
+            <div ng-controller="NavCtrl" class="collapse navbar-collapse" id="js-navbar-collapse">
 
-            <ul class="nav navbar-nav">
-              <li data-ng-class="{active: isActive('/home')}"><a href="#/">Home</a></li>
-              <li data-ng-class="{active: isActive('/criteria')}"><a href="#/criteria">My Criteria</a></li>
-              <li data-ng-class="{active: isActive('/collegelist')}"><a href="#/collegelist">List of Colleges</a></li>
-              <li data-ng-class="{active: isActive('/plantrip')}"><a href="#/plantrip">Plan A Trip</a></li>
-              <li data-ng-class="{active: isActive('/about')}"><a ng-href="#/about">About</a></li>
-              <li data-ng-class="{active: isActive('/contact')}"><a ng-href="#/contact">Contact</a></li>
-            </ul>
-          </div>
+                <ul class="nav navbar-nav">
+                    <li data-ng-class="{active: isActive('/home')}"><a href="#/">Home</a></li>
+                    <li data-ng-class="{active: isActive('/criteria')}"><a href="#/criteria">My Criteria</a></li>
+                    <li data-ng-class="{active: isActive('/collegelist')}"><a href="#/collegelist">List of Colleges</a></li>
+                    <li data-ng-class="{active: isActive('/plantrip')}"><a href="#/plantrip">Plan A Trip</a></li>
+                    <li data-ng-class="{active: isActive('/about')}"><a ng-href="#/about">About</a></li>
+                    <li data-ng-class="{active: isActive('/contact')}"><a ng-href="#/contact">Contact</a></li>
+                </ul>
+            </div>
         </div>
-      </div>
     </div>
+</div>
 
-    <!--PLW Changed to fluid so the content goes full width-->
-    <!--<div class="container">-->
-    <div class="container-fluid">
+<!--PLW Changed to fluid so the content goes full width-->
+<!--<div class="container">-->
+<div class="container-fluid">
     <div ng-view=""></div>
-    </div>
+</div>
 
-    <div class="footer">
-      <div class="container">
+<div class="footer">
+    <div class="container">
         <p><span class="glyphicon glyphicon-heart"></span> Created by: Paul Winter</p>
-      </div>
     </div>
+</div>
 
 
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
-     <script>
-       !function(A,n,g,u,l,a,r){A.GoogleAnalyticsObject=l,A[l]=A[l]||function(){
-       (A[l].q=A[l].q||[]).push(arguments)},A[l].l=+new Date,a=n.createElement(g),
-       r=n.getElementsByTagName(g)[0],a.src=u,r.parentNode.insertBefore(a,r)
-       }(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+<!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+<script>
+    !function(A,n,g,u,l,a,r){A.GoogleAnalyticsObject=l,A[l]=A[l]||function(){
+        (A[l].q=A[l].q||[]).push(arguments)},A[l].l=+new Date,a=n.createElement(g),
+            r=n.getElementsByTagName(g)[0],a.src=u,r.parentNode.insertBefore(a,r)
+    }(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-       ga('create', 'UA-XXXXX-X');
-       ga('send', 'pageview');
-    </script>
+    ga('create', 'UA-XXXXX-X');
+    ga('send', 'pageview');
+</script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-resource.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-route.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-sanitize.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-resource.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-route.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-sanitize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap.min.js"></script>
 
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-sanitize.min.js"></script>-->
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
-    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+<!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-sanitize.min.js"></script>-->
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
+<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 
-    <!--<script src="bower_components/angular/angular.js"></script>-->
-    <!--<script src="bower_components/angular-resource/angular-resource.js"></script>-->
-    <!--<script src="bower_components/angular-route/angular-route.js"></script>-->
-    <!--<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>-->
-    <!--<script src="bower_components/jquery/jquery.js"></script>-->
-    <!--<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>-->
+<!--<script src="bower_components/angular/angular.js"></script>-->
+<!--<script src="bower_components/angular-resource/angular-resource.js"></script>-->
+<!--<script src="bower_components/angular-route/angular-route.js"></script>-->
+<!--<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>-->
+<!--<script src="bower_components/jquery/jquery.js"></script>-->
+<!--<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>-->
 
-    <!--<script src="bower_components/angular-bootstrap/dist/ui-bootstrap.js"></script>-->
+<!--<script src="bower_components/angular-bootstrap/dist/ui-bootstrap.js"></script>-->
 
 
-    <!-- Replacing: NOTE (.) with ({.tmp,app}) causes usemin to pull from .tmp and app directories and will build a full vendor file ...-->
-    <!-- items below will ve turned into vendor.js file.. put CDN items above  ...-->
+<!-- Replacing: NOTE (.) with ({.tmp,app}) causes usemin to pull from .tmp and app directories and will build a full vendor file ...-->
+<!-- items below will ve turned into vendor.js file.. put CDN items above  ...-->
 
-    <!--BUILD.... SCRIPTS...-->
-    <!-- build:js({.tmp,app}) scripts/vendor.js -->
-    <!-- bower:js -->
-    <script src="bower_components/toastr/toastr.js"></script>
-    <script src="bower_components/underscore/underscore.js"></script>
-    <script src="bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
-    <script src="bower_components/lodash/lodash.js"></script>
-    <script src="bower_components/angular-google-maps/dist/angular-google-maps.js"></script>
-    <script src="bower_components/odometer/odometer.js"></script>
-    <script src="bower_components/angular-odometer/dist/angular-odometer.js"></script>
-    <script src="bower_components/ng-dialog/js/ngDialog.js"></script>
-    <script src="bower_components/angular-smart-table/dist/smart-table.js"></script>
-    <script src="bower_components/satellizer/dist/satellizer.js"></script>
-    <!-- endbower -->
-    <!-- endbuild -->
+<!--BUILD.... SCRIPTS...-->
+<!-- build:js({.tmp,app}) scripts/vendor.js -->
+<!-- bower:js -->
+<!--THIS WAS CAUSING ERRORS... BECAUSE ANGULAR IS ALREADY LOADED VIA CDN ABOVE -->
+<!--<script src="bower_components/angular/angular.js"></script>-->
+<script src="bower_components/jquery/jquery.js"></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="bower_components/angular-resource/angular-resource.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/toastr/toastr.js"></script>
+<script src="bower_components/underscore/underscore.js"></script>
+<script src="bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
+<script src="bower_components/lodash/lodash.js"></script>
+<script src="bower_components/markerclustererplus/src/markerclusterer.js"></script>
+<script src="bower_components/odometer/odometer.js"></script>
+<script src="bower_components/angular-odometer/dist/angular-odometer.js"></script>
+<script src="bower_components/ng-dialog/js/ngDialog.js"></script>
+<script src="bower_components/angular-smart-table/dist/smart-table.js"></script>
+<script src="bower_components/satellizer/dist/satellizer.js"></script>
 
-    <!-- build:js({.tmp,app}) scripts/scripts.js -->
-    <script src="scripts/app.js"></script>
-    <script src="scripts/services/collegefactory.js"></script>
-    <script src="scripts/controllers/nav.js"></script>
-    <script src="scripts/controllers/main.js"></script>
-    <script src="scripts/controllers/about.js"></script>
-    <script src="scripts/controllers/criteria.js"></script>
-    <script src="scripts/controllers/collegelist.js"></script>
-    <script src="scripts/controllers/plantrip.js"></script>
-    <!-- endbuild -->
+<script src="bower_components/angular-google-maps/dist/angular-google-maps.js"></script>
 
-  </body>
+<!--THESE ERROR OUT WITH GOOGLE NOT DEFINED ERROR -->
+<!--<script src="bower_components/google-maps-utility-library-v3-markerwithlabel/dist/markerwithlabel.js"></script>-->
+<!--<script src="bower_components/google-maps-utility-library-v3-infobox/dist/infobox.js"></script>-->
+<!--<script src="bower_components/google-maps-utility-library-v3-keydragzoom/dist/keydragzoom.js"></script>-->
+<!--<script src="bower_components/js-rich-marker/src/richmarker.js"></script>-->
+<!-- endbower -->
+<!-- endbuild -->
+
+<!-- build:js({.tmp,app}) scripts/scripts.js -->
+<script src="scripts/app.js"></script>
+<script src="scripts/services/collegefactory.js"></script>
+<script src="scripts/controllers/nav.js"></script>
+<script src="scripts/controllers/main.js"></script>
+<script src="scripts/controllers/about.js"></script>
+<script src="scripts/controllers/criteria.js"></script>
+<script src="scripts/controllers/collegelist.js"></script>
+<script src="scripts/controllers/plantrip.js"></script>
+<!-- endbuild -->
+
+
+
+
+
+</body>
 </html>

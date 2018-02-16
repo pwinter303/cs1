@@ -117,27 +117,21 @@ angular
     });
 //
 
-//        $authProvider.baseUrl = '#/';
-//        $authProvider.loginUrl = '/auth/login';
+    $authProvider.google({
+        url: 'cs1/app/auth/google.php',
+        authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
+//        redirectUri: window.location.origin + '/cs1/app/auth/spinner.html',
+        redirectUri: window.location.origin,
+        requiredUrlParams: ['scope'],
+        optionalUrlParams: ['display'],
+        scope: ['profile', 'email'],
+        scopePrefix: 'openid',
+        scopeDelimiter: ' ',
+        display: 'popup',
+        oauthType: '2.0',
+        popupOptions: { width: 452, height: 633 }
+    });
 
-        $authProvider.google({
-            url: '/cs1/app/auth/google.php',
-            scope: ['profile', 'email']
-        });
 
-//        $authProvider.google({
-//            url: '/cs1/app/auth/google.php',
-////            url: '#/about'
-//////            authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
-//////            redirectUri: window.location.origin,
-//////            requiredUrlParams: ['scope'],
-//////            optionalUrlParams: ['display'],
-////            scope: ['profile', 'email'],
-//            scope: ['email']
-//////            scopePrefix: 'openid',
-//////            scopeDelimiter: ' ',
-//////            display: 'popup',
-//////            oauthType: '2.0',
-//////            popupOptions: { width: 452, height: 633 }
-//        });
+
 });

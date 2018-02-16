@@ -420,6 +420,12 @@ module.exports = function (grunt) {
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
             },
+            PHPVendorFiles: {
+                expand: true,
+                cwd: '<%= yeoman.app %>',
+                src: 'vendor/*',
+                dest: '<%= yeoman.dist %>'
+            },
             otherfiles: {
                 expand: true,
                 cwd: '<%= yeoman.app %>',
@@ -544,10 +550,7 @@ module.exports = function (grunt) {
 
     // simple build task
     grunt.registerTask('PLW-Testing', [
-        'clean:dist',
-        'clean:server',
-        'htmlmin',
-        'usemin'
+        'copy:PHPVendorFiles'
     ]);
 
 

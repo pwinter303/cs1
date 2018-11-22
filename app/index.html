@@ -54,11 +54,11 @@
 
                 <ul class="nav navbar-nav">
                     <li data-ng-class="{active: isActive('/home')}"><a href="#/">Home</a></li>
-                    <li data-ng-class="{active: isActive('/criteria')}"><a href="#/criteria">My Criteria</a></li>
-                    <li data-ng-class="{active: isActive('/collegelist')}"><a href="#/collegelist">List of Colleges</a></li>
-                    <li data-ng-class="{active: isActive('/plantrip')}"><a href="#/plantrip">Plan A Trip</a></li>
-                    <li data-ng-class="{active: isActive('/about')}"><a ng-href="#/about">About</a></li>
-                    <li data-ng-class="{active: isActive('/contact')}"><a ng-href="#/contact">Contact</a></li>
+                    <li data-ng-class="{active: isActive('/criteria')}"><a href="#!/criteria">My Criteria</a></li>
+                    <li data-ng-class="{active: isActive('/collegelist')}"><a href="#!/collegelist">List of Colleges</a></li>
+                    <li data-ng-class="{active: isActive('/plantrip')}"><a href="#!/plantrip">Plan A Trip</a></li>
+                    <li data-ng-class="{active: isActive('/about')}"><a ng-href="#!/about">About</a></li>
+                    <li data-ng-class="{active: isActive('/contact')}"><a ng-href="#!/contact">Contact</a></li>
                 </ul>
             </div>
         </div>
@@ -89,14 +89,13 @@
     ga('send', 'pageview');
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-resource.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-route.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-sanitize.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap.min.js"></script>
-
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-resource.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-route.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-sanitize.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap.min.js"></script>-->
 
 
 <!--BUILD.... SCRIPTS...-->
@@ -104,6 +103,8 @@
 <!-- bower:js -->
 <script src="bower_components/jquery/jquery.js"></script>
 <!--<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>-->
+
+<script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/angular-resource/angular-resource.js"></script>
 <script src="bower_components/angular-route/angular-route.js"></script>
 <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
@@ -127,6 +128,11 @@
 <!--<script src="bower_components/js-rich-marker/src/richmarker.js"></script>-->
 <!-- endbower -->
 <!-- endbuild -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+
 
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
 <script src="scripts/app.js"></script>

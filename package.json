@@ -47,10 +47,12 @@
     "time-grunt": "^1.4.0"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=0.10.0",
+    "yarn": ">= 1.0.0"
   },
   "scripts": {
-    "test": "karma start test/karma.conf.js"
+    "test": "karma start test/karma.conf.js",
+    "postinstall": "node -e \"try { require('fs').symlinkSync(require('path').resolve('node_modules/@bower_components'), 'app/bower_components', 'junction') } catch (e) { }\""
   },
   "description": "This project is generated with [yo angular generator](https://github.com/yeoman/generator-angular)\r version 0.15.1.",
   "main": "Gruntfile.js",
@@ -58,7 +60,29 @@
     "test": "test"
   },
   "dependencies": {
-    "angular-ui-bootstrap": "^2.3.0"
+    "angular-ui-bootstrap": "^2.3.0",
+    "@bower_components/angular": "angular/bower-angular#1.7.5",
+    "@bower_components/angular-google-maps": "angular-ui/angular-google-maps#~2.3.2",
+    "@bower_components/angular-mocks": "angular/bower-angular-mocks#^1.4.0",
+    "@bower_components/angular-odometer": "bahaaldine/angular-odometer#~0.0.10",
+    "@bower_components/angular-resource": "angular/bower-angular-resource#^1.4.0",
+    "@bower_components/angular-route": "angular/bower-angular-route#^1.4.0",
+    "@bower_components/angular-sanitize": "angular/bower-angular-sanitize#^1.4.0",
+    "@bower_components/angular-simple-logger": "nmccready/angular-simple-logger#>=0.0.1",
+    "@bower_components/angular-smart-table": "lorenzofox3/Smart-Table#^2.1.8",
+    "@bower_components/bootstrap": "twbs/bootstrap#^3.2.0",
+    "@bower_components/google-maps-utility-library-v3-infobox": "nmccready/google-maps-utility-library-v3-infobox#^1.1.14",
+    "@bower_components/google-maps-utility-library-v3-keydragzoom": "nmccready/google-maps-utility-library-v3-keydragzoom#^2.0.9",
+    "@bower_components/google-maps-utility-library-v3-markerwithlabel": "git://github.com/nmccready/google-maps-utility-library-v3-markerwithlabel.git#*",
+    "@bower_components/jquery": "jquery/jquery-dist#~1.10.2",
+    "@bower_components/js-rich-marker": "ashsidhu/js-rich-marker#*",
+    "@bower_components/lodash": "lodash/lodash#3.X - 4.X",
+    "@bower_components/markerclustererplus": "mahnunchik/markerclustererplus#^2.1.4",
+    "@bower_components/ng-dialog": "likeastore/ngDialog#~0.6.0",
+    "@bower_components/odometer": "HubSpot/odometer#0.4.x",
+    "@bower_components/satellizer": "sahat/satellizer#^0.15.5",
+    "@bower_components/toastr": "johnpapa/toastr-bower#~2.1.2",
+    "@bower_components/underscore": "jashkenas/underscore#~1.8.3"
   },
   "repository": {
     "type": "git",

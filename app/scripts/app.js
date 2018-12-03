@@ -45,6 +45,11 @@ angular
         controller: 'PlantripCtrl',
         controllerAs: 'plantrip'
       })
+      .when('/searchCollege', {
+        templateUrl: 'views/searchcollege.html',
+        controller: 'SearchcollegeCtrl',
+        controllerAs: 'searchCollege'
+      })
       .otherwise({
         redirectTo: '/'
       });

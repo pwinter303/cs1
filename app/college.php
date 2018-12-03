@@ -114,6 +114,7 @@ function  processPost($customer_id){
 //    $request = convertFromBoolean($request);
     $dbh = createDatabaseConnection();
     $action = $request->action;
+//    var_dump($request);
 
     switch ($action) {
        case 'saveCriteria':
@@ -148,6 +149,10 @@ function  processPost($customer_id){
       #### did this as a POST to easily pass extra information
       case 'getCollegesOnRoute':
              $result = getCollegesOnRoute($dbh,$request,$customer_id);
+             break;
+      #### did this as a POST to easily pass extra information
+       case 'searchForColleges':
+             $result = searchForColleges($dbh,$request,$customer_id);
              break;
        default:
              echo "Error:Invalid Request:Action not set properly";
@@ -261,6 +266,17 @@ function  getTrips($dbh, $customer_id){
     $data = execSqlMultiRowPREPARED($dbh, $query);
     return $data;
 }
+
+
+
+function searchForColleges($dbh,$request_data,$customer_id=0){
+  //$searchString = $request_data->searchString;
+  echo "wow";
+  var_dump($request_data);
+//  die;
+}
+
+
 
 function getTripDetails($dbh,$request_data,$customer_id){
   $tripID = $request_data->tripID;

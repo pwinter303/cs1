@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+
+//echo "at the VERY start of college.php..... <br>";
+
 include 'db.php';
 include 'googleMapFunctions.php';
 //include 'functions.php';
@@ -14,8 +17,15 @@ include 'googleMapFunctions.php';
 //PLW Added 2016-04-06
 date_default_timezone_set('America/New_York');
 
+//echo "at the very start of college.php..... <br>";
+
 //if(isset($_SESSION['authenticated'])){
+//    echo "AAAAAA calling process request..... <br>";
     $result = processRequest();
+
+
+
+
 //} else {
 //    ### must be logged in to use this...
 //    header('HTTP/1.1 401 Unauthorized');
@@ -37,6 +47,8 @@ function processRequest(){
 //    $customer_id = $_SESSION['customer_id'];
 //  }   else  {
 //     die ('invalid customer id'); // TODO: temp hack
+//echo "in processRequest..... <br>";
+
     $customer_id = 2;  // TODO: temp hack
     switch ($_SERVER['REQUEST_METHOD']) {
        case 'POST':
@@ -109,12 +121,27 @@ function  processGet($customer_id){
 }
 ####################  POSTs ################################
 function  processPost($customer_id){
+    //echo "BEGINNING OF PROCESS POST: <br>\n\n";
+
     $postdata = file_get_contents("php://input");
+
+    //echo "<br>This is postdata:<br>\n";
+    //var_dump($postdata);
+
     $request = json_decode($postdata);
-//    $request = convertFromBoolean($request);
+
+    //echo "<br>This is request after json_decode:<br>\n";
+    //var_dump($request);
+
     $dbh = createDatabaseConnection();
     $action = $request->action;
-//    var_dump($request);
+
+    //echo "<br>just about to go into switch case this is action:<br>\n";
+    //var_dump($action);
+
+    //echo "<br>just about to go into switch case this is request:<br>\n";
+    //var_dump($request);
+
 
     switch ($action) {
        case 'saveCriteria':
@@ -270,10 +297,56 @@ function  getTrips($dbh, $customer_id){
 
 
 function searchForColleges($dbh,$request_data,$customer_id=0){
-  //$searchString = $request_data->searchString;
-  echo "wow";
-  var_dump($request_data);
-//  die;
+
+    //echo "<br><br>in searchForColleges this is dbh--->" . var_dump($dbh) . "<br>";
+    //echo "<br><br>in searchForColleges this is request_data--->" . var_dump($request_data) . "<br>";
+
+
+    $searchString = $request_data->searchString;
+    //echo "<br>now... this is searchString:\n";
+    //var_dump($searchString);
+
+
+    //wrap paramater in percentage signs.. since doing a like
+    $params = array('%' . $searchString . '%');
+
+    $where=  "and instnm like  ? ";
+    $query = "select instnm as name,
+                institutions.unitid as schoolID,
+                locale_decode as locale,
+                latitude as lat,
+                longitude as lng,
+                CONCAT(city,',', stabbr) as location,
+                webaddr as url,
+                CASE
+                   WHEN ADMSSN = 0 THEN 'N/A'
+                   ELSE concat(round(ADMSSN/APPLCN*100),'%')
+                END AS acpt_rate,
+                SATVR25 + SATMT25 as sat_avg_rng_low,
+                SATVR75 + SATMT75 as sat_avg_rng_high,
+                instsize_decode as school_size
+      from institutions, decode_instsize, decode_locale, admissions_info
+      where
+        institutions.instsize = decode_instsize.instsize and
+        admissions_info.unitid = institutions.unitid and
+        institutions.locale = decode_locale.locale
+        $where  order by name
+      ";
+
+
+
+
+
+
+    $types = 's';  ## pass
+    //echo "getting ready to call execSqlMultiRowPREPARED<br>";
+    //echo "this is query:$query\n";
+    //echo "this is types:$types\n";
+    //echo "this is params:";
+    //var_dump($params);
+
+    $data = execSqlMultiRowPREPARED($dbh, $query, $types, $params);
+    return $data;
 }
 
 

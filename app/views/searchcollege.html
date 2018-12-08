@@ -14,4 +14,66 @@
           </div>
     </form>
   </div>
+
+    <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">My Colleges</div>
+        <div class="panel-body">
+          <!-- Table -->
+          <table st-table="displayedColleges" st-safe-src="colleges" class="table table-striped">
+            <thead>
+            <tr>
+              <th colspan="3">
+                <input st-search placeholder="search" class="input-sm form-control" type="search"/>
+              </th>
+              <th colspan="7">
+              </th>
+            </tr>
+            <tr>
+              <th></th>
+              <th st-sort="name">College Name</th>
+              <th st-sort="acpt_rate">Admission Info</th>
+              <th st-sort="distance">Miles from Home</th>
+              <th st-sort="location">Location</th>
+              <th st-sort="locale">Locale</th>
+              <th st-sort="school_size">Students</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="college in displayedColleges">
+              <td>
+                <span data-ng-show="college.favorite" class="glyphicon glyphicon-star"  ng-click="addToFavorites(college)"></span>
+                <span data-ng-hide="college.favorite" class="glyphicon glyphicon-star-empty"  ng-click="addToFavorites(college)"></span>
+              </td>
+              <td>
+                <a href="http://{{college.url}}">{{college.name}}</a>
+                <span class="glyphicon glyphicon-camera"  ng-click="getPics(college)"></span>
+                <!--<span class="glyphicon glyphicon-camera"  ng-click="clickToOpen()"></span>-->
+              </td>
+              <td>AccptRate: {{college.acpt_rate}}<br>AvgSAT: {{college.sat_avg_rng_low}} - {{college.sat_avg_rng_high}}</td>
+              <td>{{college.distance}}</td>
+              <td>{{college.location}}</td>
+              <td>{{college.locale}}</td>
+              <td>{{college.school_size}}</td>
+              <td><span class="glyphicon glyphicon-trash" ng-click="trashIt(college)">
+                                  </span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--PICTURE OUTPUT - TEMP HACK FIXME -->
+  <div id="output1"></div>
+  </div>
+
+
 </div>
+
+
+
+

@@ -66,40 +66,6 @@ angular.module('collegeApp')
       });
     };
     ////=============================================================================///
-    dataFactory.searchColleges = function(passedData) {
-      var url = 'college.php';
-      passedData.action = 'searchForColleges';
-      var promise = $http.post(url , passedData);
-      return promise.then(function(result) {
-        if (typeof result.data === 'object') {
-          return result.data;
-        } else {
-          // call was successful but response was invalid (result was not an object)
-          return $q.reject(result.data);
-        }
-      }, function(result) {
-        // something went wrong.... error on the call..
-        return $q.reject(result.data);
-      });
-    };
-    ////=============================================================================///
-    dataFactory.evaluateCollege = function(passedData) {
-      var url = 'college.php';
-      passedData.action = 'evaluateSchoolVersusCriteria';
-      var promise = $http.post(url , passedData);
-      return promise.then(function(result) {
-        if (typeof result.data === 'object') {
-          return result.data;
-        } else {
-          // call was successful but response was invalid (result was not an object)
-          return $q.reject(result.data);
-        }
-      }, function(result) {
-        // something went wrong.... error on the call..
-        return $q.reject(result.data);
-      });
-    };
-    ////=============================================================================///
     dataFactory.saveCriteria = function(passedData) {
       var url = 'college.php';
       passedData.action = 'saveCriteria';

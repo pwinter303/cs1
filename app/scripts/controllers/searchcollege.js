@@ -12,8 +12,12 @@ angular.module('collegeApp')
 
     $scope.searchIt = function(searchString){
       var passedData = {};
+      var url = 'college.php';
+      passedData.action = 'searchForColleges';
       passedData.searchString = searchString;
-      collegeFactory.searchColleges(passedData).then(function (data) {
+      if (searchString.length < 3) {collegeFactory.msgError('Please enter at least 3 characters'); return;}
+
+      collegeFactory.getDataUsingPost(url, passedData).then(function (data) {
         if (data){
           $scope.colleges = data;
         }
@@ -25,8 +29,10 @@ angular.module('collegeApp')
 
     $scope.evaluateCollege = function(schoolID){
       var passedData = {};
+      var url = 'college.php';
+      passedData.action = 'evaluateSchoolVersusCriteria';
       passedData.schoolID = schoolID;
-      collegeFactory.evaluateCollege(passedData).then(function (data) {
+      collegeFactory.getDataUsingPost(url, passedData).then(function (data) {
         if (data){
           $scope.evaluation = data;
         }

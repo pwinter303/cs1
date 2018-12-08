@@ -13,7 +13,7 @@ angular.module('collegeApp')
     $scope.getColleges = function (){
       var url = 'college.php';
       var action = 'getColleges';
-      collegeFactory.getData(url, action).then(function (data) {
+      collegeFactory.getDataUsingPost(url, action).then(function (data) {
         if (data){
           $scope.colleges = data;
 //            $scope.rowCollection = data;

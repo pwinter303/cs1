@@ -50,6 +50,7 @@
                 <a href="http://{{college.url}}">{{college.name}}</a>
                 <span class="glyphicon glyphicon-camera"  ng-click="getPics(college)"></span>
                 <!--<span class="glyphicon glyphicon-camera"  ng-click="clickToOpen()"></span>-->
+                <span class="glyphicon glyphicon-leaf"  ng-click="evaluateCollege(college.schoolID)"></span>
               </td>
               <td>AccptRate: {{college.acpt_rate}}<br>AvgSAT: {{college.sat_avg_rng_low}} - {{college.sat_avg_rng_high}}</td>
               <td>{{college.distance}}</td>

@@ -181,6 +181,10 @@ function  processPost($customer_id){
        case 'searchForColleges':
              $result = searchForColleges($dbh,$request,$customer_id);
              break;
+      #### did this as a POST to easily pass extra information
+       case 'evaluateSchoolVersusCriteria':
+             $result = evaluateSchoolVersusCriteria($dbh,$request,$customer_id);
+             break;
        default:
              echo "Error:Invalid Request:Action not set properly";
              break;
@@ -523,127 +527,144 @@ function  createWhereClauseUsingCriteria($dbh, $customer_id){
 }
 
 
+function  createCriteriaArray($dbh, $customer_id){
+  ### this creates an hash of the criteria
+  $data = getCriteria($dbh, $customer_id);
+  $whereArr = array();
+  $distColsFinal = "";
+  $distHavingFinal = "";
+
+  foreach ($data as $criteria => $restOfArray){
+      ##var_dump($restOfArray);
+      if (1 == $restOfArray{'enabled'}){
+          list($criteria,$where, $distCols, $distHaving) = criteriaLogic($dbh, $criteria,$restOfArray);
+          $finalData{$criteria}= array($where, $distCols, $distHaving);
+      }
+  } ## end of foreach
+  return $finalData;
+}
+
 function criteriaLogic($dbh, $criteria, $restOfArray){
 
-       $where="";
-       $distCols="";
-       $distHaving="";
+     $where="";
+     $distCols="";
+     $distHaving="";
 
-      switch ($criteria) {
-         case 'yrsOfSchool':
-             $value = $restOfArray{'options'};
-             $where = " and institutions.ICLEVEL in ($value)";
-             break;
-         case 'runBy':
-             $value = $restOfArray{'options'};
-             $where = " and institutions.CONTROL in ($value)";
-             break;
-         case 'states':
-             ### special logic to wrap the values in quotes (since they are alpha numeric)
-             $value = $restOfArray{'options'};
-             $valueArr = explode(",", $value);
-             # Iterate through the array and convert items to strings and wrap with quotes
-             array_walk($valueArr, create_function('&$str', '$str = "\"$str\"";'));
-             #### Changed this since strings are already quoted... Dont need more quotes
-             ####$value = implode('", "', $valueArr);
-             $value = implode(',', $valueArr);
+    switch ($criteria) {
+       case 'yrsOfSchool':
+           $value = $restOfArray{'options'};
+           $where = " and institutions.ICLEVEL in ($value)";
+           break;
+       case 'runBy':
+           $value = $restOfArray{'options'};
+           $where = " and institutions.CONTROL in ($value)";
+           break;
+       case 'states':
+           ### special logic to wrap the values in quotes (since they are alpha numeric)
+           $value = $restOfArray{'options'};
+           $valueArr = explode(",", $value);
+           # Iterate through the array and convert items to strings and wrap with quotes
+           array_walk($valueArr, create_function('&$str', '$str = "\"$str\"";'));
+           #### Changed this since strings are already quoted... Dont need more quotes
+           ####$value = implode('", "', $valueArr);
+           $value = implode(',', $valueArr);
 
-             $where = " and institutions.STABBR in ($value)";
-             break;
-         case 'schoolSize':
-             $value = $restOfArray{'options'};
-             $where = " and institutions.instsize in ($value)";
-             break;
-         case 'testScore':
-              $typesOfSchools = $restOfArray{'options'};
-              $typesOfSchoolsArr = explode(",", $typesOfSchools);
+           $where = " and institutions.STABBR in ($value)";
+           break;
+       case 'schoolSize':
+           $value = $restOfArray{'options'};
+           $where = " and institutions.instsize in ($value)";
+           break;
+       case 'testScore':
+            $typesOfSchools = $restOfArray{'options'};
+            $typesOfSchoolsArr = explode(",", $typesOfSchools);
 
-              $sat = $restOfArray{'SAT'};
-              $act = $restOfArray{'ACT'};
+            $sat = $restOfArray{'SAT'};
+            $act = $restOfArray{'ACT'};
 
-              $tempWhereArr = array();
-              $where = "";
-              foreach($typesOfSchoolsArr as $value){
-                if ($value == 'match'){
-                  $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  ((SATVR25 + SATMT25) < $sat) and ((SATVR75 + SATMT75) > $sat) ) ) )";
-                  array_push($tempWhereArr, $where);
-                }
-                if ($value == 'reach'){
-                  $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where ( (SATVR25 + SATMT25) > $sat)  ) )";
-                  array_push($tempWhereArr, $where);
-                }
-                if ($value == 'safety'){
-                  $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  (SATVR75 + SATMT75) < $sat) and ((SATVR75 + SATMT75) > 0)  ) )";
-                  array_push($tempWhereArr, $where);
-                }
-                if ($value == 'notest'){
-                  $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  (SATVR75 + SATMT75) = 0)  ) )";
-                  array_push($tempWhereArr, $where);
-                }
+            $tempWhereArr = array();
+            $where = "";
+            foreach($typesOfSchoolsArr as $value){
+              if ($value == 'match'){
+                $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  ((SATVR25 + SATMT25) < $sat) and ((SATVR75 + SATMT75) > $sat) ) ) )";
+                array_push($tempWhereArr, $where);
               }
-              $where = "and (" . implode(" or ", $tempWhereArr) . ")";
-              #echo "finalWhere:$finalWhere\n";
-              break;
-         case 'schoolSetting':
-            $value = $restOfArray{'options'};
-            $where = " and institutions.locale in ($value)";
-            break;
-         case 'acptRate':
-             $min = $restOfArray{'min'};
-             $max = $restOfArray{'max'};
-             $where = " and (ADMSSN <> 0) and  (ADMSSN/APPLCN*100) between $min and $max";
-             break;
-         case 'home':
-            $zipCode = $restOfArray{'zipCode'};
-            $min = $restOfArray{'minDistanceAway'};
-            $max = $restOfArray{'maxDistanceAway'};
-            $data = getLatLngForZipCode($dbh, $zipCode);
-            $latitude = $data{'latitude'};
-            $longitude = $data{'longitude'};
-            $distCols = ",round((((acos(sin(($latitude*pi()/180)) * sin((`latitude`*pi()/180))+cos(($latitude*pi()/180))
-                             * cos((`latitude`*pi()/180)) * cos((($longitude- `longitude`)*pi()/180))))*180/pi())*60*1.1515))
-                             AS distance";
-            $distHaving = "having distance < $max and $min < distance ";
-            break;
-         case 'loc2':
-            $zipCode = $restOfArray{'zipCode'};
-            $min = $restOfArray{'minDistanceAway'};
-            $max = $restOfArray{'maxDistanceAway'};
-            $data = getLatLngForZipCode($dbh, $zipCode);
-            $latitude = $data{'latitude'};
-            $longitude = $data{'longitude'};
-            $distCols = ",round((((acos(sin(($latitude*pi()/180)) * sin((`latitude`*pi()/180))+cos(($latitude*pi()/180))
-                             * cos((`latitude`*pi()/180)) * cos((($longitude- `longitude`)*pi()/180))))*180/pi())*60*1.1515))
-                             AS distance2";
-            $distHaving = "having distance2 < $max and $min < distance2 ";
-            break;
-         case 'sports':
-            $sports = $restOfArray{'options'};
-            $divisions = $restOfArray{'divisions'};
-
-            $sportsArr = explode(",", $sports);
-            $divisionsArr = explode(",", $divisions);
-            $valueArr = array();
-            #var_dump($sportsArr);
-            #var_dump($divisionsArr);
-            foreach($sportsArr as $sport){
-              foreach ($divisionsArr as $division){
-                ###echo "wow:$sport wowee:$division\n";
-                $item = $sport . "-" . $division;
-                array_push($valueArr,$item);
+              if ($value == 'reach'){
+                $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where ( (SATVR25 + SATMT25) > $sat)  ) )";
+                array_push($tempWhereArr, $where);
+              }
+              if ($value == 'safety'){
+                $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  (SATVR75 + SATMT75) < $sat) and ((SATVR75 + SATMT75) > 0)  ) )";
+                array_push($tempWhereArr, $where);
+              }
+              if ($value == 'notest'){
+                $where = " ( institutions.unitid in (select distinct admissions_info.unitid from admissions_info where (  (SATVR75 + SATMT75) = 0)  ) )";
+                array_push($tempWhereArr, $where);
               }
             }
-
-            # Iterate through the array and convert items to strings and wrap with quotes
-            array_walk($valueArr, create_function('&$str', '$str = "\"$str\"";'));
-            #### Changed this since strings are already quoted... Dont need more quotes
-            ####$value = implode('", "', $valueArr);
-            $value = implode(',', $valueArr);
-            ###echo "this is value for sports $value\n";
-            $where = " and institutions.unitid in (select distinct sports.unitid from sports where CONCAT(sport_cd,'-',division) in ($value)) ";
-            ###echo "this is where: $where\n";
+            $where = "and (" . implode(" or ", $tempWhereArr) . ")";
+            #echo "finalWhere:$finalWhere\n";
             break;
-      } ### end of switch
+       case 'schoolSetting':
+          $value = $restOfArray{'options'};
+          $where = " and institutions.locale in ($value)";
+          break;
+       case 'acptRate':
+           $min = $restOfArray{'min'};
+           $max = $restOfArray{'max'};
+           $where = " and (ADMSSN <> 0) and  (ADMSSN/APPLCN*100) between $min and $max";
+           break;
+       case 'home':
+          $zipCode = $restOfArray{'zipCode'};
+          $min = $restOfArray{'minDistanceAway'};
+          $max = $restOfArray{'maxDistanceAway'};
+          $data = getLatLngForZipCode($dbh, $zipCode);
+          $latitude = $data{'latitude'};
+          $longitude = $data{'longitude'};
+          $distCols = ",round((((acos(sin(($latitude*pi()/180)) * sin((`latitude`*pi()/180))+cos(($latitude*pi()/180))
+                           * cos((`latitude`*pi()/180)) * cos((($longitude- `longitude`)*pi()/180))))*180/pi())*60*1.1515))
+                           AS distance";
+          $distHaving = "having distance < $max and $min < distance ";
+          break;
+       case 'loc2':
+          $zipCode = $restOfArray{'zipCode'};
+          $min = $restOfArray{'minDistanceAway'};
+          $max = $restOfArray{'maxDistanceAway'};
+          $data = getLatLngForZipCode($dbh, $zipCode);
+          $latitude = $data{'latitude'};
+          $longitude = $data{'longitude'};
+          $distCols = ",round((((acos(sin(($latitude*pi()/180)) * sin((`latitude`*pi()/180))+cos(($latitude*pi()/180))
+                           * cos((`latitude`*pi()/180)) * cos((($longitude- `longitude`)*pi()/180))))*180/pi())*60*1.1515))
+                           AS distance2";
+          $distHaving = "having distance2 < $max and $min < distance2 ";
+          break;
+       case 'sports':
+          $sports = $restOfArray{'options'};
+          $divisions = $restOfArray{'divisions'};
+
+          $sportsArr = explode(",", $sports);
+          $divisionsArr = explode(",", $divisions);
+          $valueArr = array();
+          #var_dump($sportsArr);
+          #var_dump($divisionsArr);
+          foreach($sportsArr as $sport){
+            foreach ($divisionsArr as $division){
+              ###echo "wow:$sport wowee:$division\n";
+              $item = $sport . "-" . $division;
+              array_push($valueArr,$item);
+            }
+          }
+
+          # Iterate through the array and convert items to strings and wrap with quotes
+          array_walk($valueArr, create_function('&$str', '$str = "\"$str\"";'));
+          #### Changed this since strings are already quoted... Dont need more quotes
+          ####$value = implode('", "', $valueArr);
+          $value = implode(',', $valueArr);
+          ###echo "this is value for sports $value\n";
+          $where = " and institutions.unitid in (select distinct sports.unitid from sports where CONCAT(sport_cd,'-',division) in ($value)) ";
+          ###echo "this is where: $where\n";
+          break;
+    } ### end of switch
 
   return array($criteria,$where,$distCols, $distHaving);
 
@@ -806,9 +827,10 @@ function  getCollegeCount($dbh, $customer_id){
   ) as count";
   #####echo "query:$query\n";
   $data = execSqlSingleRowPREPARED($dbh, $query);
-
   return $data;
 }
+
+
 function  getColleges($dbh, $customer_id){
   ####$data = getCollegeFunc($dbh, $customer_id);  #1 = return count
   $componentsArr = createWhereClauseUsingCriteria($dbh, $customer_id);
@@ -860,6 +882,42 @@ function  getDirectionsFROMFILE($dbh, $request_data){
 //      $dataResponse = json_decode($dataRouteJSON);
 //      return $dataResponse;
 //}
+
+
+
+
+
+
+
+function  evaluateSchoolVersusCriteria($dbh, $request_data, $customer_id){
+  $schoolId = $request_data->schoolID;
+
+  $criteriaArray = createCriteriaArray($dbh, $customer_id);
+  $where = "";
+  $distCols="";
+  $distHaving="";
+  $finalArr = array();
+  foreach ($criteriaArray as $criteria => $restOfArray){
+      list($where, $distCols, $distHaving)  = @$restOfArray;
+      #### ToDo: Execute SQL to see if school meets criteria
+      $where .= $distHaving;
+
+      ## ToDo: change this into a query that uses parameters so not passing raw data (schoolId into the SQL)
+
+      $query = "SELECT count(*) as count FROM (
+      select institutions.unitid $distCols from institutions, admissions_info
+      where institutions.unitid = '$schoolId' and institutions.unitid = admissions_info.unitid $where
+      ) as count";
+      $data = execSqlSingleRowPREPARED($dbh, $query);
+      ##echo "results:$criteria" . $data{'count'} . "\n";
+      $criteriaResult="Did Not Meet Criteria";
+      if (1 == $data{'count'}) {$criteriaResult="Met Criteria";}
+      $finalArr{$criteria} = $criteriaResult;
+  }
+
+  return $finalArr;
+}
+
 
 
 function  getDirectionsBest($dbh, $orig, $dest, $waypoints){

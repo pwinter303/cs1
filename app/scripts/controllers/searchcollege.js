@@ -23,4 +23,17 @@ angular.module('collegeApp')
       });
     };
 
+    $scope.evaluateCollege = function(schoolID){
+      var passedData = {};
+      passedData.schoolID = schoolID;
+      collegeFactory.evaluateCollege(passedData).then(function (data) {
+        if (data){
+          $scope.evaluation = data;
+        }
+      }, function(error) {
+        // promise rejected, could be because server returned 404, 500 error...
+        collegeFactory.msgError('Error Saving:' + error);
+      });
+    };
+
   }]);
